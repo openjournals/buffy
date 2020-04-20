@@ -15,6 +15,10 @@ class Buffy < Sinatra::Base
 
   config_file "config/settings.yml"
 
+  get '/' do
+    "Hi!"
+  end
+
   post '/dispatch' do
     responders.respond(@message, @context)
   end
