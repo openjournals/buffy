@@ -1,7 +1,2 @@
-editor_team_id: 2009411
-reviewers: https://bit.ly/joss-reviewers
-reviewers_signup: http://joss.theoj.org/reviewer-signup.html
-responders:
-  - AnnoyingResponder
-  - GoodbyeResponder
-  - WelcomeResponder
+bot_name: <%= ENV['BUFFY_BOT_NAME'] || 'botsci' %>
+github_user: <%= ENV['BUFFY_GH_USER'] || 'xuanxu' %>
