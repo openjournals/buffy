@@ -1,4 +1,4 @@
 $stdout.sync = true
 
-require './lib/buffy.rb'
+require './app/buffy.rb'
 run Buffy
