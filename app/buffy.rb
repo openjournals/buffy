@@ -6,7 +6,6 @@ class Buffy < Sinatra::Base
   include GithubWebhookParser
   register Sinatra::ConfigFile
 
-  set :gh_secret_token, nil
   config_file "../config/settings.yml"
 
   before '/dispatch' do
