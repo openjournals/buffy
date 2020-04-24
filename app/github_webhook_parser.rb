@@ -49,6 +49,4 @@ module GithubWebhookParser
     signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), secret_token, payload_body)
     return halt 403, "Signatures didn't match!" unless Rack::Utils.secure_compare(signature, gh_signature)
   end
-
 end
-

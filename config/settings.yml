@@ -1,1 +1,1 @@
-bot_github_user:  <%= ENV['BUFFY_BOT_GH_USER'] || botsci %>
+bot_github_user:  <%= ENV['BUFFY_BOT_GH_USER'] || 'botsci' %>
