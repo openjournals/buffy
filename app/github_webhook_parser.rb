@@ -2,7 +2,7 @@ require 'ostruct'
 require 'json'
 require 'openssl'
 
-module GithubWebhookParser
+module GitHubWebhookParser
 
   def parse_webhook
     begin
@@ -50,5 +50,3 @@ module GithubWebhookParser
     return halt 403, "Signatures didn't match!" unless Rack::Utils.secure_compare(signature, gh_signature)
   end
 end
-
-

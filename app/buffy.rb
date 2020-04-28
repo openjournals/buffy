@@ -1,20 +1,15 @@
 require 'sinatra/base'
 require 'sinatra/config_file'
-require_relative 'github_webhook_parser'
+require_relative 'sinatra_ext/github_webhook_filter'
 
 class Buffy < Sinatra::Base
-  include GithubWebhookParser
   register Sinatra::ConfigFile
+  register GitHubWebhookFilter
 
   config_file "../config/settings.yml"
 
-  before '/dispatch' do
-    verify_signature
-    parse_webhook
-  end
-
   post '/dispatch' do
-    halt 200
+    halt 200, "OK"
   end
 
   get '/status' do
