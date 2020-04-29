@@ -35,4 +35,5 @@ RSpec.configure do |config|
   end
 
   config.include RSpecMixin
+  config.include CommonActions
 end
