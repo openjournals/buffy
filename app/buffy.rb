@@ -9,7 +9,7 @@ class Buffy < Sinatra::Base
   config_file "../config/settings.yml"
 
   post '/dispatch' do
-    halt 200, @context.inspect
+    halt 200
   end
 
   get '/status' do

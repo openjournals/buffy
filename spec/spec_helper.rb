@@ -10,7 +10,7 @@ Dir["#{File.expand_path '../support', __FILE__}/**/*.rb"].sort.each { |f| requir
 
 module RSpecMixin
   include Rack::Test::Methods
-  def app() described_class.new! end
+  def app() Buffy end
 
   def json_fixture(file_name)
     File.open(File.dirname(__FILE__) + '/support/fixtures/' + file_name, 'rb').read
