@@ -1,5 +1,5 @@
 require 'sinatra/extension'
-require_relative '../github_webhook_parser'
+require_relative '../lib/github_webhook_parser'
 
 module GitHubWebhookFilter
   extend Sinatra::Extension
