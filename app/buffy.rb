@@ -6,7 +6,7 @@ class Buffy < Sinatra::Base
   register Sinatra::ConfigFile
   register GitHubWebhookFilter
 
-  config_file "../config/settings.yml"
+  config_file "../config/settings-#{settings.environment}.yml"
 
   post '/dispatch' do
     halt 200
