@@ -43,7 +43,7 @@ module GitHubWebhookParser
   end
 
   def verify_signature
-    secret_token = settings.gh_secret_token
+    secret_token = settings.buffy[:gh_secret_token]
     gh_signature = request.get_header 'HTTP_X_HUB_SIGNATURE'
     return halt 500, "Can't compute signature" if secret_token.nil? || secret_token.empty?
     return halt 403, 'Request missing signature' if gh_signature.nil? || gh_signature.empty?
