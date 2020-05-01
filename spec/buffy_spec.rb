@@ -9,7 +9,7 @@ describe Buffy do
   describe "#dispatch" do
 
     before do
-      #allow(Octokit::Client).to receive(:new).never
+      allow(Octokit::Client).to receive(:new).never
     end
 
     context "when verifying signature" do
