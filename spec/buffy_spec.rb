@@ -88,4 +88,13 @@ describe Buffy do
       end
     end
   end
+
+  describe "#status" do
+    it "should respond bot name and environment" do
+      get "/status"
+
+      expect(last_response).to be_ok
+      expect(last_response.body).to include("botsci in test: up and running!")
+    end
+  end
 end
