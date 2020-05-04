@@ -7,10 +7,7 @@ class HelloResponder < Responder
     @event_regex = /\AHello @#{@bot_name}/i
   end
 
-  def call(message, context)
-    return false unless responds_on?(context)
-    if event_regex
-      respond("Hi!", context) if message.match(event_regex)
-    end
+  def process_message(message, context)
+    respond("Hi!", context) if message.match(event_regex)
   end
 end

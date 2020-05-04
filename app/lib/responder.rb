@@ -8,6 +8,7 @@ class Responder
   attr_accessor :params
   attr_accessor :teams
   attr_accessor :bot_name
+  attr_accessor :match_data
 
 
   def initialize(settings, params)
@@ -32,7 +33,15 @@ class Responder
   # otherwise check if the message matches the responder regex
   def responds_to?(message)
     return true unless event_regex
-    message.match(event_regex)
+    @match_data = event_regex.match(message)
+    return @match_data
+  end
+
+  def call(message, context)
+    return false unless responds_on?(context)
+    return false unless responds_to?(message)
+    @context = context
+    process_message(message, @context)
   end
 
   # Post a message to GitHub.
@@ -43,4 +52,9 @@ class Responder
   # To be overwritten by subclasses with events and actions they respond to
   def define_listening
   end
+
+  # To be overwritten by subclasses
+  def process_message(message, context)
+  end
+
 end
