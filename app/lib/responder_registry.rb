@@ -3,7 +3,8 @@ Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].sort.each { |f| 
 class ResponderRegistry
 
   RESPONDER_MAPPING = {
-    "hello" => HelloResponder
+    "hello" => HelloResponder,
+    "assign_reviewer_n" => AssignReviewerNResponder
   }
 
   attr_accessor :responders

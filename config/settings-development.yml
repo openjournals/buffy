@@ -8,5 +8,6 @@ buffy:
     reviwers:
   responders:
     hello:
+    assign_reviewer_n:
       only: editors
 
