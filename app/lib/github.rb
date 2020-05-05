@@ -28,4 +28,15 @@ module GitHub
   def update_issue(context, options={})
     github_client.update_issue(context.repo, context.issue_id, options)
   end
+
+  def authorized_people
+    @authorized_people ||= begin
+      authorized_team_ids = []
+      team_ids.each do |team_id|
+        autorized_logins += github_client.team_members(team_id).collect { |e| e.login }.sort
+      end
+      autorized_logins.uniq
+    end
+  end
+
 end

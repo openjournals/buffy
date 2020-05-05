@@ -1,6 +1,8 @@
 require_relative 'github'
+require_relative 'authorizations'
 
 class Responder
+  include Authorizations
   include GitHub
 
   attr_accessor :event_regex
@@ -37,11 +39,23 @@ class Responder
     return @match_data
   end
 
+  def authorized?(context)
+    if params[:only].nil?
+      return true
+    else
+      authorized_people.include? context.sender
+    end
+  end
+
   def call(message, context)
     return false unless responds_on?(context)
     return false unless responds_to?(message)
-    @context = context
-    process_message(message, @context)
+    if authorized?(context)
+      @context = context
+      process_message(message, @context)
+    else
+      respond "I'm sorry @#{context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do.", context
+    end
   end
 
   # Post a message to GitHub.

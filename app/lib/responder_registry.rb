@@ -1,3 +1,4 @@
+require 'logger'
 Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].sort.each { |f| require f }
 
 class ResponderRegistry
@@ -18,7 +19,11 @@ class ResponderRegistry
 
   def respond(message, context)
     responders.each do |responder|
-      responder.call(message, context)
+      begin
+        responder.call(message, context)
+      rescue => err
+        log_error(responder, err)
+      end
     end; nil
   end
 
@@ -31,5 +36,13 @@ class ResponderRegistry
     config[:responders].each_pair do |name, params|
       add_responder(RESPONDER_MAPPING[name].new(config, params))
     end
+  end
+
+  def log_error(responder, error)
+    logger.warn("Error calling #{responder.class}: #{error.message}")
+  end
+
+  def logger
+    @logger ||= Logger.new(STDOUT)
   end
 end

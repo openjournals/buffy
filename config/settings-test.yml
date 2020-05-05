@@ -5,7 +5,7 @@ buffy:
   teams:
     editors: 2009411
     eics:
-    reviwers:
+    reviewers:
   responders:
     hello:
       only: editors

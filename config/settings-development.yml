@@ -5,9 +5,11 @@ buffy:
   teams:
     editors: 2009411
     eics:
-    reviwers:
+    reviewers:
   responders:
     hello:
     assign_reviewer_n:
-      only: editors
+      only:
+        - editors
+        - eics
 
