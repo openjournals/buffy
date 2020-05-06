@@ -5,7 +5,8 @@ class ResponderRegistry
 
   RESPONDER_MAPPING = {
     "hello" => HelloResponder,
-    "assign_reviewer_n" => AssignReviewerNResponder
+    "assign_reviewer_n" => AssignReviewerNResponder,
+    "remove_reviewer_n" => RemoveReviewerNResponder
   }
 
   attr_accessor :responders
