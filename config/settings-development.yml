@@ -12,4 +12,9 @@ buffy:
       only:
         - editors
         - eics
+    remove_reviewer_n:
+      only:
+        - editors
+        - eics
+      no_reviewer_text: "TBD"
 
