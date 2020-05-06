@@ -1,6 +1,6 @@
 module Authorizations
 
-  def authorized_team_ids(params)
+  def authorized_team_ids
     @authorized_team_ids ||= begin
       teams_ids = []
       case params[:only]
@@ -13,7 +13,7 @@ module Authorizations
     end
   end
 
-  def authorized_team_names(params)
+  def authorized_team_names
     @authorized_team_names ||= begin
       team_names = []
       case params[:only]
@@ -27,12 +27,14 @@ module Authorizations
   end
 
   def authorized_teams_sentence
-    if authorized_team_names.size = 1
-      authorized_team_names[0]
-    elsif authorized_team_names.size > 1
-      "#{authorized_team_names[0...-1] * ', '} and #{authorized_team_names[-1]}"
-    else
-      ""
+    @authorized_teams_sentence ||= begin
+      if authorized_team_names.size == 1
+        authorized_team_names[0]
+      elsif authorized_team_names.size > 1
+        "#{authorized_team_names[0...-1] * ', '} and #{authorized_team_names[-1]}"
+      else
+        ""
+      end
     end
   end
 
