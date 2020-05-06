@@ -31,7 +31,7 @@ module GitHub
 
   def authorized_people
     @authorized_people ||= begin
-      authorized_team_ids = []
+      autorized_logins = []
       team_ids.each do |team_id|
         autorized_logins += github_client.team_members(team_id).collect { |e| e.login }.sort
       end

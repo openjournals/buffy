@@ -3,7 +3,7 @@ require_relative "./spec_helper.rb"
 describe Responder do
 
   subject do
-    app = described_class.new({}, {})
+    described_class.new({}, {})
   end
 
   before do
@@ -43,6 +43,28 @@ describe Responder do
       expect(subject.responds_to?("testing again")).to be_falsey
       expect(subject.responds_to?("" )).to be_falsey
       expect(subject.responds_to?(nil )).to be_falsey
+    end
+  end
+
+  describe "#authorized?" do
+    before do
+      @context = OpenStruct.new({ sender: "sender" })
+    end
+
+    it "should be true if there is not restrictions (via :only setting)" do
+      expect(subject.authorized?(@context)).to be_truthy
+    end
+
+    it "should be true if sender is in an authorized team" do
+      subject.params = { only: 'editors' }
+      allow(subject).to receive(:authorized_people).and_return(["user_a", "sender", "user_b"])
+      expect(subject.authorized?(@context)).to be_truthy
+    end
+
+    it "should be false if sender is not in any authorized team" do
+      subject.params = { only: 'editors' }
+      allow(subject).to receive(:authorized_people).and_return(["user_a", "user_b"])
+      expect(subject.authorized?(@context)).to be_falsey
     end
   end
 

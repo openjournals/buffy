@@ -6,6 +6,15 @@ describe Buffy do
     app = described_class.new!
   end
 
+  describe "initialization" do
+    it "should parse the config file" do
+      expect(subject.settings.buffy["bot_github_user"]).to eq("botsci")
+      expect(subject.settings.buffy["gh_access_token"]).to eq("secret-access")
+      expect(subject.settings.buffy["gh_secret_token"]).to eq("secret-token")
+      expect(subject.settings.buffy["teams"]["editors"]).to eq(2009411)
+    end
+  end
+
   describe "#dispatch" do
 
     before do
@@ -13,7 +22,6 @@ describe Buffy do
     end
 
     context "when verifying signature" do
-
       it "should error if secret token is not present" do
         with_secret_token nil do
           post "/dispatch", nil, headers.merge({"HTTP_X_HUB_SIGNATURE" => "sha1=39b8d8"})
@@ -38,7 +46,6 @@ describe Buffy do
         expect(last_response.status).to eq(403)
         expect(last_response.body).to eq("Signatures didn't match!")
       end
-
     end
 
     context "when parsing GitHub payload" do
