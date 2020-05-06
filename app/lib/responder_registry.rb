@@ -35,6 +35,7 @@ class ResponderRegistry
   # Load up the responders defined in config/settings-#{ENV}.yml
   def load_responders!
     config[:responders].each_pair do |name, params|
+      params = {} if params.nil?
       add_responder(RESPONDER_MAPPING[name].new(config, params))
     end
   end

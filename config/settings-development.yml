@@ -7,8 +7,8 @@ buffy:
     eics:
     reviewers:
   responders:
-    hello: {}
-    assign_reviewer_n: {}
+    hello:
+    assign_reviewer_n:
     remove_reviewer_n:
       no_reviewer_text: "TBD"
 
