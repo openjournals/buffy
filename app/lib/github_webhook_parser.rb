@@ -31,14 +31,14 @@ module GitHubWebhookParser
     @repo = @payload.dig('repository', 'full_name')
 
     @gh_context = OpenStruct.new(
-      :action => @action,
-      :event => @event,
-      :issue_id => @issue_id,
-      :message => @message,
-      :repo => @repo,
-      :sender => @sender,
-      :event_action => "#{@event}.#{@action}",
-      #:payload => @payload
+      action: @action,
+      event: @event,
+      issue_id: @issue_id,
+      message: @message,
+      repo: @repo,
+      sender: @sender,
+      event_action: "#{@event}.#{@action}",
+      #payload: @payload
     )
   end
 
