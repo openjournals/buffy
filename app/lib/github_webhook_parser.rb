@@ -27,6 +27,10 @@ module GitHubWebhookParser
     end
 
     @sender = @payload.dig('sender', 'login')
+    if @sender == settings.buffy[:bot_github_user]
+      halt 200, "Event origin discarded"
+    end
+
     @issue_id = @payload.dig('issue', 'number')
     @repo = @payload.dig('repository', 'full_name')
 

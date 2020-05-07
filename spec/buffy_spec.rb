@@ -40,7 +40,7 @@ describe Buffy do
 
       it "should halt if signatures don't match" do
         with_secret_token 'test_secret_token' do
-          post "/dispatch", "{'payload': 'test'}", headers.merge({"HTTP_X_HUB_SIGNATURE" => "sha1=39b8d8"})
+          post "/dispatch", "{'payload':'test'}", headers.merge({"HTTP_X_HUB_SIGNATURE" => "sha1=39b8d8"})
         end
 
         expect(last_response.status).to eq(403)
@@ -61,7 +61,7 @@ describe Buffy do
 
       it "should halt if there's no event header" do
         with_secret_token 'test_secret_token' do
-          post "/dispatch", '{}', headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for('{}'), 'HTTP_X_GITHUB_EVENT' => nil})
+          post "/dispatch", "{}", headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for("{}"), 'HTTP_X_GITHUB_EVENT' => nil})
         end
 
         expect(last_response.status).to eq(422)
@@ -70,7 +70,7 @@ describe Buffy do
 
       it "should create context for 'issues' events" do
         with_secret_token 'test_secret_token' do
-          post "/dispatch", '{}', headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for('{}'), 'HTTP_X_GITHUB_EVENT' => 'issues'})
+          post "/dispatch", "{}", headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for("{}"), 'HTTP_X_GITHUB_EVENT' => 'issues'})
         end
 
         expect(last_response.status).to eq(200)
@@ -79,16 +79,26 @@ describe Buffy do
 
       it "should create context for 'issue_comment' events" do
         with_secret_token 'test_secret_token' do
-          post "/dispatch", '{}', headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for('{}'), 'HTTP_X_GITHUB_EVENT' => 'issue_comment'})
+          post "/dispatch", "{}", headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for("{}"), 'HTTP_X_GITHUB_EVENT' => 'issue_comment'})
         end
 
         expect(last_response.status).to eq(200)
         expect(last_response.body).not_to eq("Event discarded")
       end
 
+      it "should discard event if created by buffy" do
+        with_secret_token 'test_secret_token' do
+          payload = '{"sender":{"login":"botsci"}}'
+          post "/dispatch", payload, headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for(payload), 'HTTP_X_GITHUB_EVENT' => 'issue_comment'})
+        end
+
+        expect(last_response.status).to eq(200)
+        expect(last_response.body).to eq("Event origin discarded")
+      end
+
       it "should discard other events" do
         with_secret_token 'test_secret_token' do
-          post "/dispatch", '{}', headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for('{}'), 'HTTP_X_GITHUB_EVENT' => 'page_build'})
+          post "/dispatch", "{}", headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for("{}"), 'HTTP_X_GITHUB_EVENT' => 'page_build'})
         end
         expect(last_response.status).to eq(200)
         expect(last_response.body).to eq("Event discarded")
