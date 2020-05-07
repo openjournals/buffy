@@ -57,13 +57,13 @@ describe Responder do
 
     it "should be true if sender is in an authorized team" do
       subject.params = { only: 'editors' }
-      allow(subject).to receive(:authorized_people).and_return(["user_a", "sender", "user_b"])
+      allow(subject).to receive(:user_authorized?).with("sender").and_return(true)
       expect(subject.authorized?(@context)).to be_truthy
     end
 
     it "should be false if sender is not in any authorized team" do
       subject.params = { only: 'editors' }
-      allow(subject).to receive(:authorized_people).and_return(["user_a", "user_b"])
+      allow(subject).to receive(:user_authorized?).with("sender").and_return(false)
       expect(subject.authorized?(@context)).to be_falsey
     end
   end

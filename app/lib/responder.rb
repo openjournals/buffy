@@ -43,7 +43,7 @@ class Responder
     if params[:only].nil?
       return true
     else
-      authorized_people.include? context.sender
+      user_authorized? context.sender
     end
   end
 
