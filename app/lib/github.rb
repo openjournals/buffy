@@ -38,4 +38,15 @@ module GitHub
     end
   end
 
+  def user_authorized?(user_login)
+    @user_authorized ||= begin
+      autorized = []
+      authorized_team_ids.each do |team_id|
+        autorized << github_client.team_member?(team_id, user_login)
+        break if autorized.compact.any?
+      end
+      autorized.compact.any?
+    end
+  end
+
 end
