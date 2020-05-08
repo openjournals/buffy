@@ -1,0 +1,12 @@
+buffy:
+  bot_github_user: 'botsci'
+  gh_access_token: 'secret-access'
+  gh_secret_token: 'secret-token'
+  teams:
+    editors: 2009411
+    eics:
+    reviewers:
+  responders:
+    hello:
+      only: editors
+

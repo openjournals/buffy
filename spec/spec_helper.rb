@@ -5,11 +5,12 @@ WebMock.disable_net_connect!(allow_localhost: true)
 
 ENV['RACK_ENV'] = 'test'
 
-require File.expand_path '../../buffy.rb', __FILE__
+require_relative  '../app/buffy.rb'
+Dir["#{File.expand_path '../support', __FILE__}/**/*.rb"].sort.each { |f| require f }
 
 module RSpecMixin
   include Rack::Test::Methods
-  def app() described_class end
+  def app() Buffy end
 
   def json_fixture(file_name)
     File.open(File.dirname(__FILE__) + '/support/fixtures/' + file_name, 'rb').read
@@ -34,4 +35,5 @@ RSpec.configure do |config|
   end
 
   config.include RSpecMixin
+  config.include CommonActions
 end
