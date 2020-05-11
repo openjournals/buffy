@@ -1,8 +1,10 @@
 require_relative 'github'
+require_relative 'actions'
 require_relative 'authorizations'
 
 class Responder
   include Authorizations
+  include Actions
   include GitHub
 
   attr_accessor :event_regex
@@ -18,6 +20,7 @@ class Responder
     @bot_name = settings[:bot_github_user]
     @params = params
     @settings = settings
+    @context = nil
     define_listening
   end
 
@@ -39,6 +42,9 @@ class Responder
     return @match_data
   end
 
+  # Is the sender authorized to this action?
+  # Returns true if user belongs to any authorized team
+  # or if there's no list of authorized teams
   def authorized?(context)
     if params[:only].nil?
       return true
@@ -47,6 +53,8 @@ class Responder
     end
   end
 
+  # If user can perform action and the responder responds to
+  # this event and message then process_message is called
   def call(message, context)
     return false unless responds_on?(context)
     return false unless responds_to?(message)
@@ -56,11 +64,6 @@ class Responder
     else
       respond "I'm sorry @#{context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do.", context
     end
-  end
-
-  # Post a message to GitHub.
-  def respond(message, context)
-    bg_respond(message, context)
   end
 
   # To be overwritten by subclasses with events and actions they respond to

@@ -43,9 +43,9 @@ describe "Github methods" do
   end
 
   describe "#update_issue" do
-    it "should add labels to github issue" do
+    it "should update github issue with received options" do
       expect_any_instance_of(Octokit::Client).to receive(:update_issue).once.with('openjournals/buffy', 5, { body: "new body"})
-      subject.update_issue(@context, body: "new body")
+      subject.update_issue({body: "new body"}, @context)
     end
   end
 

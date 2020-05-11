@@ -14,17 +14,17 @@ module GitHub
 
   # Post messages to a GitHub issue.
   # Context is an OpenStruct created in lib/github_webhook_parser
-  def bg_respond(comment, context)
+  def bg_respond(comment, context=@context)
     github_client.add_comment(context.repo, context.issue_id, comment)
   end
 
   # Add labels to a GitHub issue
   # Context is an OpenStruct created in lib/github_webhook_parser
-  def label_issue(labels, context)
+  def label_issue(labels, context=@context)
     github_client.add_labels_to_an_issue(context.repo, context.issue_id, labels)
   end
 
-  def update_issue(context, options={})
+  def update_issue(options, context=@context)
     github_client.update_issue(context.repo, context.issue_id, options)
   end
 

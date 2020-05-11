@@ -85,7 +85,7 @@ describe Responder do
     end
 
     it "should process message if responds_on? and responds_to? are both true" do
-      context = OpenStruct.new({ event_action: "test_created" })
+      context = OpenStruct.new({ event_action: "test_created", repo: "openjournals/buffy" })
       message = "testing"
       allow(subject).to receive(:responds_on?).and_return(true)
       allow(subject).to receive(:responds_to?).and_return(true)
