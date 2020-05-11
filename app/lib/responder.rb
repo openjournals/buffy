@@ -61,7 +61,7 @@ class Responder
     return false unless responds_to?(message)
     if authorized?(buffy_context)
       @context = buffy_context
-      process_message(message, @context)
+      process_message(message)
     else
       respond "I'm sorry @#{context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do.", buffy_context
     end

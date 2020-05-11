@@ -91,8 +91,9 @@ describe Responder do
       allow(subject).to receive(:responds_to?).and_return(true)
       allow(subject).to receive(:process_message).and_return(true)
 
-      expect(subject).to receive(:process_message).once.with(message, context)
+      expect(subject).to receive(:process_message).once.with(message)
       expect(subject.call(message, context)).to be true
+      expect(subject.context).to eq(context)
     end
   end
 end
