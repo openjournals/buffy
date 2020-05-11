@@ -14,4 +14,13 @@ class AssignReviewerNResponder < Responder
     update_body(mark, end_mark, @match_data[1])
     respond("Reviewer #{@match_data[2]} assigned!")
   end
+
+  def description
+    "Assign a user as the reviewer N of this submission (where N=1,2...)"
+  end
+
+  def example_invocation
+    "#{@bot_name} assign @username as reviewer 2"
+  end
+
 end

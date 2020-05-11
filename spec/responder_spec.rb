@@ -96,4 +96,26 @@ describe Responder do
       expect(subject.context).to eq(context)
     end
   end
+
+  describe "description" do
+    it "should be present for all responders" do
+      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+        responder = responder_class.new({}, {})
+        expect(responder.respond_to?(:description)).to eq(true)
+        expect(responder.description).to_not be_nil
+        expect(responder.description).to_not be_empty
+      end
+    end
+  end
+
+  describe "example_invocation" do
+    it "should be present for all responders" do
+      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+        responder = responder_class.new({}, {})
+        expect(responder.respond_to?(:example_invocation)).to eq(true)
+        expect(responder.example_invocation).to_not be_nil
+        expect(responder.example_invocation).to_not be_empty
+      end
+    end
+  end
 end

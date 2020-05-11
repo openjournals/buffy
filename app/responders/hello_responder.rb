@@ -10,4 +10,12 @@ class HelloResponder < Responder
   def process_message(message)
     respond("Hi!")
   end
+
+  def description
+    "Say hi!"
+  end
+
+  def example_invocation
+    "Hello @#{@bot_name}"
+  end
 end
