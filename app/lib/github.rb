@@ -8,26 +8,29 @@ module GitHub
   end
 
   # Return an Octokit GitHub Issue
-  def issue(context=@context)
+  def issue
     @issue ||= github_client.issue(context.repo, context.issue_id)
   end
 
   # Post messages to a GitHub issue.
   # Context is an OpenStruct created in lib/github_webhook_parser
-  def bg_respond(comment, context=@context)
+  def bg_respond(comment)
     github_client.add_comment(context.repo, context.issue_id, comment)
   end
 
   # Add labels to a GitHub issue
   # Context is an OpenStruct created in lib/github_webhook_parser
-  def label_issue(labels, context=@context)
+  def label_issue(labels)
     github_client.add_labels_to_an_issue(context.repo, context.issue_id, labels)
   end
 
-  def update_issue(options, context=@context)
+  # Update a Github issue
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def update_issue(options)
     github_client.update_issue(context.repo, context.issue_id, options)
   end
 
+  # Returns the list of members in all authorized teams using the GitHub API
   def authorized_people
     @authorized_people ||= begin
       autorized_logins = []
@@ -38,6 +41,8 @@ module GitHub
     end
   end
 
+  # Returns true if the user in a team member of any of the authorized teams
+  # false otherwise
   def user_authorized?(user_login)
     @user_authorized ||= begin
       autorized = []

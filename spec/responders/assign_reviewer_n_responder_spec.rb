@@ -27,24 +27,22 @@ describe AssignReviewerNResponder do
       @responder = subject.new({ bot_github_user: 'botsci' }, {})
       disable_github_calls_for(@responder)
 
-      @msg = "@botsci assign @arfon as reviewer 3"
-      @responder.match_data = @responder.event_regex.match(@msg)
+      msg = "@botsci assign @arfon as reviewer 3"
+      @responder.match_data = @responder.event_regex.match(msg)
 
-      @issue = OpenStruct.new({ body: "...Reviewer list: 3: <!--reviewer-3-->Pending<!--end-reviewer-3--> ..." })
-      allow(@responder).to receive(:issue).and_return(@issue)
-
-      @context = OpenStruct.new({ repo: "buffy/test", issue_id: 1 })
+      issue = OpenStruct.new({ body: "...Reviewer list: 3: <!--reviewer-3-->Pending<!--end-reviewer-3--> ..." })
+      allow(@responder).to receive(:issue).and_return(issue)
     end
 
     it "should update the body of the issue" do
       expected_new_body = "...Reviewer list: 3: <!--reviewer-3-->@arfon<!--end-reviewer-3--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
-      @responder.process_message("Hello @botsci", @context)
+      @responder.process_message("Hello @botsci")
     end
 
     it "should respond to github" do
       expect(@responder).to receive(:respond).with("Reviewer 3 assigned!")
-      @responder.process_message("Hello @botsci", @context)
+      @responder.process_message("Hello @botsci")
     end
   end
 end

@@ -7,7 +7,7 @@ class RemoveReviewerNResponder < Responder
     @event_regex = /\A@#{@bot_name} remove reviewer (\S+)/i
   end
 
-  def process_message(message, context)
+  def process_message(message)
     mark = "<!--reviewer-#{@match_data[1]}-->"
     end_mark = "<!--end-reviewer-#{@match_data[1]}-->"
 

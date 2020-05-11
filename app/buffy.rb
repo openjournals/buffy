@@ -11,7 +11,7 @@ class Buffy < Sinatra::Base
   config_file "../config/settings-#{settings.environment}.yml"
 
   post '/dispatch' do
-    responders.respond(@message, @gh_context)
+    responders.respond(@message, @context)
     halt 200, "Message processed"
   end
 

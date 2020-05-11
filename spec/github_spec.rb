@@ -9,7 +9,7 @@ describe "Github methods" do
   end
 
   before do
-    @context = OpenStruct.new({ repo: 'openjournals/buffy', issue_id: 5})
+    subject.context = OpenStruct.new({ repo: 'openjournals/buffy', issue_id: 5})
   end
 
   describe "#github_client" do
@@ -23,29 +23,29 @@ describe "Github methods" do
   describe "#issue" do
     it "should call proper issue using the Octokit client" do
       expect_any_instance_of(Octokit::Client).to receive(:issue).once.with('openjournals/buffy', 5).and_return("issue")
-      subject.issue(@context)
-      subject.issue(@context)
+      subject.issue
+      subject.issue
     end
   end
 
   describe "#bg_respond" do
     it "should add comment to github issue" do
       expect_any_instance_of(Octokit::Client).to receive(:add_comment).once.with('openjournals/buffy', 5, 'comment!')
-      subject.bg_respond("comment!", @context)
+      subject.bg_respond("comment!")
     end
   end
 
   describe "#label_issue" do
     it "should add labels to github issue" do
       expect_any_instance_of(Octokit::Client).to receive(:add_labels_to_an_issue).once.with('openjournals/buffy', 5, ['reviewed'])
-      subject.label_issue(['reviewed'], @context)
+      subject.label_issue(['reviewed'])
     end
   end
 
   describe "#update_issue" do
     it "should update github issue with received options" do
       expect_any_instance_of(Octokit::Client).to receive(:update_issue).once.with('openjournals/buffy', 5, { body: "new body"})
-      subject.update_issue({body: "new body"}, @context)
+      subject.update_issue({body: "new body"})
     end
   end
 

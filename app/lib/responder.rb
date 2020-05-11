@@ -13,6 +13,7 @@ class Responder
   attr_accessor :teams
   attr_accessor :bot_name
   attr_accessor :match_data
+  attr_accessor :context
 
 
   def initialize(settings, params)
@@ -28,9 +29,9 @@ class Responder
   # Returns true if no event_action is set (e.g. nil)
   # otherwise checks if the responder.event_action is the same as the
   # webhook event_action
-  def responds_on?(context)
+  def responds_on?(buffy_context)
     return true unless event_action
-    context.event_action == event_action ? true : false
+    buffy_context.event_action == event_action ? true : false
   end
 
   # Does the responder respond to this message?
@@ -45,24 +46,24 @@ class Responder
   # Is the sender authorized to this action?
   # Returns true if user belongs to any authorized team
   # or if there's no list of authorized teams
-  def authorized?(context)
+  def authorized?(buffy_context)
     if params[:only].nil?
       return true
     else
-      user_authorized? context.sender
+      user_authorized? buffy_context.sender
     end
   end
 
   # If user can perform action and the responder responds to
   # this event and message then process_message is called
-  def call(message, context)
-    return false unless responds_on?(context)
+  def call(message, buffy_context)
+    return false unless responds_on?(buffy_context)
     return false unless responds_to?(message)
-    if authorized?(context)
-      @context = context
+    if authorized?(buffy_context)
+      @context = buffy_context
       process_message(message, @context)
     else
-      respond "I'm sorry @#{context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do.", context
+      respond "I'm sorry @#{context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do.", buffy_context
     end
   end
 
@@ -71,7 +72,7 @@ class Responder
   end
 
   # To be overwritten by subclasses
-  def process_message(message, context)
+  def process_message(message)
   end
 
 end

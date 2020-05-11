@@ -34,7 +34,7 @@ module GitHubWebhookParser
     @issue_id = @payload.dig('issue', 'number')
     @repo = @payload.dig('repository', 'full_name')
 
-    @gh_context = OpenStruct.new(
+    @context = OpenStruct.new(
       action: @action,
       event: @event,
       issue_id: @issue_id,

@@ -26,31 +26,29 @@ describe RemoveReviewerNResponder do
       @responder = subject.new({ bot_github_user: 'botsci' }, {})
       disable_github_calls_for(@responder)
 
-      @msg = "@botsci remove reviewer 33"
-      @responder.match_data = @responder.event_regex.match(@msg)
+      msg = "@botsci remove reviewer 33"
+      @responder.match_data = @responder.event_regex.match(msg)
 
-      @issue = OpenStruct.new({ body: "...Reviewer list: 33: <!--reviewer-33-->@buffy<!--end-reviewer-33--> ..." })
-      allow(@responder).to receive(:issue).and_return(@issue)
-
-      @context = OpenStruct.new({ repo: "buffy/test", issue_id: 1 })
+      issue = OpenStruct.new({ body: "...Reviewer list: 33: <!--reviewer-33-->@buffy<!--end-reviewer-33--> ..." })
+      allow(@responder).to receive(:issue).and_return(issue)
     end
 
     it "should update the body of the issue" do
       expected_new_body = "...Reviewer list: 33: <!--reviewer-33-->Pending<!--end-reviewer-33--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
-      @responder.process_message("Hello @botsci", @context)
+      @responder.process_message("Hello @botsci")
     end
 
     it "should update the body of the issue with custom text" do
       @responder.params = { no_reviewer_text: 'TBD' }
       expected_new_body = "...Reviewer list: 33: <!--reviewer-33-->TBD<!--end-reviewer-33--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
-      @responder.process_message("Hello @botsci", @context)
+      @responder.process_message("Hello @botsci")
     end
 
     it "should respond to github" do
       expect(@responder).to receive(:respond).with("Reviewer 33 removed!")
-      @responder.process_message("Hello @botsci", @context)
+      @responder.process_message("Hello @botsci")
     end
   end
 end

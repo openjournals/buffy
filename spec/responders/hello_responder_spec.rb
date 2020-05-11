@@ -27,9 +27,8 @@ describe HelloResponder do
     end
 
     it "should respond to github" do
-      context = OpenStruct.new({ repo: "buffy/test" })
-      expect(@responder).to receive(:respond).with("Hi!", context)
-      @responder.process_message("Hello @botsci", context)
+      expect(@responder).to receive(:respond).with("Hi!")
+      @responder.process_message("Hello @botsci")
     end
   end
 end

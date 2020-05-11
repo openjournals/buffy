@@ -7,7 +7,7 @@ class HelloResponder < Responder
     @event_regex = /\AHello @#{@bot_name}\z/i
   end
 
-  def process_message(message, context)
-    respond("Hi!", context)
+  def process_message(message)
+    respond("Hi!")
   end
 end

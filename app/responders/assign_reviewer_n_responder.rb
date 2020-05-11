@@ -7,7 +7,7 @@ class AssignReviewerNResponder < Responder
     @event_regex = /\A@#{@bot_name} assign (.*) as reviewer (\S+)/i
   end
 
-  def process_message(message, context)
+  def process_message(message)
     mark = "<!--reviewer-#{@match_data[2]}-->"
     end_mark = "<!--end-reviewer-#{@match_data[2]}-->"
 
