@@ -1,5 +1,4 @@
 require_relative '../lib/responder'
-require 'sinatra/base'
 
 class HelpResponder < Responder
 
