@@ -7,6 +7,7 @@ buffy:
     eics:
     reviewers:
   responders:
+    help:
     hello:
     assign_reviewer_n:
       only: editors

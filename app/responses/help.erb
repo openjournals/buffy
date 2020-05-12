@@ -1,0 +1,13 @@
+<% if descriptions_and_examples.size <= 1 %>
+I'm sorry @<%= sender %>, currently I can help you.
+You are not authorized to use my services.
+<% else %>
+Hello @<%= sender %> are some things you can ask me to do:
+
+```
+<% descriptions_and_examples.each do |desc_and_example| %>
+# <%= desc_and_example[0] %>
+<%= desc_and_example[1] %>
+<% end %>
+```
+<% end %>
