@@ -20,7 +20,7 @@ class AssignReviewerNResponder < Responder
   end
 
   def example_invocation
-    "#{@bot_name} assign @username as reviewer 2"
+    "@#{@bot_name} assign @username as reviewer 2"
   end
 
 end

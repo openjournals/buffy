@@ -26,6 +26,6 @@ class HelpResponder < Responder
   end
 
   def example_invocation
-    "#{@bot_name} #{help_command}"
+    "@#{@bot_name} #{help_command}"
   end
 end

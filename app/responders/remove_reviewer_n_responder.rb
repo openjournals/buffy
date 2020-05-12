@@ -20,10 +20,10 @@ class RemoveReviewerNResponder < Responder
   end
 
   def description
-    "Remove the user assigned as reviewer n of this submission (where n=1,2...)"
+    "Remove the user assigned as reviewer N of this submission (where N=1,2...)"
   end
 
   def example_invocation
-    "#{@bot_name} remove reviewer 2"
+    "@#{@bot_name} remove reviewer 2"
   end
 end
