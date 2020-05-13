@@ -7,7 +7,9 @@ class ResponderRegistry
     "help" => HelpResponder,
     "hello" => HelloResponder,
     "assign_reviewer_n" => AssignReviewerNResponder,
-    "remove_reviewer_n" => RemoveReviewerNResponder
+    "remove_reviewer_n" => RemoveReviewerNResponder,
+    "assign_editor" => AssignEditorResponder,
+    "remove_editor" => RemoveEditorResponder,
   }
 
   attr_accessor :responders

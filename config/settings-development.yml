@@ -14,4 +14,9 @@ buffy:
     remove_reviewer_n:
       only: editors
       no_reviewer_text: "TBD"
+    assign_editor:
+      only: editors
+    remove_editor:
+      only: editors
+      no_reviewer_text: "TBD"
 
