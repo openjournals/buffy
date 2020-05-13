@@ -1,11 +1,13 @@
 require_relative 'github'
 require_relative 'actions'
 require_relative 'authorizations'
+require_relative 'erb_responder'
 
 class Responder
   include Authorizations
   include Actions
   include GitHub
+  include ERBResponder
 
   attr_accessor :event_regex
   attr_accessor :event_action
@@ -59,11 +61,12 @@ class Responder
   def call(message, buffy_context)
     return false unless responds_on?(buffy_context)
     return false unless responds_to?(message)
+    @context = buffy_context
     if authorized?(buffy_context)
-      @context = buffy_context
       process_message(message)
     else
-      respond "I'm sorry @#{context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do.", buffy_context
+      respond "I'm sorry @#{buffy_context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do."
+      false
     end
   end
 

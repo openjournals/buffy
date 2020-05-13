@@ -18,4 +18,12 @@ class RemoveReviewerNResponder < Responder
   def no_reviewer_text
     params[:no_reviewer_text] || 'Pending'
   end
+
+  def description
+    "Remove the user assigned as reviewer N of this submission (where N=1,2...)"
+  end
+
+  def example_invocation
+    "@#{@bot_name} remove reviewer 2"
+  end
 end

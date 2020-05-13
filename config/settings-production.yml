@@ -5,6 +5,7 @@ buffy:
   teams:
     editors: 3824115
   responders:
+    help:
     hello:
     assign_reviewer_n:
       only: editors

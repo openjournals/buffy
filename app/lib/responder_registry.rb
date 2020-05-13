@@ -4,6 +4,7 @@ Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].sort.each { |f| 
 class ResponderRegistry
 
   RESPONDER_MAPPING = {
+    "help" => HelpResponder,
     "hello" => HelloResponder,
     "assign_reviewer_n" => AssignReviewerNResponder,
     "remove_reviewer_n" => RemoveReviewerNResponder

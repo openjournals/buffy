@@ -72,28 +72,66 @@ describe Responder do
     it "should not process message if responds_on? is false" do
       allow(subject).to receive(:responds_on?).and_return(false)
       allow(subject).to receive(:responds_to?).and_return(true)
+      allow(subject).to receive(:authorized?).and_return(true)
       allow(subject).to receive(:process_message).never
       expect(subject.call("testing", {})).to be false
     end
-
 
     it "should not process message if responds_to? is false" do
       allow(subject).to receive(:responds_on?).and_return(true)
       allow(subject).to receive(:responds_to?).and_return(false)
+      allow(subject).to receive(:authorized?).and_return(true)
       allow(subject).to receive(:process_message).never
       expect(subject.call("testing", {})).to be false
     end
 
-    it "should process message if responds_on? and responds_to? are both true" do
+
+    it "should not process message if authorized? is false" do
+      context = OpenStruct.new(sender: "tester", repo: "openjournals/buffy")
+      subject.params = {only: ['editors', 'owners']}
+      allow(subject).to receive(:responds_on?).and_return(true)
+      allow(subject).to receive(:responds_to?).and_return(true)
+      allow(subject).to receive(:authorized?).and_return(false)
+      allow(subject).to receive(:respond).and_return(true)
+      allow(subject).to receive(:process_message).never
+      expected_msg = "I'm sorry @tester, I'm afraid I can't do that. That's something only editors and owners are allowed to do."
+      expect(subject).to receive(:respond).once.with(expected_msg)
+      expect(subject.call("testing", context)).to be false
+    end
+
+    it "should process message if responds_on?, responds_to? and authorized? are all true" do
       context = OpenStruct.new({ event_action: "test_created", repo: "openjournals/buffy" })
       message = "testing"
       allow(subject).to receive(:responds_on?).and_return(true)
       allow(subject).to receive(:responds_to?).and_return(true)
+      allow(subject).to receive(:authorized?).and_return(true)
       allow(subject).to receive(:process_message).and_return(true)
 
       expect(subject).to receive(:process_message).once.with(message)
       expect(subject.call(message, context)).to be true
       expect(subject.context).to eq(context)
+    end
+  end
+
+  describe "description" do
+    it "should be present for all responders" do
+      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+        responder = responder_class.new({}, {})
+        expect(responder.respond_to?(:description)).to eq(true)
+        expect(responder.description).to_not be_nil
+        expect(responder.description).to_not be_empty
+      end
+    end
+  end
+
+  describe "example_invocation" do
+    it "should be present for all responders" do
+      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+        responder = responder_class.new({}, {})
+        expect(responder.respond_to?(:example_invocation)).to eq(true)
+        expect(responder.example_invocation).to_not be_nil
+        expect(responder.example_invocation).to_not be_empty
+      end
     end
   end
 end
