@@ -4,7 +4,7 @@ class HelloResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\AHello @#{@bot_name}\z/i
+    @event_regex = /\AHello @#{@bot_name}\s*\z/i
   end
 
   def process_message(message)
