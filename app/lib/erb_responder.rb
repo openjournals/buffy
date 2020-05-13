@@ -8,7 +8,7 @@ module ERBResponder
     template = ERB.new(File.read(filename))
     message = template.result_with_hash(locals)
 
-    bg_respond(message)
+    respond(message)
   end
 
 end
