@@ -1,6 +1,6 @@
 require_relative "../spec_helper.rb"
 
-describe RemoveReviewerNResponder do
+describe RemoveEditorResponder do
 
   subject do
     described_class
@@ -14,10 +14,10 @@ describe RemoveReviewerNResponder do
     end
 
     it "should define regex" do
-      expect(@responder.event_regex).to match("@botsci remove reviewer 1")
-      expect(@responder.event_regex).to match("@botsci remove reviewer 33B")
-      expect(@responder.event_regex).to_not match("assign remove @xuanxu as reviewer 2")
-      expect(@responder.event_regex).to_not match("@botsci remove reviewer")
+      expect(@responder.event_regex).to match("@botsci remove editor")
+      expect(@responder.event_regex).to match("@botsci remove editor ")
+      expect(@responder.event_regex).to_not match("@bot_name remove editor")
+      expect(@responder.event_regex).to_not match("@botsci remove editor 3")
     end
   end
 
@@ -26,28 +26,28 @@ describe RemoveReviewerNResponder do
       @responder = subject.new({ bot_github_user: 'botsci' }, {})
       disable_github_calls_for(@responder)
 
-      @msg = "@botsci remove reviewer 33"
+      @msg = "@botsci remove editor"
       @responder.match_data = @responder.event_regex.match(@msg)
 
-      issue = OpenStruct.new({ body: "...Reviewer list: 33: <!--reviewer-33-->@buffy<!--end-reviewer-33--> ..." })
+      issue = OpenStruct.new({ body: "...Submission editor: <!--editor-->@buffy<!--end-editor--> ..." })
       allow(@responder).to receive(:issue).and_return(issue)
     end
 
     it "should remove a reviewer from the body of the issue" do
-      expected_new_body = "...Reviewer list: 33: <!--reviewer-33-->Pending<!--end-reviewer-33--> ..."
+      expected_new_body = "...Submission editor: <!--editor-->Pending<!--end-editor--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
       @responder.process_message(@msg)
     end
 
     it "should update the body of the issue with custom text" do
       @responder.params = { no_reviewer_text: 'TBD' }
-      expected_new_body = "...Reviewer list: 33: <!--reviewer-33-->TBD<!--end-reviewer-33--> ..."
+      expected_new_body = "...Submission editor: <!--editor-->TBD<!--end-editor--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
       @responder.process_message(@msg)
     end
 
     it "should respond to github" do
-      expect(@responder).to receive(:respond).with("Reviewer 33 removed!")
+      expect(@responder).to receive(:respond).with("Editor removed!")
       @responder.process_message(@msg)
     end
   end

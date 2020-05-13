@@ -1,6 +1,6 @@
 require_relative "../spec_helper.rb"
 
-describe AssignReviewerNResponder do
+describe AssignEditorResponder do
 
   subject do
     described_class
@@ -14,10 +14,10 @@ describe AssignReviewerNResponder do
     end
 
     it "should define regex" do
-      expect(@responder.event_regex).to match("@botsci assign @arfon as reviewer 1")
-      expect(@responder.event_regex).to match("@botsci assign @xuanxu as reviewer 33B")
-      expect(@responder.event_regex).to_not match("assign @xuanxu as reviewer 2")
-      expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as editor")
+      expect(@responder.event_regex).to match("@botsci assign @arfon as editor")
+      expect(@responder.event_regex).to match("@botsci assign @xuanxu as editor   \r\n")
+      expect(@responder.event_regex).to_not match("assign @xuanxu as editor")
+      expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as editor now")
       expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as reviewer")
     end
   end
@@ -27,21 +27,21 @@ describe AssignReviewerNResponder do
       @responder = subject.new({ bot_github_user: 'botsci' }, {})
       disable_github_calls_for(@responder)
 
-      @msg = "@botsci assign @arfon as reviewer 3"
+      @msg = "@botsci assign @arfon as editor"
       @responder.match_data = @responder.event_regex.match(@msg)
 
-      issue = OpenStruct.new({ body: "...Reviewer list: 3: <!--reviewer-3-->Pending<!--end-reviewer-3--> ..." })
+      issue = OpenStruct.new({ body: "...Submission editor: <!--editor-->Pending<!--end-editor--> ..." })
       allow(@responder).to receive(:issue).and_return(issue)
     end
 
-    it "should update a reviewer the body of the issue" do
-      expected_new_body = "...Reviewer list: 3: <!--reviewer-3-->@arfon<!--end-reviewer-3--> ..."
+    it "should update editor in the body of the issue" do
+      expected_new_body = "...Submission editor: <!--editor-->@arfon<!--end-editor--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
       @responder.process_message(@msg)
     end
 
     it "should respond to github" do
-      expect(@responder).to receive(:respond).with("Reviewer 3 assigned!")
+      expect(@responder).to receive(:respond).with("Assigned! @arfon is now the editor")
       @responder.process_message(@msg)
     end
   end
