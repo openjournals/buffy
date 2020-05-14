@@ -17,7 +17,7 @@ class HelpResponder < Responder
   end
 
   def help_command
-    params[:help_command] || 'help'
+    params[:help_command] || "help"
   end
 
   def description

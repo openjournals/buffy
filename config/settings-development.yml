@@ -9,6 +9,7 @@ buffy:
   responders:
     help:
     hello:
+    thanks:
     assign_reviewer_n:
       only: editors
     remove_reviewer_n:
