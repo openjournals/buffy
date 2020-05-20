@@ -9,4 +9,5 @@ buffy:
   responders:
     hello:
       only: editors
-
+    thanks:
+      hidden: true

@@ -21,7 +21,7 @@ class Responder
   def initialize(settings, params)
     @teams = settings[:teams]
     @bot_name = settings[:bot_github_user]
-    @params = params
+    @params = params || {}
     @settings = settings
     @context = nil
     define_listening
@@ -68,6 +68,10 @@ class Responder
       respond "I'm sorry @#{buffy_context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do."
       false
     end
+  end
+
+  def hidden?
+    @params[:hidden] == true
   end
 
   # To be overwritten by subclasses with events and actions they respond to

@@ -113,6 +113,24 @@ describe Responder do
     end
   end
 
+  describe "#hidden?" do
+    it "should be true if params[:hidden] is true" do
+      responder = described_class.new({}, { hidden: true })
+      expect(responder).to be_hidden
+    end
+
+    it "should be false otherwise" do
+      responder = described_class.new({}, {})
+      expect(responder).to_not be_hidden
+
+      responder = described_class.new({}, { hidden: false })
+      expect(responder).to_not be_hidden
+
+      responder = described_class.new({}, { hidden: "wrong value" })
+      expect(responder).to_not be_hidden
+    end
+  end
+
   describe "description" do
     it "should be present for all responders" do
       ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|

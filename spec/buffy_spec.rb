@@ -12,6 +12,8 @@ describe Buffy do
       expect(subject.settings.buffy["gh_access_token"]).to eq("secret-access")
       expect(subject.settings.buffy["gh_secret_token"]).to eq("secret-token")
       expect(subject.settings.buffy["teams"]["editors"]).to eq(2009411)
+      expect(subject.settings.buffy["responders"]["hello"]["only"]).to eq("editors")
+      expect(subject.settings.buffy["responders"]["thanks"]["hidden"]).to eq(true)
     end
   end
 

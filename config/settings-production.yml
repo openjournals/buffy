@@ -7,7 +7,9 @@ buffy:
   responders:
     help:
     hello:
+      hidden: true
     thanks:
+      hidden: true
     assign_reviewer_n:
       only: editors
     remove_reviewer_n:
