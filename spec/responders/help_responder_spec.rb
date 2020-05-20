@@ -59,5 +59,20 @@ describe HelpResponder do
       expect(@responder).to receive(:respond_template).once.with(:help, expected_locals)
       @responder.process_message("@botsci help")
     end
+
+    it "should not list hidden responders" do
+      allow_any_instance_of(Responder).to receive(:authorized?).and_return(true)
+      new_settings = @settings.merge({ responders: @settings[:responders].merge({"hello" => { hidden: true }}) })
+      responder = subject.new(new_settings, {})
+      responder.context = OpenStruct.new(sender: "sender")
+      disable_github_calls_for(responder)
+
+      responders = [HelpResponder.new(new_settings,{}), AssignReviewerNResponder.new(new_settings,{})]
+      expected_descriptions = responders.map {|r| [r.description, r.example_invocation]}
+      expected_locals = { sender: "sender", descriptions_and_examples: expected_descriptions}
+
+      expect(responder).to receive(:respond_template).once.with(:help, expected_locals)
+      responder.process_message("@botsci help")
+    end
   end
 end

@@ -11,7 +11,7 @@ class HelpResponder < Responder
     descriptions_and_examples = []
     active_responders = ResponderRegistry.new(@settings).responders.select {|r| r.authorized?(context)}
     active_responders.each do |r|
-      descriptions_and_examples << [r.description, r.example_invocation]
+      descriptions_and_examples << [r.description, r.example_invocation] unless r.hidden?
     end
     respond_template :help, { sender: context.sender, descriptions_and_examples: descriptions_and_examples }
   end
