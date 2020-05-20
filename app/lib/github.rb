@@ -30,6 +30,13 @@ module GitHub
     github_client.update_issue(context.repo, context.issue_id, options)
   end
 
+  # Add a user as collaborator to the repo
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def add_collaborator(username)
+    username = username.sub(/^@/, "").downcase
+    github_client.add_collaborator(context.repo, username)
+  end
+
   # Returns the list of members in all authorized teams using the GitHub API
   def authorized_people
     @authorized_people ||= begin

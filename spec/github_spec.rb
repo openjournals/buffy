@@ -4,12 +4,12 @@ describe "Github methods" do
 
   subject do
     settings = Sinatra::IndifferentHash[teams: { editors: 11, reviewers: 22, eics: 33 }]
-    params ={ only: ['editors', 'eics'] }
+    params ={ only: ["editors", "eics"] }
     Responder.new(settings, params)
   end
 
   before do
-    subject.context = OpenStruct.new({ repo: 'openjournals/buffy', issue_id: 5})
+    subject.context = OpenStruct.new({ repo: "openjournals/buffy", issue_id: 5})
   end
 
   describe "#github_client" do
@@ -22,7 +22,7 @@ describe "Github methods" do
 
   describe "#issue" do
     it "should call proper issue using the Octokit client" do
-      expect_any_instance_of(Octokit::Client).to receive(:issue).once.with('openjournals/buffy', 5).and_return("issue")
+      expect_any_instance_of(Octokit::Client).to receive(:issue).once.with("openjournals/buffy", 5).and_return("issue")
       subject.issue
       subject.issue
     end
@@ -30,22 +30,34 @@ describe "Github methods" do
 
   describe "#bg_respond" do
     it "should add comment to github issue" do
-      expect_any_instance_of(Octokit::Client).to receive(:add_comment).once.with('openjournals/buffy', 5, 'comment!')
+      expect_any_instance_of(Octokit::Client).to receive(:add_comment).once.with("openjournals/buffy", 5, "comment!")
       subject.bg_respond("comment!")
     end
   end
 
   describe "#label_issue" do
     it "should add labels to github issue" do
-      expect_any_instance_of(Octokit::Client).to receive(:add_labels_to_an_issue).once.with('openjournals/buffy', 5, ['reviewed'])
-      subject.label_issue(['reviewed'])
+      expect_any_instance_of(Octokit::Client).to receive(:add_labels_to_an_issue).once.with("openjournals/buffy", 5, ["reviewed"])
+      subject.label_issue(["reviewed"])
     end
   end
 
   describe "#update_issue" do
     it "should update github issue with received options" do
-      expect_any_instance_of(Octokit::Client).to receive(:update_issue).once.with('openjournals/buffy', 5, { body: "new body"})
+      expect_any_instance_of(Octokit::Client).to receive(:update_issue).once.with("openjournals/buffy", 5, { body: "new body"})
       subject.update_issue({body: "new body"})
+    end
+  end
+
+  describe "#add_collaborator" do
+    it "should add the user to the repo's collaborators" do
+      expect_any_instance_of(Octokit::Client).to receive(:add_collaborator).once.with("openjournals/buffy", "xuanxu")
+      subject.add_collaborator("xuanxu")
+    end
+
+    it "should use the user's login" do
+      expect_any_instance_of(Octokit::Client).to receive(:add_collaborator).once.with("openjournals/buffy", "xuanxu")
+      subject.add_collaborator("@XuanXu")
     end
   end
 

@@ -40,6 +40,11 @@ describe AssignReviewerNResponder do
       @responder.process_message(@msg)
     end
 
+    it "should add reviewer as collaborator" do
+      expect(@responder).to receive(:add_collaborator).with("@arfon")
+      @responder.process_message(@msg)
+    end
+
     it "should respond to github" do
       expect(@responder).to receive(:respond).with("Reviewer 3 assigned!")
       @responder.process_message(@msg)

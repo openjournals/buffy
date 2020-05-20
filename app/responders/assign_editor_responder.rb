@@ -11,8 +11,11 @@ class AssignEditorResponder < Responder
     mark = "<!--editor-->"
     end_mark = "<!--end-editor-->"
 
-    update_body(mark, end_mark, @match_data[1])
-    respond("Assigned! #{@match_data[1]} is now the editor")
+    new_editor = @match_data[1]
+
+    update_body(mark, end_mark, new_editor)
+    add_collaborator new_editor
+    respond("Assigned! #{new_editor} is now the editor")
   end
 
   def description

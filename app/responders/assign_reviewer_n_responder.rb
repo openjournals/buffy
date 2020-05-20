@@ -11,7 +11,10 @@ class AssignReviewerNResponder < Responder
     mark = "<!--reviewer-#{@match_data[2]}-->"
     end_mark = "<!--end-reviewer-#{@match_data[2]}-->"
 
-    update_body(mark, end_mark, @match_data[1])
+    new_reviewer = @match_data[1]
+
+    update_body(mark, end_mark, new_reviewer)
+    add_collaborator new_reviewer
     respond("Reviewer #{@match_data[2]} assigned!")
   end
 

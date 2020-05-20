@@ -40,6 +40,11 @@ describe AssignEditorResponder do
       @responder.process_message(@msg)
     end
 
+    it "should add editor as collaborator" do
+      expect(@responder).to receive(:add_collaborator).with("@arfon")
+      @responder.process_message(@msg)
+    end
+
     it "should respond to github" do
       expect(@responder).to receive(:respond).with("Assigned! @arfon is now the editor")
       @responder.process_message(@msg)
