@@ -61,6 +61,18 @@ describe "Github methods" do
     end
   end
 
+  describe "#remove_collaborator" do
+    it "should remove the user to the repo's collaborators" do
+      expect_any_instance_of(Octokit::Client).to receive(:remove_collaborator).once.with("openjournals/buffy", "xuanxu")
+      subject.remove_collaborator("xuanxu")
+    end
+
+    it "should use the user's login" do
+      expect_any_instance_of(Octokit::Client).to receive(:remove_collaborator).once.with("openjournals/buffy", "xuanxu")
+      subject.remove_collaborator("@XuanXu")
+    end
+  end
+
   describe "#authorized_people" do
     it "should return all people in authorized teams" do
       editors_team = [OpenStruct.new(login: "supereditor")]

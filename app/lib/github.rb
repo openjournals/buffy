@@ -37,6 +37,13 @@ module GitHub
     github_client.add_collaborator(context.repo, username)
   end
 
+  # Remove a user from repo's collaborators
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def remove_collaborator(username)
+    username = username.sub(/^@/, "").downcase
+    github_client.remove_collaborator(context.repo, username)
+  end
+
   # Returns the list of members in all authorized teams using the GitHub API
   def authorized_people
     @authorized_people ||= begin
