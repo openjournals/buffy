@@ -40,8 +40,14 @@ describe AssignEditorResponder do
       @responder.process_message(@msg)
     end
 
-    it "should add editor as collaborator" do
+    it "should not add editor as collaborator by default" do
+      expect(@responder).to_not receive(:add_collaborator).with("@arfon")
+      @responder.process_message(@msg)
+    end
+
+    it "should add editor as collaborator if params[:add_as_collaborator] is true" do
       expect(@responder).to receive(:add_collaborator).with("@arfon")
+      @responder.params = {add_as_collaborator: true}
       @responder.process_message(@msg)
     end
 

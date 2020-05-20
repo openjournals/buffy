@@ -14,7 +14,7 @@ class AssignEditorResponder < Responder
     new_editor = @match_data[1]
 
     update_body(mark, end_mark, new_editor)
-    add_collaborator new_editor
+    add_collaborator(new_editor) if add_as_collaborator?
     respond("Assigned! #{new_editor} is now the editor")
   end
 
@@ -24,6 +24,10 @@ class AssignEditorResponder < Responder
 
   def example_invocation
     "@#{@bot_name} assign @username as editor"
+  end
+
+  def add_as_collaborator?
+    params[:add_as_collaborator] == true
   end
 
 end
