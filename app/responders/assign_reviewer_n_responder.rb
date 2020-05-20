@@ -14,7 +14,7 @@ class AssignReviewerNResponder < Responder
     new_reviewer = @match_data[1]
 
     update_body(mark, end_mark, new_reviewer)
-    add_collaborator new_reviewer
+    add_collaborator(new_reviewer) if add_as_collaborator?
     respond("Reviewer #{@match_data[2]} assigned!")
   end
 
@@ -24,6 +24,10 @@ class AssignReviewerNResponder < Responder
 
   def example_invocation
     "@#{@bot_name} assign @username as reviewer 2"
+  end
+
+  def add_as_collaborator?
+    true unless params[:add_as_collaborator] == false
   end
 
 end

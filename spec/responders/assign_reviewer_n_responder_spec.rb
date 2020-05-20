@@ -40,8 +40,14 @@ describe AssignReviewerNResponder do
       @responder.process_message(@msg)
     end
 
-    it "should add reviewer as collaborator" do
+    it "should add reviewer as collaborator by default" do
       expect(@responder).to receive(:add_collaborator).with("@arfon")
+      @responder.process_message(@msg)
+    end
+
+    it "should not add reviewer as collaborator if params[:add_as_collaborator] is false" do
+      expect(@responder).to_not receive(:add_collaborator).with("@arfon")
+      @responder.params = {add_as_collaborator: false}
       @responder.process_message(@msg)
     end
 
