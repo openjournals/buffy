@@ -45,7 +45,7 @@ class ResponderRegistry
         params.each do |responder_instances|
           responder_instances.each_pair do |instance_name, subparams|
             subparams = {} if subparams.nil?
-            add_responder(RESPONDER_MAPPING[name].new(config, {name: instance_name.to_s}.merge(subparams)))
+            add_responder(RESPONDER_MAPPING[name].new(config, Sinatra::IndifferentHash[name: instance_name.to_s].merge(subparams)))
           end
         end
       else
