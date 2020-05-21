@@ -41,7 +41,15 @@ class ResponderRegistry
   def load_responders!
     config[:responders].each_pair do |name, params|
       params = {} if params.nil?
-      add_responder(RESPONDER_MAPPING[name].new(config, params))
+      if params.is_a?(Array)
+        params.each do |responder_instances|
+          responder_instances.each_pair do |instance_name, subparams|
+            add_responder(RESPONDER_MAPPING[name].new(config, {name: instance_name.to_s}.merge(subparams)))
+          end
+        end
+      else
+        add_responder(RESPONDER_MAPPING[name].new(config, params))
+      end
     end
   end
 

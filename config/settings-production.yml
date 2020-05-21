@@ -21,9 +21,9 @@ buffy:
       only: editors
       no_reviewer_text: "TBD"
     set_value:
-      name: version
-      only: editors
-    set_value:
-      name: archive
-      only: editors
-      sample_value: 10.21105/joss.12345
+      - version:
+        only: editors
+        sample_value: "v1.0.0"
+      - archive:
+        only: editors
+        sample_value: "10.21105/joss.12345"

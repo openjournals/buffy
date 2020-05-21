@@ -25,4 +25,3 @@ buffy:
     set_value:
       name: version
       only: editors
-
