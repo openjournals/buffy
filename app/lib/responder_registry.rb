@@ -10,6 +10,7 @@ class ResponderRegistry
     "remove_reviewer_n" => RemoveReviewerNResponder,
     "assign_editor"     => AssignEditorResponder,
     "remove_editor"     => RemoveEditorResponder,
+    "set_value"         => SetValueResponder,
     "thanks"            => ThanksResponder,
   }
 
