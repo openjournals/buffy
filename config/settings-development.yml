@@ -22,4 +22,7 @@ buffy:
     remove_editor:
       only: editors
       no_reviewer_text: "TBD"
+    set_value:
+      name: version
+      only: editors
 
