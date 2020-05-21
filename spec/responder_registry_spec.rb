@@ -7,7 +7,8 @@ describe ResponderRegistry do
                               "assign_reviewer_n" => { only: "editors" },
                               "set_value" => [
                                 { version: { only: "editors" }},
-                                { archival: { name: "archive", sample_value: "doi42" }}
+                                { archival: { name: "archive", sample_value: "doi42" }},
+                                { url: nil }
                               ]
                             }
               }
@@ -26,16 +27,20 @@ describe ResponderRegistry do
       registry = described_class.new(@config)
       responders = registry.responders.select { |r| r.kind_of?(SetValueResponder) }
 
-      expect(responders.size).to eq(2)
+      expect(responders.size).to eq(3)
 
       version = responders[0]
       archival = responders[1]
+      url = responders[2]
 
       expect(version.params[:name]).to eq("version")
       expect(version.params[:only]).to eq("editors")
       expect(archival.params[:name]).to eq("archive")
       expect(archival.params[:only]).to be_nil
       expect(archival.params[:sample_value]).to eq("doi42")
+      expect(url.params[:name]).to eq("url")
+      expect(url.params[:only]).to be_nil
+      expect(url.params[:sample_value]).to be_nil
     end
   end
 

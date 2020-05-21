@@ -44,6 +44,7 @@ class ResponderRegistry
       if params.is_a?(Array)
         params.each do |responder_instances|
           responder_instances.each_pair do |instance_name, subparams|
+            subparams = {} if subparams.nil?
             add_responder(RESPONDER_MAPPING[name].new(config, {name: instance_name.to_s}.merge(subparams)))
           end
         end
