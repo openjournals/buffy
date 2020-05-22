@@ -55,9 +55,18 @@ describe "Actions" do
     it "should add user as collaborator otherwise" do
       allow(subject).to receive(:is_invited?).and_return(false)
       allow(subject).to receive(:is_collaborator?).and_return(false)
+      expect(subject).to receive(:add_collaborator).and_return(true)
       expected_response = "OK, invitation sent!\n\n@buffy please accept the invite here: ../invitations"
 
-      expect(subject).to receive(:add_collaborator).and_return(true)
+      expect(subject.invite_user("buffy")).to eq(expected_response)
+    end
+
+    it "should report when unable to add user as collaborator" do
+      allow(subject).to receive(:is_invited?).and_return(false)
+      allow(subject).to receive(:is_collaborator?).and_return(false)
+      expect(subject).to receive(:add_collaborator).and_return(false)
+      expected_response = "It was not possible to invite @buffy"
+
       expect(subject.invite_user("buffy")).to eq(expected_response)
     end
   end
