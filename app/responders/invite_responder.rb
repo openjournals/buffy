@@ -4,7 +4,7 @@ class InviteResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} invite (\S*)\s*\z/i
+    @event_regex = /\A@#{@bot_name} invite (\S+)\s*\z/i
   end
 
   def process_message(message)

@@ -16,6 +16,7 @@ describe AssignReviewerNResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci assign @arfon as reviewer 1")
       expect(@responder.event_regex).to match("@botsci assign @xuanxu as reviewer 33B")
+      expect(@responder.event_regex).to_not match("@botsci assign   as reviewer 2")
       expect(@responder.event_regex).to_not match("assign @xuanxu as reviewer 2")
       expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as editor")
       expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as reviewer")
