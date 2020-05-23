@@ -4,7 +4,7 @@ class AssignReviewerNResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} assign (.*) as reviewer (\S+)\s*\z/i
+    @event_regex = /\A@#{@bot_name} assign (\S+) as reviewer (\S+)\s*\z/i
   end
 
   def process_message(message)

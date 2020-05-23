@@ -44,6 +44,20 @@ module GitHub
     github_client.remove_collaborator(context.repo, username)
   end
 
+  # Uses the GitHub API to determine if a user is already a collaborator of the repo
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def is_collaborator?(username)
+    username = username.sub(/^@/, "").downcase
+    github_client.collaborator?(context.repo, username)
+  end
+
+  # Uses the GitHub API to determine if a user has a pending invitation
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def is_invited?(username)
+    username = username.sub(/^@/, "").downcase
+    github_client.repository_invitations(context.repo).any? { |i| i.invitee.login.downcase == username }
+  end
+
   # Returns the list of members in all authorized teams using the GitHub API
   def authorized_people
     @authorized_people ||= begin
@@ -66,6 +80,11 @@ module GitHub
       end
       autorized.compact.any?
     end
+  end
+
+  # The url of the invitations page for the current repo
+  def invitations_url
+    "https://github.com/#{context.repo}/invitations"
   end
 
 end

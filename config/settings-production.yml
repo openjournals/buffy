@@ -20,6 +20,8 @@ buffy:
     remove_editor:
       only: editors
       no_reviewer_text: "TBD"
+    invite:
+      only: editors
     set_value:
       - version:
           only: editors

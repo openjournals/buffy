@@ -49,6 +49,36 @@ describe "Github methods" do
     end
   end
 
+  describe "#is_collaborator?" do
+    it "should be true if user is a collaborator" do
+      expect_any_instance_of(Octokit::Client).to receive(:collaborator?).twice.with("openjournals/buffy", "xuanxu").and_return(true)
+      expect(subject.is_collaborator?("@xuanxu")).to eq(true)
+      expect(subject.is_collaborator?("xuanxu")).to eq(true)
+    end
+
+    it "should be false if user is not a collaborator" do
+      expect_any_instance_of(Octokit::Client).to receive(:collaborator?).twice.with("openjournals/buffy", "xuanxu").and_return(false)
+      expect(subject.is_collaborator?("@XuanXu")).to eq(false)
+      expect(subject.is_collaborator?("xuanxu")).to eq(false)
+    end
+  end
+
+  describe "#is_invited?" do
+    before do
+      invitations = [OpenStruct.new(invitee: OpenStruct.new(login: 'Faith')), OpenStruct.new(invitee: OpenStruct.new(login: 'Buffy'))]
+      allow_any_instance_of(Octokit::Client).to receive(:repository_invitations).with("openjournals/buffy").and_return(invitations)
+    end
+
+    it "should be true if user has a pending invitation" do
+      expect(subject.is_invited?("@BUFfy")).to eq(true)
+      expect(subject.is_invited?("buffy")).to eq(true)
+    end
+
+    it "should be false if user has not a pending invitation" do
+      expect(subject.is_invited?("drusilla")).to eq(false)
+    end
+  end
+
   describe "#add_collaborator" do
     it "should add the user to the repo's collaborators" do
       expect_any_instance_of(Octokit::Client).to receive(:add_collaborator).once.with("openjournals/buffy", "xuanxu")
@@ -88,7 +118,7 @@ describe "Github methods" do
     end
   end
 
-  describe "#authorized_people" do
+  describe "#user_authorized?" do
     it "should return true if user is member of any authorized team" do
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).once.with(11, "sender").and_return(true)
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).never.with(22, "sender")
@@ -96,15 +126,20 @@ describe "Github methods" do
 
       expect(subject.user_authorized?("sender")).to be_truthy
     end
-  end
 
-  describe "#authorized_people" do
     it "should return false if user is not member of any authorized team" do
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).once.with(11, "sender").and_return(false)
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).never.with(22, "sender")
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).once.with(33, "sender").and_return(false)
 
       expect(subject.user_authorized?("sender")).to be_falsey
+    end
+  end
+
+  describe "#invitations_url" do
+    it "should return the url of the repo's invitations page" do
+      expected_url = "https://github.com/openjournals/buffy/invitations"
+      expect(subject.invitations_url).to eq(expected_url)
     end
   end
 

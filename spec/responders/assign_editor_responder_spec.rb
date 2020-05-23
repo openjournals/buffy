@@ -18,6 +18,7 @@ describe AssignEditorResponder do
       expect(@responder.event_regex).to match("@botsci assign @xuanxu as editor   \r\n")
       expect(@responder.event_regex).to_not match("assign @xuanxu as editor")
       expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as editor now")
+      expect(@responder.event_regex).to_not match("@botsci assign   as editor")
       expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as reviewer")
     end
   end
