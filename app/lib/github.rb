@@ -66,7 +66,7 @@ module GitHub
       team = github_client.organization_teams(org_name).select { |t| t[:slug] == team_name || t[:name].downcase == team_name.downcase }.first
       team.nil? ? nil : team[:id]
     rescue Octokit::Forbidden
-      nil
+      raise "Configuration Error: No API access to organization: #{org_name}"
     end
   end
 
@@ -74,12 +74,12 @@ module GitHub
   # false otherwise
   def user_authorized?(user_login)
     @user_authorized ||= begin
-      autorized = []
+      authorized = []
       authorized_team_ids.each do |team_id|
-        autorized << github_client.team_member?(team_id, user_login)
-        break if autorized.compact.any?
+        authorized << github_client.team_member?(team_id, user_login)
+        break if authorized.compact.any?
       end
-      autorized.compact.any?
+      authorized.compact.any?
     end
   end
 
@@ -103,7 +103,7 @@ module GitHub
             team = gh.organization_teams(org_slug).select { |t| t[:slug] == team_slug || t[:name].downcase == team_slug.downcase }.first
             team.nil? ? nil : team[:id]
           rescue Octokit::Forbidden
-            nil
+            raise "Configuration Error: No API access to organization: #{org_slug}"
           end
         end
       end

@@ -3,12 +3,19 @@ require_relative "./spec_helper.rb"
 describe "Authorizations" do
 
   subject do
-    settings = Sinatra::IndifferentHash[teams: { editors: 11, reviewers: 22, eics: 33, guests: "orgbuffy/guests" }]
+    settings = Sinatra::IndifferentHash[teams: { editors: 11, reviewers: 22, eics: 33, guests: "orgbuffy/guests", empty: nil }]
     params = { only: ['editors', 'eics'] }
     Responder.new(settings, params)
   end
 
   context "#authorized_team_ids" do
+    describe "when there is no restrictions via :only param" do
+      it "should return nothing" do
+        subject.params = { }
+        expect(subject.authorized_team_ids).to eq([])
+      end
+    end
+
     describe "when ids received" do
       it "should return ids of all authorized team" do
         expect(subject.authorized_team_ids).to eq([11, 33])
@@ -28,6 +35,13 @@ describe "Authorizations" do
         subject.params = { only: ['editors', 'guests'] }
         expect(subject).to receive(:team_id).once.with("orgbuffy/guests").and_return(44)
         expect(subject.authorized_team_ids).to eq([11, 44])
+      end
+    end
+
+    describe "when a team with nil value is received" do
+      it "should return nothing" do
+        subject.params = { only: ['empty'] }
+        expect(subject.authorized_team_ids).to eq([])
       end
     end
   end

@@ -104,21 +104,31 @@ describe "Github methods" do
   end
 
   describe "#team_id" do
-    before do
-      teams = [{name: "Editors", id: 372411, description: ""}, {name: "Bots!", id: 111001, slug: "bots"}]
-      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.and_return(teams)
+    context "with valid API access" do
+      before do
+        teams = [{name: "Editors", id: 372411, description: ""}, {name: "Bots!", id: 111001, slug: "bots"}]
+        expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.and_return(teams)
+      end
+
+      it "should return team's id if the team exists" do
+        expect(subject.team_id("openjournals/editors")).to eq(372411)
+      end
+
+      it "should find team by slug" do
+        expect(subject.team_id("openjournals/bots")).to eq(111001)
+      end
+
+      it "should return nil if the team doesn't exists" do
+        expect(subject.team_id("openjournals/nonexistent")).to be_nil
+      end
     end
 
-    it "should return team's id if the team exists" do
-      expect(subject.team_id("openjournals/editors")).to eq(372411)
-    end
+    it "should raise an error if there's not access to the organization" do
+      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("buffy").and_raise(Octokit::Forbidden)
 
-    it "should find team by slug" do
-      expect(subject.team_id("openjournals/bots")).to eq(111001)
-    end
-
-    it "should return nil if the team doesn't exists" do
-      expect(subject.team_id("openjournals/nonexistent")).to be_nil
+      expect {
+        subject.team_id("buffy/whatever")
+      }.to raise_error "Configuration Error: No API access to organization: buffy"
     end
   end
 
@@ -170,6 +180,15 @@ describe "Github methods" do
       expect {
         Responder.get_team_ids(config)
       }.to raise_error "Configuration Error: Invalid team name: wrong-name"
+    end
+
+    it "should raise an error if there's not access to the organization" do
+      config = { teams: { the_bots: "openjournals/bots" } }
+      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("openjournals").and_raise(Octokit::Forbidden)
+
+      expect {
+        Responder.get_team_ids(config)
+      }.to raise_error "Configuration Error: No API access to organization: openjournals"
     end
   end
 
