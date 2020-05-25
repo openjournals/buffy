@@ -58,6 +58,13 @@ module GitHub
     github_client.repository_invitations(context.repo).any? { |i| i.invitee.login.downcase == username }
   end
 
+  # Uses the GitHub API to obtain the id of an organization's team
+  def team_id(org_name, team_name)
+    begin
+      team = github_client.organization_teams(org_name).select { |t| t[:slug] == team_name || t[:name].downcase == team_name.downcase }.first
+      team.nil? ? nil : team[:id]
+    rescue Octokit::Forbidden
+      nil
     end
   end
 

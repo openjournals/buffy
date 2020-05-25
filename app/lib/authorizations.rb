@@ -2,14 +2,27 @@ module Authorizations
 
   def authorized_team_ids
     @authorized_team_ids ||= begin
-      teams_ids = []
+      team_ids = []
+      teams_ids_or_names = []
       case params[:only]
       when String
-        teams_ids << @teams[params[:only]]
+        teams_ids_or_names << @teams[params[:only]]
       when Array
-        params[:only].each { |team_name| teams_ids << @teams[team_name] }
+        params[:only].each { |team_name| teams_ids_or_names << @teams[team_name] }
       end
-      teams_ids
+
+      teams_ids_or_names.each do |team_id_or_name|
+        case team_id_or_name
+        when Integer
+          team_ids << team_id_or_name
+        when String
+          org_team = team_id_or_name.split('/')
+          raise "Configuration Error: Invalid team name: #{team_id_or_name}" unless org_team.size == 2
+          team_id = team_id(org_team[0], org_team[1])
+          team_ids << team_id unless team_id.nil?
+        end
+      end
+      team_ids.uniq
     end
   end
 

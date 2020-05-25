@@ -103,6 +103,18 @@ describe "Github methods" do
     end
   end
 
+  describe "#team_id" do
+    before do
+      teams = [{name: "Editors", id: 372411, description: ""}, {name: "bots", id: 3824219, slug: "bots"}]
+      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("openjournals").and_return(teams)
+    end
+
+    it "should return team's id if the team exists" do
+      expect(subject.team_id("openjournals", "editors")).to eq(372411)
+    end
+
+    it "should return nil if the team doesn't exists" do
+      expect(subject.team_id("openjournals", "nonexistent")).to be_nil
     end
   end
 

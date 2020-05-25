@@ -20,6 +20,7 @@ module CommonActions
     allow(responder).to receive(:label_issue).and_return(true)
     allow(responder).to receive(:update_issue).and_return(true)
     allow(responder).to receive(:add_collaborator).and_return(true)
+    allow(responder).to receive(:team_id).and_return(nil)
 
     allow(Octokit::Client).to receive(:new).and_return(true)
   end
