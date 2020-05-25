@@ -123,7 +123,13 @@ describe "Github methods" do
       end
     end
 
-    it "should raise an error if there's not access to the organization" do
+    it "should raise a configuration error for teams with wrong name" do
+      expect {
+        subject.team_id("wrong-name")
+      }.to raise_error "Configuration Error: Invalid team name: wrong-name"
+    end
+
+    it "should raise a configuration error if there's not access to the organization" do
       expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("buffy").and_raise(Octokit::Forbidden)
 
       expect {
@@ -182,7 +188,7 @@ describe "Github methods" do
       }.to raise_error "Configuration Error: Invalid team name: wrong-name"
     end
 
-    it "should raise an error if there's not access to the organization" do
+    it "should raise a configuration error if there's not access to the organization" do
       config = { teams: { the_bots: "openjournals/bots" } }
       expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("openjournals").and_raise(Octokit::Forbidden)
 
