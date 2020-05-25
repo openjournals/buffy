@@ -58,14 +58,6 @@ module GitHub
     github_client.repository_invitations(context.repo).any? { |i| i.invitee.login.downcase == username }
   end
 
-  # Returns the list of members in all authorized teams using the GitHub API
-  def authorized_people
-    @authorized_people ||= begin
-      autorized_logins = []
-      authorized_team_ids.each do |team_id|
-        autorized_logins += github_client.team_members(team_id).collect { |e| e.login }
-      end
-      autorized_logins.sort.uniq
     end
   end
 

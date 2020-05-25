@@ -103,18 +103,6 @@ describe "Github methods" do
     end
   end
 
-  describe "#authorized_people" do
-    it "should return all people in authorized teams" do
-      editors_team = [OpenStruct.new(login: "supereditor")]
-      eics_team = [OpenStruct.new(login: "supereditor")]
-      [1,2].each do |n|
-        editors_team << OpenStruct.new(login: "editor_#{n}")
-        eics_team << OpenStruct.new(login: "eic_#{n}")
-      end
-      expect_any_instance_of(Octokit::Client).to receive(:team_members).once.with(11).and_return(editors_team)
-      expect_any_instance_of(Octokit::Client).to receive(:team_members).once.with(33).and_return(eics_team)
-
-      expect(subject.authorized_people).to eq(["editor_1", "editor_2", "eic_1", "eic_2", "supereditor"])
     end
   end
 
