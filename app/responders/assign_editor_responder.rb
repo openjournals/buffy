@@ -12,6 +12,7 @@ class AssignEditorResponder < Responder
     end_mark = "<!--end-editor-->"
 
     new_editor = @match_data[1]
+    new_editor = "@#{context.sender}" if new_editor == "me"
 
     update_body(mark, end_mark, new_editor)
     add_collaborator(new_editor) if add_as_collaborator?

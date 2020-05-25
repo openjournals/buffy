@@ -16,6 +16,7 @@ describe AssignEditorResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci assign @arfon as editor")
       expect(@responder.event_regex).to match("@botsci assign @xuanxu as editor   \r\n")
+      expect(@responder.event_regex).to match("@botsci assign me as editor")
       expect(@responder.event_regex).to_not match("assign @xuanxu as editor")
       expect(@responder.event_regex).to_not match("@botsci assign @xuanxu as editor now")
       expect(@responder.event_regex).to_not match("@botsci assign   as editor")
@@ -55,6 +56,14 @@ describe AssignEditorResponder do
     it "should respond to github" do
       expect(@responder).to receive(:respond).with("Assigned! @arfon is now the editor")
       @responder.process_message(@msg)
+    end
+
+    it "should understand 'assign me'" do
+      msg = "@botsci assign me as editor"
+      @responder.context = OpenStruct.new(sender: 'xuanxu')
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(@responder).to receive(:respond).with("Assigned! @xuanxu is now the editor")
+      @responder.process_message(msg)
     end
   end
 end
