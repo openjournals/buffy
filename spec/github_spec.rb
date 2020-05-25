@@ -105,16 +105,20 @@ describe "Github methods" do
 
   describe "#team_id" do
     before do
-      teams = [{name: "Editors", id: 372411, description: ""}, {name: "bots", id: 3824219, slug: "bots"}]
-      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("openjournals").and_return(teams)
+      teams = [{name: "Editors", id: 372411, description: ""}, {name: "Bots!", id: 111001, slug: "bots"}]
+      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.and_return(teams)
     end
 
     it "should return team's id if the team exists" do
-      expect(subject.team_id("openjournals", "editors")).to eq(372411)
+      expect(subject.team_id("openjournals/editors")).to eq(372411)
+    end
+
+    it "should find team by slug" do
+      expect(subject.team_id("openjournals/bots")).to eq(111001)
     end
 
     it "should return nil if the team doesn't exists" do
-      expect(subject.team_id("openjournals", "nonexistent")).to be_nil
+      expect(subject.team_id("openjournals/nonexistent")).to be_nil
     end
   end
 
@@ -140,6 +144,32 @@ describe "Github methods" do
     it "should return the url of the repo's invitations page" do
       expected_url = "https://github.com/openjournals/buffy/invitations"
       expect(subject.invitations_url).to eq(expected_url)
+    end
+  end
+
+  describe ".get_team_ids" do
+    it "should convert all team entries to ids" do
+      config = { teams: { editors: 11, eics: "openjournals/eics", nonexistent: "openjournals/nope" } }
+      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).twice.and_return([{name: "eics", id: 42}])
+
+      expected_response = { editors: 11, eics: 42, nonexistent: nil }
+      expect(Responder.get_team_ids(config)). to eq(expected_response)
+    end
+
+    it "should find teams by slug" do
+      config = { teams: { the_bots: "openjournals/bots" } }
+      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.and_return([{name: "Rob0tz", id: 111001, slug: "bots"}])
+
+      expected_response = { the_bots: 111001 }
+      expect(Responder.get_team_ids(config)). to eq(expected_response)
+    end
+
+    it "should raise a configuration error for teams with wrong name" do
+      config = { teams: { editors: 11, nonexistent: "wrong-name" } }
+
+      expect {
+        Responder.get_team_ids(config)
+      }.to raise_error "Configuration Error: Invalid team name: wrong-name"
     end
   end
 

@@ -59,7 +59,9 @@ module GitHub
   end
 
   # Uses the GitHub API to obtain the id of an organization's team
-  def team_id(org_name, team_name)
+  def team_id(org_team_name)
+    org_name, team_name = org_team_name.split('/')
+    raise "Configuration Error: Invalid team name: #{org_team_name}" if org_name.nil? || team_name.nil?
     begin
       team = github_client.organization_teams(org_name).select { |t| t[:slug] == team_name || t[:name].downcase == team_name.downcase }.first
       team.nil? ? nil : team[:id]
@@ -84,6 +86,33 @@ module GitHub
   # The url of the invitations page for the current repo
   def invitations_url
     "https://github.com/#{context.repo}/invitations"
+  end
+
+
+  module ClassMethods
+    # Class method to get team ids for teams configured by name
+    def get_team_ids(config)
+      teams_hash = config[:teams] || Sinatra::IndifferentHash.new
+      gh = nil
+      teams_hash.each_pair do |team_name, id_or_slug|
+        if id_or_slug.is_a? String
+          org_slug, team_slug = id_or_slug.split('/')
+          raise "Configuration Error: Invalid team name: #{id_or_slug}" if org_slug.nil? || team_slug.nil?
+          gh ||= Octokit::Client.new(access_token: config[:gh_access_token], auto_paginate: true)
+          teams_hash[team_name] = begin
+            team = gh.organization_teams(org_slug).select { |t| t[:slug] == team_slug || t[:name].downcase == team_slug.downcase }.first
+            team.nil? ? nil : team[:id]
+          rescue Octokit::Forbidden
+            nil
+          end
+        end
+      end
+      teams_hash
+    end
+  end
+
+  def self.included base
+    base.extend ClassMethods
   end
 
 end

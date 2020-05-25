@@ -40,6 +40,7 @@ class ResponderRegistry
 
   # Load up the responders defined in config/settings-#{ENV}.yml
   def load_responders!
+    config[:teams] = Responder.get_team_ids(config) if config[:teams]
     config[:responders].each_pair do |name, params|
       params = {} if params.nil?
       if params.is_a?(Array)

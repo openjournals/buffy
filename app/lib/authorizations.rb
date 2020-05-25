@@ -16,10 +16,8 @@ module Authorizations
         when Integer
           team_ids << team_id_or_name
         when String
-          org_team = team_id_or_name.split('/')
-          raise "Configuration Error: Invalid team name: #{team_id_or_name}" unless org_team.size == 2
-          team_id = team_id(org_team[0], org_team[1])
-          team_ids << team_id unless team_id.nil?
+          found_team_id = team_id(team_id_or_name)
+          team_ids << found_team_id unless found_team_id.nil?
         end
       end
       team_ids.uniq

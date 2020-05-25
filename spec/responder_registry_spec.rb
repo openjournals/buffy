@@ -44,4 +44,20 @@ describe ResponderRegistry do
     end
   end
 
+  describe "loading responders" do
+    it "should retrieve all teams ids once" do
+      @config[:teams] = { editors: 11, eics: "openjournals/eics" }
+      expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("openjournals").and_return([{name: "eics", id: 42}])
+      expected_teams = { editors: 11, eics: 42 }
+
+      registry = described_class.new(@config)
+      responders = registry.responders
+
+      expect(responders.size).to eq(5)
+      responders.each do |responder|
+        expect(responder.teams).to eq(expected_teams)
+      end
+    end
+  end
+
 end
