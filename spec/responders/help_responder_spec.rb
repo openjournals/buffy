@@ -29,19 +29,26 @@ describe HelpResponder do
   describe "#process_message" do
     before do
       @settings = { bot_github_user: "botsci",
-                   teams: { editors: 2009411 },
-                   responders: { "hello" => nil,
+                    teams: { editors: 2009411 },
+                    responders: { "hello" => nil,
                                  "help" => nil,
                                  "assign_reviewer_n" => { only: "editors" } } }
       @responder = subject.new(@settings, {})
-      @responder.context = OpenStruct.new(sender: "sender")
+
+      @hello = HelloResponder.new(@settings,{})
+      @help = HelpResponder.new(@settings,{})
+      @assign_reviewer_n = AssignReviewerNResponder.new(@settings,{})
+
+      @context = OpenStruct.new(sender: "sender", event: "issue_comments", event_action: "issue_comment.created")
+      @responder.context = @context
+
       disable_github_calls_for(@responder)
     end
 
     it "should respond the help erb template to github" do
       allow_any_instance_of(Responder).to receive(:authorized?).and_return(true)
 
-      responders = [HelloResponder.new(@settings,{}), HelpResponder.new(@settings,{}), AssignReviewerNResponder.new(@settings,{})]
+      responders = [@hello, @help, @assign_reviewer_n]
       expected_descriptions = responders.map {|r| [r.description, r.example_invocation]}
       expected_locals = { sender: "sender", descriptions_and_examples: expected_descriptions}
 
@@ -52,7 +59,7 @@ describe HelpResponder do
     it "should list only allowed responders" do
       allow_any_instance_of(AssignReviewerNResponder).to receive(:authorized?).and_return(false)
 
-      responders = [HelloResponder.new(@settings,{}), HelpResponder.new(@settings,{})]
+      responders = [@hello, @help]
       expected_descriptions = responders.map {|r| [r.description, r.example_invocation]}
       expected_locals = { sender: "sender", descriptions_and_examples: expected_descriptions}
 
@@ -64,15 +71,34 @@ describe HelpResponder do
       allow_any_instance_of(Responder).to receive(:authorized?).and_return(true)
       new_settings = @settings.merge({ responders: @settings[:responders].merge({"hello" => { hidden: true }}) })
       responder = subject.new(new_settings, {})
-      responder.context = OpenStruct.new(sender: "sender")
+      responder.context = @context
       disable_github_calls_for(responder)
 
-      responders = [HelpResponder.new(new_settings,{}), AssignReviewerNResponder.new(new_settings,{})]
+      responders = [@help, @assign_reviewer_n]
       expected_descriptions = responders.map {|r| [r.description, r.example_invocation]}
       expected_locals = { sender: "sender", descriptions_and_examples: expected_descriptions}
 
       expect(responder).to receive(:respond_template).once.with(:help, expected_locals)
       responder.process_message("@botsci help")
+    end
+
+    it "should not list responders not listening to comments" do
+      allow_any_instance_of(Responder).to receive(:authorized?).and_return(true)
+      allow_any_instance_of(Responder).to receive(:hidden?).and_return(false)
+      no_comment_responder = Responder.new(@settings, {})
+      no_comment_responder.event_action = "issues"
+
+      responders = [@help, no_comment_responder, @assign_reviewer_n]
+
+      expect_any_instance_of(ResponderRegistry).to receive(:load_responders!).and_return(true)
+      expect_any_instance_of(ResponderRegistry).to receive(:responders).and_return(responders)
+
+      expected_responders = responders - [no_comment_responder]
+      expected_descriptions = expected_responders.map {|r| [r.description, r.example_invocation]}
+      expected_locals = { sender: "sender", descriptions_and_examples: expected_descriptions}
+
+      expect(@responder).to receive(:respond_template).once.with(:help, expected_locals)
+      @responder.process_message("@botsci help")
     end
   end
 end

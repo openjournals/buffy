@@ -9,7 +9,10 @@ class HelpResponder < Responder
 
   def process_message(message)
     descriptions_and_examples = []
-    active_responders = ResponderRegistry.new(@settings).responders.select {|r| !r.hidden? }.select {|r| r.authorized?(context)}
+    visible_responders = ResponderRegistry.new(@settings).responders.select {|r| !r.hidden? }
+    comment_responders = visible_responders.select{|r| r.responds_on?(context)}
+    active_responders = comment_responders.select {|r| r.authorized?(context)}
+
     active_responders.each do |r|
       descriptions_and_examples << [r.description, r.example_invocation]
     end
