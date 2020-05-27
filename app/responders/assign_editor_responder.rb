@@ -16,6 +16,7 @@ class AssignEditorResponder < Responder
 
     update_body(mark, end_mark, new_editor)
     add_collaborator(new_editor) if add_as_collaborator?
+    add_assignee(new_editor) if add_as_assignee?
     respond("Assigned! #{new_editor} is now the editor")
   end
 
@@ -29,6 +30,10 @@ class AssignEditorResponder < Responder
 
   def add_as_collaborator?
     params[:add_as_collaborator] == true
+  end
+
+  def add_as_assignee?
+    true unless params[:add_as_assignee] == false
   end
 
 end

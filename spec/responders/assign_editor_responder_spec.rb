@@ -27,6 +27,7 @@ describe AssignEditorResponder do
   describe "#process_message" do
     before do
       @responder = subject.new({ bot_github_user: 'botsci' }, {})
+      @responder.context = OpenStruct.new({ repo: "openjournals/buffy", issue_id: 5 })
       disable_github_calls_for(@responder)
 
       @msg = "@botsci assign @arfon as editor"
@@ -43,13 +44,24 @@ describe AssignEditorResponder do
     end
 
     it "should not add editor as collaborator by default" do
-      expect(@responder).to_not receive(:add_collaborator).with("@arfon")
+      expect(@responder).to_not receive(:add_collaborator)
       @responder.process_message(@msg)
     end
 
     it "should add editor as collaborator if params[:add_as_collaborator] is true" do
       expect(@responder).to receive(:add_collaborator).with("@arfon")
       @responder.params = {add_as_collaborator: true}
+      @responder.process_message(@msg)
+    end
+
+    it "should add editor as assignee by default" do
+      expect(@responder).to receive(:add_assignee).with("@arfon")
+      @responder.process_message(@msg)
+    end
+
+    it "should not add editor as assignee if params[:add_as_assignee] is false" do
+      expect(@responder).to_not receive(:add_assignee)
+      @responder.params = {add_as_assignee: false}
       @responder.process_message(@msg)
     end
 
@@ -60,7 +72,7 @@ describe AssignEditorResponder do
 
     it "should understand 'assign me'" do
       msg = "@botsci assign me as editor"
-      @responder.context = OpenStruct.new(sender: 'xuanxu')
+      @responder.context.sender = "xuanxu"
       @responder.match_data = @responder.event_regex.match(msg)
       expect(@responder).to receive(:respond).with("Assigned! @xuanxu is now the editor")
       @responder.process_message(msg)
