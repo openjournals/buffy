@@ -37,6 +37,20 @@ module GitHub
     github_client.add_collaborator(context.repo, username)
   end
 
+  # Add a user to the issue's assignees list
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def add_assignee(username)
+    username = username.sub(/^@/, "").downcase
+    github_client.add_assignees(context.repo, context.issue_id, [username])
+  end
+
+  # Remove a user from the issue's assignees list
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def remove_assignee(username)
+    username = username.sub(/^@/, "").downcase
+    github_client.remove_assignees(context.repo, context.issue_id, [username])
+  end
+
   # Remove a user from repo's collaborators
   # Context is an OpenStruct created in lib/github_webhook_parser
   def remove_collaborator(username)

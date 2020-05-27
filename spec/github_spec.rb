@@ -103,6 +103,30 @@ describe "Github methods" do
     end
   end
 
+  describe "#add_assignee" do
+    it "should add the user to the repo's assignees list" do
+      expect_any_instance_of(Octokit::Client).to receive(:add_assignees).once.with("openjournals/buffy", 5, ["xuanxu"])
+      subject.add_assignee("xuanxu")
+    end
+
+    it "should use the user's login" do
+      expect_any_instance_of(Octokit::Client).to receive(:add_assignees).once.with("openjournals/buffy", 5, ["xuanxu"])
+      subject.add_assignee("@XuanXu")
+    end
+  end
+
+  describe "#remove_assignee" do
+    it "should remove the user from the repo's assignees list" do
+      expect_any_instance_of(Octokit::Client).to receive(:remove_assignees).once.with("openjournals/buffy", 5, ["xuanxu"])
+      subject.remove_assignee("xuanxu")
+    end
+
+    it "should use the user's login" do
+      expect_any_instance_of(Octokit::Client).to receive(:remove_assignees).once.with("openjournals/buffy", 5, ["xuanxu"])
+      subject.remove_assignee("@XuanXu")
+    end
+  end
+
   describe "#team_id" do
     context "with valid API access" do
       before do
