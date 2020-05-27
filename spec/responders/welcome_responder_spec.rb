@@ -9,7 +9,7 @@ describe WelcomeResponder do
   describe "listening" do
     before { @responder = subject.new({bot_github_user: "botsci"}, {}) }
 
-    it "should listen to new comments" do
+    it "should listen to new issues" do
       expect(@responder.event_action).to eq("issues.opened")
     end
 
