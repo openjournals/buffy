@@ -13,6 +13,7 @@ class ResponderRegistry
     "invite"            => InviteResponder,
     "set_value"         => SetValueResponder,
     "thanks"            => ThanksResponder,
+    "welcome"           => WelcomeResponder,
   }
 
   attr_accessor :responders

@@ -20,7 +20,7 @@ class WelcomeResponder < Responder
   end
 
   def reply
-    params[:reply] || "You are welcome"
+    params[:reply] || "Hi!, I'm @#{bot_name}, a friendly bot.\n\nType ```@#{bot_name} help``` to discover how I can help you."
   end
 
   def hidden?
