@@ -61,6 +61,13 @@ describe AssignEditorResponder do
       @responder.process_message(@msg)
     end
 
+    it "should not remove assignee if no previous editor present" do
+      expect(@responder).to receive(:read_from_body).once.and_return("Pending")
+      expect(@responder).to receive(:add_assignee).with("@arfon")
+      expect(@responder).to_not receive(:remove_assignee)
+      @responder.process_message(@msg)
+    end
+
     it "should not replace editor as assignee if params[:add_as_assignee] is false" do
       expect(@responder).to_not receive(:add_assignee)
       expect(@responder).to_not receive(:remove_assignee)

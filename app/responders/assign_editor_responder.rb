@@ -14,9 +14,12 @@ class AssignEditorResponder < Responder
     new_editor = @match_data[1]
     new_editor = "@#{context.sender}" if new_editor == "me"
 
+    old_editor = read_from_body(mark, end_mark)
+    old_editor = nil unless username?(old_editor)
+
     update_body(mark, end_mark, new_editor)
     add_collaborator(new_editor) if add_as_collaborator?
-    replace_assignee(read_from_body(mark, end_mark), new_editor) if add_as_assignee?
+    replace_assignee(old_editor, new_editor) if add_as_assignee?
     respond("Assigned! #{new_editor} is now the editor")
   end
 

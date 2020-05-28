@@ -107,6 +107,11 @@ module GitHub
     username.sub(/^@/, "").downcase
   end
 
+  # Returns true if the string is a valid GitHub isername (starts with @)
+  def username?(username)
+    username.match(/\A@/)
+  end
+
 
   module ClassMethods
     # Class method to get team ids for teams configured by name

@@ -232,4 +232,14 @@ describe "Github methods" do
     end
   end
 
+  describe "#username?" do
+    it "should be true if username starts with @" do
+      expect(subject.username?("@buffy")).to be_truthy
+    end
+
+    it "should be false otherwise" do
+      expect(subject.username?("buffy")).to be_falsey
+    end
+  end
+
 end
