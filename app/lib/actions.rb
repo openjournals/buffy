@@ -13,17 +13,28 @@ module Actions
 
   # Invite a user to collaborate in the repo
   def invite_user(username)
-    username = username.sub(/^@/, "").downcase
-
-    pending_msg = "The reviewer already has a pending invitation.\n\n@#{username} please accept the invite here: #{invitations_url}"
-    collaborator_msg = "@#{username} already has access."
-    added_msg = "OK, invitation sent!\n\n@#{username} please accept the invite here: #{invitations_url}"
-    error_msg = "It was not possible to invite @#{username}"
+    pending_msg = "The reviewer already has a pending invitation.\n\n#{username} please accept the invite here: #{invitations_url}"
+    collaborator_msg = "#{username} already has access."
+    added_msg = "OK, invitation sent!\n\n#{username} please accept the invite here: #{invitations_url}"
+    error_msg = "It was not possible to invite #{username}"
 
     return pending_msg if is_invited? username
     return collaborator_msg if is_collaborator? username
     return added_msg if add_collaborator username
     return error_msg
+  end
+
+  def read_from_body(start_mark, end_mark)
+    text = ""
+    issue.body.match(/#{start_mark}(.*)#{end_mark}/i) do |m|
+      text = m[1]
+    end
+    text.strip
+  end
+
+  def replace_assignee(old_assignee, new_assignee)
+    remove_assignee old_assignee unless old_assignee.nil? || old_assignee.empty?
+    add_assignee new_assignee unless new_assignee.nil? || new_assignee.empty?
   end
 
 end
