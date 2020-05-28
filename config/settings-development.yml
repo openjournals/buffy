@@ -21,7 +21,7 @@ buffy:
       only: editors
     remove_editor:
       only: editors
-      no_reviewer_text: "TBD"
+      no_editor_text: "TBD"
     invite:
       only: editors
     set_value:

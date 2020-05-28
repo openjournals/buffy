@@ -69,6 +69,8 @@ describe AssignEditorResponder do
     end
 
     it "should not replace editor as assignee if params[:add_as_assignee] is false" do
+      expect(@responder).to receive(:read_from_body).once.and_return("@other_editor")
+      expect(@responder).to_not receive(:replace_assignee)
       expect(@responder).to_not receive(:add_assignee)
       expect(@responder).to_not receive(:remove_assignee)
       @responder.params = {add_as_assignee: false}

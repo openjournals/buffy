@@ -40,7 +40,7 @@ describe RemoveEditorResponder do
     end
 
     it "should update the body of the issue with custom text" do
-      @responder.params = { no_reviewer_text: 'TBD' }
+      @responder.params = { no_editor_text: 'TBD' }
       expected_new_body = "...Submission editor: <!--editor-->TBD<!--end-editor--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
       @responder.process_message(@msg)

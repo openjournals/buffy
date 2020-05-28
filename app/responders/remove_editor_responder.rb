@@ -13,13 +13,13 @@ class RemoveEditorResponder < Responder
 
     old_editor = read_from_body(mark, end_mark)
 
-    update_body(mark, end_mark, no_reviewer_text)
-    remove_assignee(old_editor) if (old_editor != no_reviewer_text && username?(old_editor))
+    update_body(mark, end_mark, no_editor_text)
+    remove_assignee(old_editor) if (old_editor != no_editor_text && username?(old_editor))
     respond("Editor removed!")
   end
 
-  def no_reviewer_text
-    params[:no_reviewer_text] || 'Pending'
+  def no_editor_text
+    params[:no_editor_text] || 'Pending'
   end
 
   def description

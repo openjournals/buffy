@@ -46,6 +46,23 @@ describe RemoveReviewerNResponder do
       @responder.process_message(@msg)
     end
 
+    it "should remove the reviewer from assignees" do
+      expect(@responder).to receive(:remove_assignee).with("@buffy")
+      @responder.process_message(@msg)
+    end
+
+    it "should not remove the editor from assignees if not previous editor" do
+      expect(@responder).to_not receive(:remove_assignee)
+
+      issue = OpenStruct.new({ body: "...Reviewer 33: <!--reviewer-33--> Pending <!--end-reviewer-33--> ..." })
+      allow(@responder).to receive(:issue).and_return(issue)
+      @responder.process_message(@msg)
+
+      issue = OpenStruct.new({ body: "...Reviewer 33: <!--reviewer-33-->TBD<!--end-reviewer-33--> ..." })
+      allow(@responder).to receive(:issue).and_return(issue)
+      @responder.process_message(@msg)
+    end
+
     it "should respond to github" do
       expect(@responder).to receive(:respond).with("Reviewer 33 removed!")
       @responder.process_message(@msg)

@@ -11,7 +11,10 @@ class RemoveReviewerNResponder < Responder
     mark = "<!--reviewer-#{@match_data[1]}-->"
     end_mark = "<!--end-reviewer-#{@match_data[1]}-->"
 
+    old_reviewer = read_from_body(mark, end_mark)
+
     update_body(mark, end_mark, no_reviewer_text)
+    remove_assignee(old_reviewer) if (old_reviewer != no_reviewer_text && username?(old_reviewer))
     respond("Reviewer #{@match_data[1]} removed!")
   end
 

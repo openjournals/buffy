@@ -13,8 +13,12 @@ class AssignReviewerNResponder < Responder
 
     new_reviewer = @match_data[1]
 
+    old_reviewer = read_from_body(mark, end_mark)
+    old_reviewer = nil unless username?(old_reviewer)
+
     update_body(mark, end_mark, new_reviewer)
     add_collaborator(new_reviewer) if add_as_collaborator?
+    replace_assignee(old_reviewer, new_reviewer) if add_as_assignee?
     respond("Reviewer #{@match_data[2]} assigned!")
   end
 
@@ -28,6 +32,10 @@ class AssignReviewerNResponder < Responder
 
   def add_as_collaborator?
     true unless params[:add_as_collaborator] == false
+  end
+
+  def add_as_assignee?
+    true unless params[:add_as_assignee] == false
   end
 
 end

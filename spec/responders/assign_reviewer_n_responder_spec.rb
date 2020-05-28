@@ -52,6 +52,29 @@ describe AssignReviewerNResponder do
       @responder.process_message(@msg)
     end
 
+    it "should replace reviewer as assignee by default" do
+      expect(@responder).to receive(:read_from_body).once.and_return("@other_reviewer")
+      expect(@responder).to receive(:add_assignee).with("@arfon")
+      expect(@responder).to receive(:remove_assignee).with("@other_reviewer")
+      @responder.process_message(@msg)
+    end
+
+    it "should not remove assignee if no previous reviewer present" do
+      expect(@responder).to receive(:read_from_body).once.and_return("Pending")
+      expect(@responder).to receive(:add_assignee).with("@arfon")
+      expect(@responder).to_not receive(:remove_assignee)
+      @responder.process_message(@msg)
+    end
+
+    it "should not replace reviewer as assignee if params[:add_as_assignee] is false" do
+      expect(@responder).to receive(:read_from_body).once.and_return("@other_reviewer")
+      expect(@responder).to_not receive(:replace_assignee)
+      expect(@responder).to_not receive(:add_assignee)
+      expect(@responder).to_not receive(:remove_assignee)
+      @responder.params = {add_as_assignee: false}
+      @responder.process_message(@msg)
+    end
+
     it "should respond to github" do
       expect(@responder).to receive(:respond).with("Reviewer 3 assigned!")
       @responder.process_message(@msg)
