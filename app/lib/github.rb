@@ -33,42 +33,42 @@ module GitHub
   # Add a user as collaborator to the repo
   # Context is an OpenStruct created in lib/github_webhook_parser
   def add_collaborator(username)
-    username = username.sub(/^@/, "").downcase
+    username = user_login(username)
     github_client.add_collaborator(context.repo, username)
   end
 
   # Add a user to the issue's assignees list
   # Context is an OpenStruct created in lib/github_webhook_parser
   def add_assignee(username)
-    username = username.sub(/^@/, "").downcase
+    username = user_login(username)
     github_client.add_assignees(context.repo, context.issue_id, [username])
   end
 
   # Remove a user from the issue's assignees list
   # Context is an OpenStruct created in lib/github_webhook_parser
   def remove_assignee(username)
-    username = username.sub(/^@/, "").downcase
+    username = user_login(username)
     github_client.remove_assignees(context.repo, context.issue_id, [username])
   end
 
   # Remove a user from repo's collaborators
   # Context is an OpenStruct created in lib/github_webhook_parser
   def remove_collaborator(username)
-    username = username.sub(/^@/, "").downcase
+    username = user_login(username)
     github_client.remove_collaborator(context.repo, username)
   end
 
   # Uses the GitHub API to determine if a user is already a collaborator of the repo
   # Context is an OpenStruct created in lib/github_webhook_parser
   def is_collaborator?(username)
-    username = username.sub(/^@/, "").downcase
+    username = user_login(username)
     github_client.collaborator?(context.repo, username)
   end
 
   # Uses the GitHub API to determine if a user has a pending invitation
   # Context is an OpenStruct created in lib/github_webhook_parser
   def is_invited?(username)
-    username = username.sub(/^@/, "").downcase
+    username = user_login(username)
     github_client.repository_invitations(context.repo).any? { |i| i.invitee.login.downcase == username }
   end
 
@@ -100,6 +100,11 @@ module GitHub
   # The url of the invitations page for the current repo
   def invitations_url
     "https://github.com/#{context.repo}/invitations"
+  end
+
+  # Returns the user login (removes the @ from the username)
+  def user_login(username)
+    username.sub(/^@/, "").downcase
   end
 
 

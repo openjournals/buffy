@@ -222,4 +222,14 @@ describe "Github methods" do
     end
   end
 
+  describe "#user_login" do
+    it "should remove the @ from a username" do
+      expect(subject.user_login("@buffy")).to eq("buffy")
+    end
+
+    it "should downcase the username" do
+      expect(subject.user_login("@BuFFy")).to eq("buffy")
+    end
+  end
+
 end
