@@ -16,7 +16,7 @@ class AssignEditorResponder < Responder
 
     update_body(mark, end_mark, new_editor)
     add_collaborator(new_editor) if add_as_collaborator?
-    add_assignee(new_editor) if add_as_assignee?
+    replace_assignee(read_from_body(mark, end_mark), new_editor) if add_as_assignee?
     respond("Assigned! #{new_editor} is now the editor")
   end
 

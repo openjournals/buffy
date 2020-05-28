@@ -54,13 +54,16 @@ describe AssignEditorResponder do
       @responder.process_message(@msg)
     end
 
-    it "should add editor as assignee by default" do
+    it "should replace editor as assignee by default" do
+      expect(@responder).to receive(:read_from_body).once.and_return("@other_editor")
       expect(@responder).to receive(:add_assignee).with("@arfon")
+      expect(@responder).to receive(:remove_assignee).with("@other_editor")
       @responder.process_message(@msg)
     end
 
-    it "should not add editor as assignee if params[:add_as_assignee] is false" do
+    it "should not replace editor as assignee if params[:add_as_assignee] is false" do
       expect(@responder).to_not receive(:add_assignee)
+      expect(@responder).to_not receive(:remove_assignee)
       @responder.params = {add_as_assignee: false}
       @responder.process_message(@msg)
     end
