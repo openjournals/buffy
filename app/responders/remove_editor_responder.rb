@@ -11,7 +11,10 @@ class RemoveEditorResponder < Responder
     mark = "<!--editor-->"
     end_mark = "<!--end-editor-->"
 
+    old_editor = read_from_body(mark, end_mark)
+
     update_body(mark, end_mark, no_reviewer_text)
+    remove_assignee(old_editor) if (old_editor != no_reviewer_text && username?(old_editor))
     respond("Editor removed!")
   end
 

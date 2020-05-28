@@ -33,7 +33,7 @@ describe RemoveEditorResponder do
       allow(@responder).to receive(:issue).and_return(issue)
     end
 
-    it "should remove a reviewer from the body of the issue" do
+    it "should remove the editor from the body of the issue" do
       expected_new_body = "...Submission editor: <!--editor-->Pending<!--end-editor--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
       @responder.process_message(@msg)
@@ -43,6 +43,23 @@ describe RemoveEditorResponder do
       @responder.params = { no_reviewer_text: 'TBD' }
       expected_new_body = "...Submission editor: <!--editor-->TBD<!--end-editor--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+      @responder.process_message(@msg)
+    end
+
+    it "should remove the editor from assignees" do
+      expect(@responder).to receive(:remove_assignee).with("@buffy")
+      @responder.process_message(@msg)
+    end
+
+    it "should not remove the editor from assignees if not previous editor" do
+      expect(@responder).to_not receive(:remove_assignee)
+
+      issue = OpenStruct.new({ body: "...Editor: <!--editor--> Pending <!--end-editor--> ..." })
+      allow(@responder).to receive(:issue).and_return(issue)
+      @responder.process_message(@msg)
+
+      issue = OpenStruct.new({ body: "...Editor: <!--editor--> TBD <!--end-editor--> ..." })
+      allow(@responder).to receive(:issue).and_return(issue)
       @responder.process_message(@msg)
     end
 
