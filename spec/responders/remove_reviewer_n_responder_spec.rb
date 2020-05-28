@@ -29,8 +29,8 @@ describe RemoveReviewerNResponder do
       @msg = "@botsci remove reviewer 33"
       @responder.match_data = @responder.event_regex.match(@msg)
 
-      issue = OpenStruct.new({ body: "...Reviewer list: 33: <!--reviewer-33-->@buffy<!--end-reviewer-33--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body ="...Reviewer list: 33: <!--reviewer-33-->@buffy<!--end-reviewer-33--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
     end
 
     it "should remove a reviewer from the body of the issue" do
@@ -54,12 +54,12 @@ describe RemoveReviewerNResponder do
     it "should not remove the editor from assignees if not previous editor" do
       expect(@responder).to_not receive(:remove_assignee)
 
-      issue = OpenStruct.new({ body: "...Reviewer 33: <!--reviewer-33--> Pending <!--end-reviewer-33--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body = "...Reviewer 33: <!--reviewer-33--> Pending <!--end-reviewer-33--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
       @responder.process_message(@msg)
 
-      issue = OpenStruct.new({ body: "...Reviewer 33: <!--reviewer-33-->TBD<!--end-reviewer-33--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body = "...Reviewer 33: <!--reviewer-33-->TBD<!--end-reviewer-33--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
       @responder.process_message(@msg)
     end
 

@@ -27,14 +27,11 @@ describe AssignEditorResponder do
   describe "#process_message" do
     before do
       @responder = subject.new({ bot_github_user: 'botsci' }, {})
-      @responder.context = OpenStruct.new({ repo: "openjournals/buffy", issue_id: 5 })
+      @responder.context = OpenStruct.new({ issue_body:"...Submission editor: <!--editor-->Pending<!--end-editor--> ..." })
       disable_github_calls_for(@responder)
 
       @msg = "@botsci assign @arfon as editor"
       @responder.match_data = @responder.event_regex.match(@msg)
-
-      issue = OpenStruct.new({ body: "...Submission editor: <!--editor-->Pending<!--end-editor--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
     end
 
     it "should update editor in the body of the issue" do

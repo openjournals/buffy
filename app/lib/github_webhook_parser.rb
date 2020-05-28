@@ -32,12 +32,14 @@ module GitHubWebhookParser
     end
 
     @issue_id = @payload.dig('issue', 'number')
+    @issue_body = @payload.dig('issue', 'body')
     @repo = @payload.dig('repository', 'full_name')
 
     @context = OpenStruct.new(
       action: @action,
       event: @event,
       issue_id: @issue_id,
+      issue_body: @issue_body,
       message: @message,
       repo: @repo,
       sender: @sender,

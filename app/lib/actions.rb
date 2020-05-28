@@ -7,7 +7,7 @@ module Actions
 
   # Update the body of the issue between marks
   def update_body(start_mark, end_mark, new_text)
-    new_body = issue.body.gsub(/#{start_mark}(.*)#{end_mark}/i, "#{start_mark}#{new_text}#{end_mark}")
+    new_body = issue_body.gsub(/#{start_mark}(.*)#{end_mark}/i, "#{start_mark}#{new_text}#{end_mark}")
     update_issue({ body: new_body })
   end
 
@@ -26,7 +26,7 @@ module Actions
 
   def read_from_body(start_mark, end_mark)
     text = ""
-    issue.body.match(/#{start_mark}(.*)#{end_mark}/i) do |m|
+    issue_body.match(/#{start_mark}(.*)#{end_mark}/i) do |m|
       text = m[1]
     end
     text.strip

@@ -29,8 +29,8 @@ describe SetValueResponder do
       @msg = "@botsci set v0.0.33-alpha as version"
       @responder.match_data = @responder.event_regex.match(@msg)
 
-      issue = OpenStruct.new({ body: "...Latest Version: <!--version-value-->Pending<!--end-version-value--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body = "...Latest Version: <!--version-value-->Pending<!--end-version-value--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
     end
 
     it "should update value in the body of the issue" do

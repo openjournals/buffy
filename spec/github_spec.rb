@@ -28,6 +28,22 @@ describe "Github methods" do
     end
   end
 
+  describe "#issue_body" do
+    it "should get body from context if present" do
+      subject.context.issue_body = "Body Issue in Context"
+
+      expect(subject).to_not receive(:issue)
+      expect(subject.issue_body).to eq("Body Issue in Context")
+    end
+
+    it "should get body calling #issue if not available in context" do
+      subject.context.issue_body = nil
+
+      expect(subject).to receive(:issue).once.and_return(OpenStruct.new(body: "Body from calling issue"))
+      expect(subject.issue_body).to eq("Body from calling issue")
+    end
+  end
+
   describe "#bg_respond" do
     it "should add comment to github issue" do
       expect_any_instance_of(Octokit::Client).to receive(:add_comment).once.with("openjournals/buffy", 5, "comment!")

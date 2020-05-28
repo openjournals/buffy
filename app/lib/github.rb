@@ -12,6 +12,13 @@ module GitHub
     @issue ||= github_client.issue(context.repo, context.issue_id)
   end
 
+  # Return the body of issue
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def issue_body
+    @issue_body = context.issue_body
+    @issue_body ||= issue.body
+  end
+
   # Post messages to a GitHub issue.
   # Context is an OpenStruct created in lib/github_webhook_parser
   def bg_respond(comment)

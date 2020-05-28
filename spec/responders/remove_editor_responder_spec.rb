@@ -29,8 +29,8 @@ describe RemoveEditorResponder do
       @msg = "@botsci remove editor"
       @responder.match_data = @responder.event_regex.match(@msg)
 
-      issue = OpenStruct.new({ body: "...Submission editor: <!--editor-->@buffy<!--end-editor--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body = "...Submission editor: <!--editor-->@buffy<!--end-editor--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
     end
 
     it "should remove the editor from the body of the issue" do
@@ -54,12 +54,12 @@ describe RemoveEditorResponder do
     it "should not remove the editor from assignees if not previous editor" do
       expect(@responder).to_not receive(:remove_assignee)
 
-      issue = OpenStruct.new({ body: "...Editor: <!--editor--> Pending <!--end-editor--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body = "...Editor: <!--editor--> Pending <!--end-editor--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
       @responder.process_message(@msg)
 
-      issue = OpenStruct.new({ body: "...Editor: <!--editor--> TBD <!--end-editor--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body = "...Editor: <!--editor--> TBD <!--end-editor--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
       @responder.process_message(@msg)
     end
 

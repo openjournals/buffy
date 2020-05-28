@@ -31,8 +31,8 @@ describe AssignReviewerNResponder do
       @msg = "@botsci assign @arfon as reviewer 3"
       @responder.match_data = @responder.event_regex.match(@msg)
 
-      issue = OpenStruct.new({ body: "...Reviewer list: 3: <!--reviewer-3-->Pending<!--end-reviewer-3--> ..." })
-      allow(@responder).to receive(:issue).and_return(issue)
+      issue_body = "...Reviewer list: 3: <!--reviewer-3-->Pending<!--end-reviewer-3--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
     end
 
     it "should update a reviewer the body of the issue" do

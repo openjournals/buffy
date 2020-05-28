@@ -19,8 +19,8 @@ describe "Actions" do
 
   describe "#update_body" do
     it "should call update_issue on new body" do
-      issue = OpenStruct.new({ body: "... <before> Here! <after> ..." })
-      allow(subject).to receive(:issue).and_return(issue)
+      issue_body = "... <before> Here! <after> ..."
+      allow(subject).to receive(:issue_body).and_return(issue_body)
 
       expected_new_body = "... <before> New content! <after> ..."
 
@@ -30,19 +30,14 @@ describe "Actions" do
   end
 
   describe "#read_from_body" do
+    before { allow(subject).to receive(:issue_body).and_return("... <before> Here! <after> ...") }
     it "should return stripped text between marks" do
-      issue = OpenStruct.new({ body: "... <before> Here! <after> ..." })
-      allow(subject).to receive(:issue).and_return(issue)
-
       expected_text = "Here!"
 
       expect(subject.read_from_body("<before>", "<after>")).to eq expected_text
     end
 
     it "should return empty string if nothing matches" do
-      issue = OpenStruct.new({ body: "... <before> Here! <after> ..." })
-      allow(subject).to receive(:issue).and_return(issue)
-
       expected_text = ""
 
       expect(subject.read_from_body("<Hey>", "<after>")).to eq expected_text
