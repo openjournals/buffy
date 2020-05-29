@@ -14,7 +14,13 @@ class HelpResponder < Responder
     active_responders = comment_responders.select {|r| r.authorized?(context)}
 
     active_responders.each do |r|
-      descriptions_and_examples << [r.description, r.example_invocation]
+      if r.description.is_a? Array
+        r.description.zip(r.example_invocation).each do |d_and_ex|
+          descriptions_and_examples << [d_and_ex[0], d_and_ex[1]]
+        end
+      else
+        descriptions_and_examples << [r.description, r.example_invocation]
+      end
     end
     respond_template :help, { sender: context.sender, descriptions_and_examples: descriptions_and_examples }
   end

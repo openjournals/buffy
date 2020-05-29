@@ -31,8 +31,8 @@ describe HelpResponder do
       @settings = { bot_github_user: "botsci",
                     teams: { editors: 2009411 },
                     responders: { "hello" => nil,
-                                 "help" => nil,
-                                 "assign_reviewer_n" => { only: "editors" } } }
+                                  "help" => nil,
+                                  "assign_reviewer_n" => { only: "editors" }}}
       @responder = subject.new(@settings, {})
 
       @hello = HelloResponder.new(@settings,{})
@@ -54,6 +54,21 @@ describe HelpResponder do
 
       expect(@responder).to receive(:respond_template).once.with(:help, expected_locals)
       @responder.process_message("@botsci help")
+    end
+
+    it "should manage responder with multiple invocations" do
+      settings = { bot_github_user: "botsci", responders: { "help" => nil, "add_remove_assignee" => nil }}
+      multiple_invocations = AddAndRemoveAssigneeResponder.new(settings, {})
+      expected = [[@help.description, @help.example_invocation],
+                  [multiple_invocations.description[0], multiple_invocations.example_invocation[0]],
+                  [multiple_invocations.description[1], multiple_invocations.example_invocation[1]]]
+      expected_locals = { sender: "sender", descriptions_and_examples: expected}
+
+      responder = subject.new(settings, {})
+      responder.context = @context
+
+      expect(responder).to receive(:respond_template).once.with(:help, expected_locals)
+      responder.process_message("@botsci help")
     end
 
     it "should list only allowed responders" do

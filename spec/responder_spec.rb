@@ -131,7 +131,7 @@ describe Responder do
     end
   end
 
-  describe "description" do
+  describe "#description" do
     it "should be present for all responders" do
       ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
         responder = responder_class.new({}, { name: responder_class.to_s })
@@ -142,13 +142,27 @@ describe Responder do
     end
   end
 
-  describe "example_invocation" do
+  describe "#example_invocation" do
     it "should be present for all responders" do
       ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
         responder = responder_class.new({}, { name: responder_class.to_s })
         expect(responder.respond_to?(:example_invocation)).to eq(true)
         expect(responder.example_invocation).to_not be_nil
         expect(responder.example_invocation).to_not be_empty
+      end
+    end
+  end
+
+  describe "multiple descriptions and example invocations" do
+    it "should have the same number of each of them" do
+      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+        responder = responder_class.new({}, { name: responder_class.to_s })
+        if responder.description.is_a?(Array) || responder.example_invocation.is_a?(Array)
+          error_msg = "#{responder_class.name} descriptions and example_invocations sizes don't match"
+          expect(responder.description.is_a?(Array)).to eq(true), error_msg
+          expect(responder.example_invocation.is_a?(Array)).to eq(true), error_msg
+          expect(responder.description.size).to eq(responder.example_invocation.size), error_msg
+        end
       end
     end
   end
