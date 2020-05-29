@@ -24,6 +24,6 @@ module CommonActions
     allow(responder).to receive(:remove_assignee).and_return(true)
     allow(responder).to receive(:team_id).and_return(nil)
 
-    allow(Octokit::Client).to receive(:new).and_return(true)
+    allow(Octokit::Client).to receive(:new).and_return(Octokit::Client.new())
   end
 end

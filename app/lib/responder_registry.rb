@@ -4,16 +4,17 @@ Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].sort.each { |f| 
 class ResponderRegistry
 
   RESPONDER_MAPPING = {
-    "help"              => HelpResponder,
-    "hello"             => HelloResponder,
-    "assign_reviewer_n" => AssignReviewerNResponder,
-    "remove_reviewer_n" => RemoveReviewerNResponder,
-    "assign_editor"     => AssignEditorResponder,
-    "remove_editor"     => RemoveEditorResponder,
-    "invite"            => InviteResponder,
-    "set_value"         => SetValueResponder,
-    "thanks"            => ThanksResponder,
-    "welcome"           => WelcomeResponder,
+    "help"                => HelpResponder,
+    "hello"               => HelloResponder,
+    "assign_reviewer_n"   => AssignReviewerNResponder,
+    "remove_reviewer_n"   => RemoveReviewerNResponder,
+    "assign_editor"       => AssignEditorResponder,
+    "remove_editor"       => RemoveEditorResponder,
+    "invite"              => InviteResponder,
+    "set_value"           => SetValueResponder,
+    "add_remove_assignee" => AddAndRemoveAssigneeResponder,
+    "thanks"              => ThanksResponder,
+    "welcome"             => WelcomeResponder,
   }
 
   attr_accessor :responders
