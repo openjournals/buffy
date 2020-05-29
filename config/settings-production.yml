@@ -22,6 +22,8 @@ buffy:
       no_editor_text: "TBD"
     invite:
       only: editors
+    add_remove_assignee:
+      only: editors
     set_value:
       - version:
           only: editors
