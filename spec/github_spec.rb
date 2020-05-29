@@ -143,6 +143,13 @@ describe "Github methods" do
     end
   end
 
+  describe "#can_be_assignee?" do
+    it "should check if user can be an assignee of the repo" do
+      expect_any_instance_of(Octokit::Client).to receive(:check_assignee).once.with("openjournals/buffy", "buffy")
+      subject.can_be_assignee?("buffy")
+    end
+  end
+
   describe "#team_id" do
     context "with valid API access" do
       before do

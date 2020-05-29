@@ -72,6 +72,13 @@ module GitHub
     github_client.collaborator?(context.repo, username)
   end
 
+  # Uses the GitHub API to determine if a user is already a collaborator of the repo
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def can_be_assignee?(username)
+    username = user_login(username)
+    github_client.check_assignee(context.repo, username)
+  end
+
   # Uses the GitHub API to determine if a user has a pending invitation
   # Context is an OpenStruct created in lib/github_webhook_parser
   def is_invited?(username)
