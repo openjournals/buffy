@@ -25,13 +25,14 @@ This will be the user responding to commands in the reviews repo.
 
 ![Sign up at GitHub](./docs/images/signup.png)
 
-2. Give the bot admin permissions: add it as member of the organization owning the repo where the reviews will take place:
+2. Go to `Settings >> Developer settings >> Personal access tokens` and create a new token with at least this scopes: `public_repo`, `repo:invite`, `read:org` and `read:user`. Save that token, it will be your `BUFFY_GH_ACCESS_TOKEN`.
+
+![Settings >> Developer settings >> Personal access tokens](./docs/images/access_token.png)
+
+3. Give the bot admin permissions: add it as member of the organization owning the repo where the reviews will take place:
 
 ![People at GitHub Organization](./docs/images/people.png)
 
-3. Go to `Settings >> Developer settings >> Personal access tokens` and create a new token with at least this scopes: `public_repo`, `repo:invite`, `read:org` and `read:user`. Save that token, it will be your `BUFFY_GH_ACCESS_TOKEN`.
-
-![Settings >> Developer settings >> Personal access tokens](./docs/images/access_token.png)
 
 
 ### Deploy Buffy
