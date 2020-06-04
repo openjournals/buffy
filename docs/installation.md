@@ -13,9 +13,9 @@ You'll need the following components:
 
 This will be the user responding to commands in the reviews repo.
 
-**1.** [GitHub's signup page](https://github.com/join) and create the bot user:
+**1.** [Sign up at GitHub](https://github.com/join) and create the bot user:
 
-  ![Sign up at GitHub](./images/signup.png "Sign up at GitHub")
+  ![GitHub's signup page](./images/signup.png "GitHub's signup page")
 
 
 **2.** Go to `Settings >> Developer settings >> Personal access tokens` and create a new token with at least this scopes: `public_repo`, `repo:invite`, `read:org` and `read:user`. Save that token, it will be your `BUFFY_GH_ACCESS_TOKEN`.
