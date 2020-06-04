@@ -13,19 +13,19 @@ You'll need the following components:
 
 This will be the user responding to commands in the reviews repo.
 
-**1.** [Sign up in GitHub](https://github.com/join) and create the bot user:
+**1.** [GitHub's signup page](https://github.com/join) and create the bot user:
 
-  ![Sign up at GitHub](./images/signup.png)
+  ![Sign up at GitHub](./images/signup.png "Sign up at GitHub")
 
 
 **2.** Go to `Settings >> Developer settings >> Personal access tokens` and create a new token with at least this scopes: `public_repo`, `repo:invite`, `read:org` and `read:user`. Save that token, it will be your `BUFFY_GH_ACCESS_TOKEN`.
 
-  ![Settings >> Developer settings >> Personal access tokens](./images/access_token.png)
+  ![Settings >> Developer settings >> Personal access tokens](./images/access_token.png "Settings >> Developer settings >> Personal access tokens")
 
 
 **3.** Give the bot admin permissions: add it as member of the organization owning the repo where the reviews will take place:
 
-  ![People at GitHub Organization](./images/people.png)
+  ![People at GitHub Organization](./images/people.png "People at GitHub Organization")
 
 
 ### Deploy Buffy
@@ -54,7 +54,7 @@ We will use here [Heroku](https://www.heroku.com) as an example service to deplo
 
 **1.** Go to the settings page of the repository where you want to use buffy. Add a new webhook.
 
-  ![New webhook](./images/new_webhook.png)
+  ![Add webhook](./images/new_webhook.png "Add webhook")
 
 **2.** Configure the new webhook with:
 
@@ -63,7 +63,7 @@ We will use here [Heroku](https://www.heroku.com) as an example service to deplo
         Secret: The BUFFY_GH_SECRET_TOKEN you configured in the previous step
 
   Select individual events to trigger: **issue comments** and **issues**
-  ![New webhook](./images/webhook.png)
+  ![New webhook](./images/webhook.png "New webhook")
 
 
 If everything went well you should have now your bot responding on the reviews issues. Try `@botname help` for example.
