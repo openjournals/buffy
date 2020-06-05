@@ -12,3 +12,4 @@ Buffy provides a bot that interacts during the peer-review process with editors,
    :maxdepth: 3
 
    installation
+   configuration
