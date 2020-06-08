@@ -50,5 +50,13 @@ It contains three main parts:
 
 A detailed description of all of them:
 
+<dl>
+  <dt>bot_github_user</dt>
+  <dd>The name of the bot. It is the GitHub user that will respond to commands. It should have admin permissions on the reviews repo.</dd>
 
+  <dt>gh_access_token</dt>
+  <dd>The GitHub developer access token for the bot user.</dd>
 
+  <dt>gh_secret_token</dt>
+  <dd>The GitHub secret token configured for the webhook sending events to Buffy.</dd>
+</dl>
