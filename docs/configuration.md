@@ -60,3 +60,55 @@ A detailed description of all of them:
   <dt>gh_secret_token</dt>
   <dd>The GitHub secret token configured for the webhook sending events to Buffy.</dd>
 </dl>
+
+### Teams
+
+```yaml
+  teams:
+    editors: 3824117
+    eics: myorg/editor-in-chief-team
+    reviewers: 45363564
+```
+ The teams node includes entries to reference GitHub teams, used later to grant access to responders only to users belonging to specific teams. Multiple entries can added to the teams node. All entries follow this simple format:
+
+ <dl>
+  <dt>key: value</dt>
+  <dd>Where <em>key</em> is the name for this team in Buffy and <em>value</em> can be the integer id of the team in GitHub (preferred) or the reference in format <em>organization/name</em> (for example: <em>openjournals/editors</em>)</dd>
+</dl>
+
+### Responders
+
+```yaml
+  responders:
+    help:
+    hello:
+      hidden: true
+    assign_reviewers:
+      only: editors
+```
+
+ The responders node lists all the responders that will be available. The key for each entry is the name of the responder and nested under it the configuration options for that responder are declared.
+
+ All the responders share some options available for all of them. They also can have their own particular configurable parameters (see docs for each responder). The common parameters are:
+
+<dl>
+  <dt>hidden</dt>
+  <dd>Defaults to <em>false</em>. If <em>true</em> this responder won't be listed in the help provided to users.</dd>
+
+  <dt>only</dt>
+  <dd>List of teams (refered by the name used in the <em>teams</em> node) that can have access to the responder. Used to limit access to the responder. If <em>only</em> is not present the responder is considered public and every user in the repository can invoke it.
+
+  Example:
+
+  ```yaml
+    public_responder:
+    available_for_one_team_responder:
+      only: editors
+    available_for_two_teams_responder:
+      only:
+        - editors
+        - reviewers
+  ```
+
+  </dd>
+</dl>
