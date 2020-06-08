@@ -140,7 +140,7 @@ If you want to use the same responder to change `version` but also to allow edit
   responders:
     set_value:
       - version:
-      - archive:
+      - url:
           only: editors
 ```
 
