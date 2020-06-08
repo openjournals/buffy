@@ -39,7 +39,7 @@ buffy:
     welcome:
 ```
 
-## Available settings
+## File Structure
 
 The structure of the settings file starts with a single root node called `buffy`.
 It contains three main parts:
@@ -50,7 +50,7 @@ It contains three main parts:
 
 A detailed description of all of them:
 
-### General configuration settings
+## General configuration settings
 
 For security reasons is a good practice to load this values from your environment instead of hardcoding them in the code.
 
@@ -65,7 +65,7 @@ For security reasons is a good practice to load this values from your environmen
   <dd>The GitHub secret token configured for the webhook sending events to Buffy. The default value is reading it from the <strong>BUFFY_GH_SECRET_TOKEN</strong> environment variable.</dd>
 </dl>
 
-### Teams
+## Teams
 
 ```yaml
   teams:
@@ -73,14 +73,14 @@ For security reasons is a good practice to load this values from your environmen
     eics: myorg/editor-in-chief-team
     reviewers: 45363564
 ```
- The teams node includes entries to reference GitHub teams, used later to grant access to responders only to users belonging to specific teams. Multiple entries can added to the teams node. All entries follow this simple format:
+ The optional teams node includes entries to reference GitHub teams, used later to grant access to responders only to users belonging to specific teams. Multiple entries can be added to the teams node. All entries follow this simple format:
 
  <dl>
   <dt>key: value</dt>
   <dd>Where <em>key</em> is the name for this team in Buffy and <em>value</em> can be the integer id of the team in GitHub (preferred) or the reference in format <em>organization/name</em> (for example: <em>openjournals/editors</em>)</dd>
 </dl>
 
-### Responders
+## Responders
 
 ```yaml
   responders:
@@ -93,7 +93,7 @@ For security reasons is a good practice to load this values from your environmen
 
  The responders node lists all the responders that will be available. The key for each entry is the name of the responder and nested under it the configuration options for that responder are declared.
 
- All the responders share some options available for all of them. They also can have their own particular configurable parameters (see docs for each responder). The common parameters are:
+ All the responders share some options available to all of them. They can also have their own particular configurable parameters (see docs for each responder). The common parameters are:
 
 <dl>
   <dt>hidden</dt>
@@ -117,7 +117,7 @@ For security reasons is a good practice to load this values from your environmen
   </dd>
 </dl>
 
-#### Multiple instances of the same responder
+### Multiple instances of the same responder
 
 Sometimes you want to use a responder more than once, with different parameters. In that case under the name of the responder you can declare an array of instances, and the key for each instance will be passed to the responder as the `name` parameter.
 

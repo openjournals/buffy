@@ -9,7 +9,7 @@ Buffy provides a bot that interacts during the peer-review process with editors,
 
 .. toctree::
    :caption: Getting started
-   :maxdepth: 4
+   :maxdepth: 3
 
    installation
    configuration
