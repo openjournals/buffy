@@ -112,3 +112,33 @@ A detailed description of all of them:
 
   </dd>
 </dl>
+
+#### Multiple instances of the same responder
+
+Sometimes you want to use a responder more than once, with different parameters. In that case under the name of the responder you can declare an array of instances, and the key for each instance will be passed to the responder as the `name` parameter.
+
+Example:
+
+The _set_value_ responder uses a `name` param to change the value to a variable. If declared in the settings file like this:
+
+
+```yaml
+  responders:
+    set_value:
+      name: version
+```
+
+It could be invoked with `@botname set 1.0 as version`.
+
+If you want to use the same responder to change `version` but also to allow editors to change `url` you would declare multiple instances in the settings file like this:
+
+```yaml
+  responders:
+    set_value:
+      - version:
+      - archive:
+          only: editors
+```
+
+Now `@botname set 1.0 as version` is a public command and `@botname set abcd.efg as url` is a command available to editors.
+
