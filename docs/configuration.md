@@ -50,6 +50,8 @@ It contains three main parts:
 
 A detailed description of all of them:
 
+### General configuration options
+
 <dl>
   <dt>bot_github_user</dt>
   <dd>The name of the bot. It is the GitHub user that will respond to commands. It should have admin permissions on the reviews repo.</dd>
