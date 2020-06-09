@@ -36,4 +36,5 @@ RSpec.configure do |config|
 
   config.include RSpecMixin
   config.include CommonActions
+  config.include ResponderParams
 end

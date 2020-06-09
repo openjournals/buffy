@@ -13,6 +13,7 @@ class ResponderRegistry
     "invite"              => InviteResponder,
     "set_value"           => SetValueResponder,
     "add_remove_assignee" => AddAndRemoveAssigneeResponder,
+    "label_command"       => LabelCommandResponder,
     "thanks"              => ThanksResponder,
     "welcome"             => WelcomeResponder,
   }
