@@ -31,4 +31,15 @@ buffy:
       - archive:
           only: editors
           sample_value: "10.21105/joss.12345"
+    label_command:
+      - review_ok:
+          command: review successful
+          labels:
+            - reviewed
+            - recommend publication
+            - pending publication
+      - review_nok:
+          command: review failed
+          labels:
+            - rejected
     welcome:

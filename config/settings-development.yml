@@ -29,4 +29,9 @@ buffy:
     set_value:
       name: version
       only: editors
+    label_command:
+      command: review successful
+      labels:
+        - reviewed
+        - pending publication
     welcome:
