@@ -20,4 +20,19 @@ describe "ERB Responder" do
     end
   end
 
+  describe "#template_path" do
+    it "should return a Pathname instance" do
+      expect(subject.template_path).to be_kind_of Pathname
+    end
+
+    it "should return the default template path if not custom setting" do
+      expect(subject.template_path.to_s).to eq(subject.default_template_path)
+    end
+
+    it "should return the template path specified in settings" do
+      responder = Responder.new({template_path: "./mytemplates/custom"}, {})
+      expect(responder.template_path.to_s).to eq("./mytemplates/custom")
+    end
+  end
+
 end
