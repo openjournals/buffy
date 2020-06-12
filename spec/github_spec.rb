@@ -44,6 +44,23 @@ describe "Github methods" do
     end
   end
 
+  describe "#template_url" do
+    it "should get the download url of a template" do
+      expected_url = "https://github.com/openjournals/buffy/templates/test_message.md"
+      expect_any_instance_of(Octokit::Client).to receive(:contents).once.and_return(OpenStruct.new(download_url: expected_url))
+
+      expect(subject.template_url("test_message.md")).to eq(expected_url)
+    end
+
+    it "should get the contents for the right template file" do
+      expected_path = Pathname.new "#{subject.default_template_path}/test_message.md"
+      response = OpenStruct.new(download_url: "")
+      expect_any_instance_of(Octokit::Client).to receive(:contents).once.with("openjournals/buffy", path: expected_path).and_return(response)
+
+      subject.template_url("test_message.md")
+    end
+  end
+
   describe "#bg_respond" do
     it "should add comment to github issue" do
       expect_any_instance_of(Octokit::Client).to receive(:add_comment).once.with("openjournals/buffy", 5, "comment!")

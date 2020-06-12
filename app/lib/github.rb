@@ -7,6 +7,11 @@ module GitHub
     @github_client ||= Octokit::Client.new(access_token: @settings[:gh_access_token], auto_paginate: true)
   end
 
+  # returns the URL for a given template in the repo
+  def template_url(filename)
+    github_client.contents(context.repo, path: template_path + filename).download_url
+  end
+
   # Return an Octokit GitHub Issue
   def issue
     @issue ||= github_client.issue(context.repo, context.issue_id)
