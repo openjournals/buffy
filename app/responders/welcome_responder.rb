@@ -12,11 +12,11 @@ class WelcomeResponder < Responder
   end
 
   def description
-    "Send a message after a issue is opened"
+    "Send a message after an issue is opened"
   end
 
   def example_invocation
-    "Is invoked once, when a issue is created"
+    "Is invoked once, when an issue is created"
   end
 
   def reply
