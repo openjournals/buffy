@@ -11,7 +11,7 @@ describe "ERB Responder" do
 
     it "should respond the rendered named erb template with passed locals" do
       template_name = :help
-      locals =  {sender: "buffy", descriptions_and_examples: []}
+      locals =  { sender: "buffy", descriptions_and_examples: [] }
       template = ERB.new(File.read("#{app.root}/responses/help.erb"))
       expected_response = template.result_with_hash(locals)
 
@@ -30,8 +30,34 @@ describe "ERB Responder" do
     end
 
     it "should return the template path specified in settings" do
-      responder = Responder.new({template_path: "./mytemplates/custom"}, {})
+      responder = Responder.new({ template_path: "./mytemplates/custom" }, {})
       expect(responder.template_path.to_s).to eq("./mytemplates/custom")
+    end
+  end
+
+  describe "#respond_external_template" do
+    before { disable_github_calls_for subject }
+
+    it "should respond the rendered external template with passed locals" do
+      template_file = "welcome_msg.md"
+      locals =  { sender: "buffy" }
+
+      expect(subject).to receive(:template_url).once.with("welcome_msg.md").and_return("TEMPLATE_URL")
+      expect(URI).to receive(:parse).once.with("TEMPLATE_URL").and_return("Welcome {{sender}}!")
+      expected_response = "Welcome buffy!"
+
+      expect(subject).to receive(:respond).once.with(expected_response)
+      subject.respond_external_template(template_file, locals)
+    end
+  end
+
+  describe "#apply_hash_to_template" do
+    it "should use values from locals hash" do
+      template = "Hi {{name}}, welcome to {{service}} {{goodbye}}"
+      locals = { name: "Anna", "service" => "Buffy reviews", goodbye: nil, other: "whatever" }
+      expected_result = "Hi Anna, welcome to Buffy reviews "
+
+      expect(subject.apply_hash_to_template(template, locals)).to eq(expected_result)
     end
   end
 
