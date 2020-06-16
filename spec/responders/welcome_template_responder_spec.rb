@@ -36,7 +36,8 @@ describe WelcomeTemplateResponder do
     end
 
     it "should respond to github using the custom template" do
-      expect(URI).to receive(:parse).and_return("Welcome {{sender}}, {{reviewer}} will review your software")
+      expect(URI).to receive(:parse).and_return(URI("buf.fy"))
+      expect_any_instance_of(URI::Generic).to receive(:read).once.and_return("Welcome {{sender}}, {{reviewer}} will review your software")
 
       expected_reply = "Welcome user33, @xuanxu will review your software"
       expect(@responder).to receive(:respond).with(expected_reply)

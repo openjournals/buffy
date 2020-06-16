@@ -14,7 +14,7 @@ module Templating
 
   # Create a new comment in the issue rendering an external template.
   def respond_external_template(template_file, locals={})
-    template = URI.parse template_url(template_file)
+    template = URI.parse(template_url(template_file)).read
     message = apply_hash_to_template(template, locals)
 
     respond(message)

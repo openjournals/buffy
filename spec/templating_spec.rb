@@ -43,7 +43,8 @@ describe "Templating" do
       locals =  { sender: "buffy" }
 
       expect(subject).to receive(:template_url).once.with("welcome_msg.md").and_return("TEMPLATE_URL")
-      expect(URI).to receive(:parse).once.with("TEMPLATE_URL").and_return("Welcome {{sender}}!")
+      expect(URI).to receive(:parse).once.with("TEMPLATE_URL").and_return(URI("buf.fy"))
+      expect_any_instance_of(URI::Generic).to receive(:read).once.and_return("Welcome {{sender}}!")
       expected_response = "Welcome buffy!"
 
       expect(subject).to receive(:respond).once.with(expected_response)
