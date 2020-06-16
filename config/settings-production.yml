@@ -42,4 +42,7 @@ buffy:
           command: review failed
           labels:
             - rejected
-    welcome:
+    welcome_template:
+      template_file: welcome.md
+      data_from_issue:
+        - repository
