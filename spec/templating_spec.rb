@@ -1,6 +1,6 @@
 require_relative "./spec_helper.rb"
 
-describe "ERB Responder" do
+describe "Templating" do
 
   subject do
     Responder.new({}, {})

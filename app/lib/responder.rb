@@ -1,13 +1,13 @@
 require_relative 'github'
 require_relative 'actions'
 require_relative 'authorizations'
-require_relative 'erb_responder'
+require_relative 'templating'
 
 class Responder
   include Authorizations
   include Actions
   include GitHub
-  include ERBResponder
+  include Templating
 
   attr_accessor :event_regex
   attr_accessor :event_action

@@ -1,7 +1,7 @@
 require 'erb'
 require 'open-uri'
 
-module ERBResponder
+module Templating
 
   # Create a new comment in the issue rendering a .erb template.
   def respond_template(template_name, locals={})
