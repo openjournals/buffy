@@ -27,13 +27,13 @@ describe WelcomeResponder do
     it "should respond custom reply" do
       @responder.params = { reply: "Hi!" }
       expect(@responder).to receive(:respond).with("Hi!")
-      @responder.process_message(@msg)
+      @responder.process_message("")
     end
 
     it "should respond to github" do
       reply = "Hi!, I'm @botsci, a friendly bot.\n\nType ```@botsci help``` to discover how I can help you."
       expect(@responder).to receive(:respond).with(reply)
-      @responder.process_message(@msg)
+      @responder.process_message("")
     end
   end
 end

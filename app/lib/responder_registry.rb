@@ -16,6 +16,7 @@ class ResponderRegistry
     "label_command"       => LabelCommandResponder,
     "thanks"              => ThanksResponder,
     "welcome"             => WelcomeResponder,
+    "welcome_template"    => WelcomeTemplateResponder,
   }
 
   attr_accessor :responders
