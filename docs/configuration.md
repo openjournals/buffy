@@ -65,7 +65,7 @@ For security reasons is a good practice to load the secret values from your envi
   <dd>The GitHub secret token configured for the webhook sending events to Buffy. The default value is reading it from the <strong>BUFFY_GH_SECRET_TOKEN</strong> environment variable.</dd>
 
   <dt>templates_path</dt>
-  <dd>The relative path in the target repo where templates are located. This path is used by responders replying with a message built from a template. The default value is <code class="docutils literal"><span class="pre">./buffy/templates</span></code>.</dd>
+  <dd>The relative path in the target repo where templates are located. This path is used by responders replying with a message built from a template. The default value is <code class="docutils literal"><span class="pre">.buffy/templates</span></code>.</dd>
 </dl>
 
 ## Teams
