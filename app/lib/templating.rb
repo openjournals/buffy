@@ -28,7 +28,7 @@ module Templating
 
   # Where the templates are located.
   def template_path
-    @template_path ||= @settings[:template_path] || default_template_path
+    @template_path ||= @settings[:templates_path] || default_template_path
     Pathname.new @template_path
   end
 
