@@ -52,7 +52,7 @@ A detailed description of all of them:
 
 ## General configuration settings
 
-For security reasons is a good practice to load this values from your environment instead of hardcoding them in the code.
+For security reasons is a good practice to load the secret values from your environment instead of hardcoding them in the code.
 
 <dl>
   <dt>bot_github_user</dt>
@@ -63,6 +63,9 @@ For security reasons is a good practice to load this values from your environmen
 
   <dt>gh_secret_token</dt>
   <dd>The GitHub secret token configured for the webhook sending events to Buffy. The default value is reading it from the <strong>BUFFY_GH_SECRET_TOKEN</strong> environment variable.</dd>
+
+  <dt>templates_path</dt>
+  <dd>The relative path in the target repo where templates are located. The default value is `./buffy/templates`. This path is used by responders replying with a message built from a template.</dd>
 </dl>
 
 ## Teams
