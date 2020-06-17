@@ -30,7 +30,7 @@ describe "Templating" do
     end
 
     it "should return the template path specified in settings" do
-      responder = Responder.new({ template_path: "./mytemplates/custom" }, {})
+      responder = Responder.new({ templates_path: "./mytemplates/custom" }, {})
       expect(responder.template_path.to_s).to eq("./mytemplates/custom")
     end
   end
