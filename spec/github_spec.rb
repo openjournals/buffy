@@ -53,7 +53,7 @@ describe "Github methods" do
     end
 
     it "should get the contents for the right template file" do
-      expected_path = Pathname.new "#{subject.default_template_path}/test_message.md"
+      expected_path = Pathname.new "#{subject.default_settings[:templates_path]}/test_message.md"
       response = OpenStruct.new(download_url: "")
       expect_any_instance_of(Octokit::Client).to receive(:contents).once.with("openjournals/buffy", path: expected_path).and_return(response)
 

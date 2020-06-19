@@ -1,11 +1,13 @@
-require_relative 'github'
 require_relative 'actions'
 require_relative 'authorizations'
+require_relative 'defaults'
+require_relative 'github'
 require_relative 'templating'
 
 class Responder
-  include Authorizations
   include Actions
+  include Authorizations
+  include Defaults
   include GitHub
   include Templating
 
@@ -19,6 +21,7 @@ class Responder
 
 
   def initialize(settings, params)
+    settings = default_settings.merge(settings)
     @teams = settings[:teams]
     @bot_name = settings[:bot_github_user]
     @params = params || {}

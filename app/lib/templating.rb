@@ -20,15 +20,9 @@ module Templating
     respond(message)
   end
 
-  # Default location for templates in target repo
-  # Can be overriden by setting: :template_path
-  def default_template_path
-    ".buffy/templates"
-  end
-
   # Where the templates are located.
   def template_path
-    @template_path ||= @settings[:templates_path] || default_template_path
+    @template_path ||= @settings[:templates_path] || default_settings[:templates_path]
     Pathname.new @template_path
   end
 

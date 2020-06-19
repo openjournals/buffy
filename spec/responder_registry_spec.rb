@@ -55,7 +55,8 @@ describe ResponderRegistry do
 
       expect(responders.size).to eq(5)
       responders.each do |responder|
-        expect(responder.teams).to eq(expected_teams)
+        expect(responder.teams[:editors]).to eq(expected_teams[:editors])
+        expect(responder.teams[:eics]).to eq(expected_teams[:eics])
       end
     end
   end

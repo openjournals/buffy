@@ -26,7 +26,7 @@ describe "Templating" do
     end
 
     it "should return the default template path if not custom setting" do
-      expect(subject.template_path.to_s).to eq(subject.default_template_path)
+      expect(subject.template_path.to_s).to eq(subject.default_settings[:templates_path])
     end
 
     it "should return the template path specified in settings" do
