@@ -31,7 +31,8 @@ class WelcomeTemplateResponder < Responder
   def locals
     from_context = { issue_id: context.issue_id,
                      repo: context.repo,
-                     sender: context.sender }
+                     sender: context.sender,
+                     bot_name: @bot_name }
     from_body = {}
 
     params[:data_from_issue].each do |varname|

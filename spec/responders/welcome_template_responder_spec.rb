@@ -29,7 +29,7 @@ describe WelcomeTemplateResponder do
     end
 
     it "should populate locals" do
-      expected_locals = { issue_id: 5, repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
+      expected_locals = { issue_id: 5, bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
 
       expect(@responder).to receive(:respond_external_template).with("test.md", expected_locals)
       @responder.process_message("")
