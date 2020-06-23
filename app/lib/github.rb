@@ -42,6 +42,12 @@ module GitHub
     github_client.remove_label(context.repo, context.issue_id, label)
   end
 
+  # List labels of a GitHub issue
+  # Context is an OpenStruct created in lib/github_webhook_parser
+  def issue_labels
+    github_client.labels_for_issue(context.repo, context.issue_id).map { |l| l[:name] }
+  end
+
   # Update a Github issue
   # Context is an OpenStruct created in lib/github_webhook_parser
   def update_issue(options)

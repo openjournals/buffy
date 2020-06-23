@@ -82,6 +82,14 @@ describe "Github methods" do
     end
   end
 
+  describe "#issue_labels" do
+    it "should return the labels names from github issue" do
+      labels = [{id:1, name: "A"}, {id:21, name: "J"}]
+      expect_any_instance_of(Octokit::Client).to receive(:labels_for_issue).once.with("openjournals/buffy", 5).and_return(labels)
+      expect(subject.issue_labels).to eq(["A", "J"])
+    end
+  end
+
   describe "#update_issue" do
     it "should update github issue with received options" do
       expect_any_instance_of(Octokit::Client).to receive(:update_issue).once.with("openjournals/buffy", 5, { body: "new body"})

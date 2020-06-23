@@ -9,7 +9,10 @@ class LabelCommandResponder < Responder
 
   def process_message(message)
     label_issue(labels) unless labels.empty?
-    labels_to_remove.each {|label| unlabel_issue(label)}
+
+    unless labels_to_remove.empty?
+      (labels_to_remove & issue_labels).each {|label| unlabel_issue(label)}
+    end
   end
 
   def command

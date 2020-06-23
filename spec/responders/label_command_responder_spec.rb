@@ -30,16 +30,26 @@ describe LabelCommandResponder do
                                  labels: ["reviewed", "approved", "pending publication"],
                                  remove: ["pending review", "ongoing"] })
       disable_github_calls_for(@responder)
+
       @msg = "@botsci recommend publication"
     end
 
     it "should label issue with defined labels" do
+      expect(@responder).to receive(:issue_labels).and_return(["pending review", "ongoing"])
       expect(@responder).to receive(:label_issue).with(["reviewed", "approved", "pending publication"])
       @responder.process_message(@msg)
     end
 
     it "should remove labels from issue" do
+      expect(@responder).to receive(:issue_labels).and_return(["pending review", "ongoing"])
       expect(@responder).to receive(:unlabel_issue).with("pending review")
+      expect(@responder).to receive(:unlabel_issue).with("ongoing")
+      @responder.process_message(@msg)
+    end
+
+    it "should remove only present labels from issue" do
+      expect(@responder).to receive(:issue_labels).and_return(["reviewers assigned", "ongoing"])
+      expect(@responder).to_not receive(:unlabel_issue).with("pending review")
       expect(@responder).to receive(:unlabel_issue).with("ongoing")
       @responder.process_message(@msg)
     end
