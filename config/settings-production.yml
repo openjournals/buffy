@@ -38,6 +38,9 @@ buffy:
             - reviewed
             - recommend publication
             - pending publication
+          remove:
+            - ongoing
+            - pending review
       - review_nok:
           command: review failed
           labels:

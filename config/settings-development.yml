@@ -32,4 +32,6 @@ buffy:
       labels:
         - reviewed
         - pending publication
+      remove:
+        - pending review
     welcome:
