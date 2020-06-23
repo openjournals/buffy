@@ -8,7 +8,8 @@ class LabelCommandResponder < Responder
   end
 
   def process_message(message)
-    label_issue(labels)
+    label_issue(labels) unless labels.empty?
+    labels_to_remove.each {|label| unlabel_issue(label)}
   end
 
   def command
@@ -22,15 +23,31 @@ class LabelCommandResponder < Responder
 
   def labels
     if params[:labels].nil? || !params[:labels].is_a?(Array) || params[:labels].uniq.compact.empty?
-      raise "Configuration Error in LabelCommandResponder: No labels specified."
+      if labels_to_remove.empty?
+        raise "Configuration Error in LabelCommandResponder: No labels specified."
+      else
+        @labels = []
+      end
     else
       @labels ||= params[:labels].uniq.compact
     end
+
     @labels
   end
 
+  def labels_to_remove
+    if params[:remove].nil? || !params[:remove].is_a?(Array) || params[:remove].uniq.compact.empty?
+      @labels_to_remove = []
+    end
+
+    @labels_to_remove ||= params[:remove].uniq.compact
+  end
+
   def description
-    "Label issue with: #{labels.join(', ')}"
+    add_labels = labels.empty? ? nil : "Label issue with: #{labels.join(', ')}"
+    remove_labels = labels_to_remove.empty? ? nil : "Remove labels: #{labels_to_remove.join(', ')}"
+
+    [add_labels, remove_labels].compact.join(". ")
   end
 
   def example_invocation
