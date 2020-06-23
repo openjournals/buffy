@@ -75,6 +75,13 @@ describe "Github methods" do
     end
   end
 
+  describe "#unlabel_issue" do
+    it "should remove label from github issue" do
+      expect_any_instance_of(Octokit::Client).to receive(:remove_label).once.with("openjournals/buffy", 5, "pending-review")
+      subject.unlabel_issue("pending-review")
+    end
+  end
+
   describe "#update_issue" do
     it "should update github issue with received options" do
       expect_any_instance_of(Octokit::Client).to receive(:update_issue).once.with("openjournals/buffy", 5, { body: "new body"})
