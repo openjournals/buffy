@@ -91,16 +91,19 @@ describe LabelCommandResponder do
 
     it "should not raise error if only labels present" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "reviewed", labels: ["review ok"] })
+        @responder = subject.new({ bot_github_user: "botsci"}, { command: "reviewed", labels: ["review ok"] })
+        expect(@responder).to receive(:label_issue).with(["review ok"])
         @responder.process_message(@msg)
-      }.to_not raise_error "Configuration Error in LabelCommandResponder: No labels specified."
+      }.to_not raise_error
     end
 
     it "should not raise error if only remove present" do
       expect {
         @responder = subject.new({ bot_github_user: "botsci" }, { command: "reviewed", remove: ["pending-review"] })
+        expect(@responder).to receive(:issue_labels).and_return(["pending-review"])
+        expect(@responder).to receive(:unlabel_issue).with("pending-review")
         @responder.process_message(@msg)
-      }.to_not raise_error "Configuration Error in LabelCommandResponder: No labels specified."
+      }.to_not raise_error
     end
   end
 
