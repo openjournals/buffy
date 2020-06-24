@@ -1,6 +1,10 @@
 Available Responders
 ====================
 
+Buffy listens to events in the target repo using responders. Every responder is a subclass of the `Responder` class.
+Each responder have a `define_listening` method where the action and/or regex the responder is listening to are defined.
+The actions a responder takes if called are defined in the `process_message` method.
+
 Buffy includes a list of Responders that can be used by configuring them in the YAML settings file.
 
 
@@ -20,4 +24,5 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/thanks
    responders/welcome
    responders/welcome_template
+   responders/close_issue_command
 ```

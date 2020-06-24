@@ -17,6 +17,7 @@ class ResponderRegistry
     "thanks"              => ThanksResponder,
     "welcome"             => WelcomeResponder,
     "welcome_template"    => WelcomeTemplateResponder,
+    "close_issue_command" => CloseIssueCommandResponder,
   }
 
   attr_accessor :responders

@@ -49,3 +49,7 @@ buffy:
       template_file: welcome.md
       data_from_issue:
         - repository
+    close_issue_command:
+      command: reject
+      labels:
+        - rejected
