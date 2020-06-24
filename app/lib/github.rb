@@ -51,6 +51,11 @@ module GitHub
     github_client.update_issue(context.repo, context.issue_id, options)
   end
 
+   # Close a Github issue
+  def close_issue(options = {})
+    github_client.close_issue(context.repo, context.issue_id, options)
+  end
+
   # Add a user as collaborator to the repo
   def add_collaborator(username)
     username = user_login(username)

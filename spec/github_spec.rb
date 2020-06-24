@@ -97,6 +97,13 @@ describe "Github methods" do
     end
   end
 
+  describe "#close_issue" do
+    it "should close a github issue with received options" do
+      expect_any_instance_of(Octokit::Client).to receive(:close_issue).once.with("openjournals/buffy", 5, { labels: "rejected" })
+      subject.close_issue({ labels: "rejected" })
+    end
+  end
+
   describe "#is_collaborator?" do
     it "should be true if user is a collaborator" do
       expect_any_instance_of(Octokit::Client).to receive(:collaborator?).twice.with("openjournals/buffy", "xuanxu").and_return(true)
