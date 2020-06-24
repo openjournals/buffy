@@ -33,6 +33,7 @@ buffy:
           sample_value: "10.21105/joss.12345"
     label_command:
       - review_ok:
+          only: editors
           command: review successful
           labels:
             - reviewed
@@ -42,14 +43,16 @@ buffy:
             - ongoing
             - pending review
       - review_nok:
+          only: editors
           command: review failed
           labels:
-            - rejected
+            - recommend rejection
     welcome_template:
       template_file: welcome.md
       data_from_issue:
         - repository
     close_issue_command:
+      only: editors
       command: reject
       labels:
         - rejected
