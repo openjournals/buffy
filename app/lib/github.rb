@@ -1,5 +1,8 @@
 require 'octokit'
 
+# This module includes all the methods involving calls to the GitHub API
+# It reuses a memoized Octokit::Client instance
+# Context is an OpenStruct created in lib/github_webhook_parser
 module GitHub
 
   # Authenticated Octokit
@@ -18,86 +21,73 @@ module GitHub
   end
 
   # Return the body of issue
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def issue_body
     @issue_body = context.issue_body
     @issue_body ||= issue.body
   end
 
   # Post messages to a GitHub issue.
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def bg_respond(comment)
     github_client.add_comment(context.repo, context.issue_id, comment)
   end
 
   # Add labels to a GitHub issue
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def label_issue(labels)
     github_client.add_labels_to_an_issue(context.repo, context.issue_id, labels)
   end
 
   # Remove a label from a GitHub issue
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def unlabel_issue(label)
     github_client.remove_label(context.repo, context.issue_id, label)
   end
 
   # List labels of a GitHub issue
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def issue_labels
     github_client.labels_for_issue(context.repo, context.issue_id).map { |l| l[:name] }
   end
 
   # Update a Github issue
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def update_issue(options)
     github_client.update_issue(context.repo, context.issue_id, options)
   end
 
   # Add a user as collaborator to the repo
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def add_collaborator(username)
     username = user_login(username)
     github_client.add_collaborator(context.repo, username)
   end
 
   # Add a user to the issue's assignees list
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def add_assignee(username)
     username = user_login(username)
     github_client.add_assignees(context.repo, context.issue_id, [username])
   end
 
   # Remove a user from the issue's assignees list
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def remove_assignee(username)
     username = user_login(username)
     github_client.remove_assignees(context.repo, context.issue_id, [username])
   end
 
   # Remove a user from repo's collaborators
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def remove_collaborator(username)
     username = user_login(username)
     github_client.remove_collaborator(context.repo, username)
   end
 
   # Uses the GitHub API to determine if a user is already a collaborator of the repo
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def is_collaborator?(username)
     username = user_login(username)
     github_client.collaborator?(context.repo, username)
   end
 
   # Uses the GitHub API to determine if a user is already a collaborator of the repo
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def can_be_assignee?(username)
     username = user_login(username)
     github_client.check_assignee(context.repo, username)
   end
 
   # Uses the GitHub API to determine if a user has a pending invitation
-  # Context is an OpenStruct created in lib/github_webhook_parser
   def is_invited?(username)
     username = user_login(username)
     github_client.repository_invitations(context.repo).any? { |i| i.invitee.login.downcase == username }
