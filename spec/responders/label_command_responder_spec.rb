@@ -112,6 +112,10 @@ describe LabelCommandResponder do
       @responder = subject.new({ bot_github_user: "botsci" }, { command: "review finished" })
     end
 
+    it "#example_invocation shows the custom command" do
+       expect(@responder.example_invocation).to eq("@botsci review finished")
+    end
+
     it "#description should include only labels" do
       @responder.params[:labels] = ["reviewed"]
       expect(@responder.description).to eq("Label issue with: reviewed")
