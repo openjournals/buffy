@@ -17,6 +17,10 @@ The body of the issue should have the editor placeholder marked with HTML commen
 <!--editor-->  <!--end-editor-->
 ```
 
+## Settings key
+
+`assign_editor`
+
 ## Params
 ```eval_rst
 :add_as_assignee: *<Boolean>* If true, the editor user will be added as assignee to the issue. Default value is **true**.
