@@ -59,3 +59,17 @@ The body of the issue should have the editor placeholder marked with HTML commen
       add_as_collaborator: true
 ...
 ```
+
+## In action
+
+* **`Initial state:`**
+
+![Before](../images/responders/assign_editor_1.png "Assign editor responder in action")
+
+* **`Invocation:`**
+
+![Sample invocation](../images/responders/assign_editor_2.png "Assign editor responder in action")
+
+* **`Final state:`**
+
+![After](../images/responders/assign_editor_3.png "Assign editor responder in action")
