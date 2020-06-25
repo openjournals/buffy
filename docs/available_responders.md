@@ -10,6 +10,7 @@ Buffy includes a list of Responders that can be used by configuring them in the 
 
 ```eval_rst
 .. toctree::
+   :maxdepth: 1
 
    responders/help
    responders/hello

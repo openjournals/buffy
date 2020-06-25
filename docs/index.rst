@@ -16,7 +16,6 @@ Buffy provides a bot that interacts during the peer-review process with editors,
 
 .. toctree::
    :caption: Responders
-   :maxdepth: 3
+   :maxdepth: 2
 
    available_responders
-
