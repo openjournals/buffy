@@ -64,12 +64,12 @@ The body of the issue should have the editor placeholder marked with HTML commen
 
 * **`Initial state:`**
 
-![Before](../images/responders/assign_editor_1.png "Assign editor responder in action")
+![](../images/responders/assign_editor_1.png "Assign editor responder in action: Before")
 
 * **`Invocation:`**
 
-![Sample invocation](../images/responders/assign_editor_2.png "Assign editor responder in action")
+![](../images/responders/assign_editor_2.png "Assign editor responder in action: Sample invocation")
 
 * **`Final state:`**
 
-![After](../images/responders/assign_editor_3.png "Assign editor responder in action")
+![](../images/responders/assign_editor_3.png "Assign editor responder in action: After")

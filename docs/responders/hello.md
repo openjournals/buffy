@@ -36,4 +36,4 @@ Hello @botname
 ```
 ## In action
 
-![Sample invocation](../images/responders/hello.png "Hello responder in action")
+![](../images/responders/hello.png "Hello responder in action")
