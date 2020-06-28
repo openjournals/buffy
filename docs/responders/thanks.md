@@ -38,7 +38,7 @@ Thank you @botname
 ...
 ```
 
-**Custom message and hidden from public command list**
+**Custom message and hidden from public command list:**
 ```yaml
 ...
   responders:
