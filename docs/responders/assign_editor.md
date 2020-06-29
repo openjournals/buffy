@@ -68,7 +68,7 @@ The body of the issue should have the editor placeholder marked with HTML commen
 
 * **`Invocation:`**
 
-![](../images/responders/assign_editor_2.png "Assign editor responder in action: Sample invocation")
+![](../images/responders/assign_editor_2.png "Assign editor responder in action: Invocation")
 
 * **`Final state:`**
 

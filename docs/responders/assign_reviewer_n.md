@@ -74,7 +74,7 @@ By default reviewer will be added as assignee to the issue and collaborator of t
 
 * **`Invocation:`**
 
-![](../images/responders/assign_reviewer_n_2.png "Assign reviewer N responder in action: Sample invocation")
+![](../images/responders/assign_reviewer_n_2.png "Assign reviewer N responder in action: Invocation")
 
 * **`Final state:`**
 
