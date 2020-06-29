@@ -40,7 +40,6 @@ Reviewer 3: <!--reviewer-3--> @spike33 <!--end-reviewer-3-->
     remove_reviewer_n:
 ...
 ```
-By default reviewer will be added as assignee to the issue and collaborator of the repo.
 
 **Action restricted to editors:**
 ```yaml
@@ -77,6 +76,4 @@ By default reviewer will be added as assignee to the issue and collaborator of t
 * **`Final state:`**
 
 ![](../images/responders/remove_reviewer_n_3.png "Remove reviewer N responder in action: After")
-
-
 
