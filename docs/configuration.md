@@ -96,7 +96,7 @@ For security reasons is a good practice to load the secret values from your envi
 
  The responders node lists all the responders that will be available. The key for each entry is the name of the responder and nested under it the configuration options for that responder are declared.
 
- All the responders share some options available to all of them. They can also have their own particular configurable parameters (see docs for each responder). The common parameters are:
+ All the responders share some options available to all of them. They can also have their own particular configurable parameters (see [docs for each responder](./available_responders)). The common parameters are:
 
 <dl>
   <dt>hidden</dt>
