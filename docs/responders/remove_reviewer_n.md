@@ -10,7 +10,6 @@ This responder removes any numbered reviewer from the body of the issue (the one
 ```
 where N is a number.
 
-
 ## Requirements
 
 In the body of the issue the reviewers should be enclosed in HTML comments.
