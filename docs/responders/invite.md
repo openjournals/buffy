@@ -37,7 +37,7 @@ Use this responder to send an invitation to a user to collaborate in the review.
 
 ## In action
 
-![](../images/responders/invite.png "Invite responder in action: Invocation")
+![](../images/responders/invite.png "Invite responder in action")
 
 
 
