@@ -9,7 +9,7 @@ This responder can be used to update the value of any field in the body of the i
 @botname set <value> as <name>
 ```
 
-for example, if you configure this responder to change the value of the _version_, it would respond to:
+For example, if you configure this responder to change the value of the _version_, it would respond to:
 ```
 @botname set v1.0.3 as version
 ```
@@ -21,7 +21,7 @@ The body of the issue should have the target field placeholder marked with HTML 
 ```html
 <!--<name>-value-->  <!--end-<name>-value-->
 ```
-following the previous example if the name of the field is _version_:
+Following the previous example if the name of the field is _version_:
 ```html
 <!--version-value-->  <!--end-version-value-->
 ```
@@ -32,7 +32,7 @@ following the previous example if the name of the field is _version_:
 
 ## Params
 ```eval_rst
-:name: *Required.* The name of the target field in the body of the issue. It can be set using the ``name:`` keyword, or via the name of each instance if there are several instances of this responder specified in the setting file.
+:name: *Required.* The name of the target field in the body of the issue. It can be set using the ``name:`` keyword, or via the name of each instance if there are several instances of this responder specified in the settings file.
 
 :sample_value:  A sample value string for the target field. It is used for documentation purposes when the :doc:`Help responder <./help>` lists all available responders. Default value is **xxxxx**.
 ```

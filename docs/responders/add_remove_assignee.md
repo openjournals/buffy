@@ -29,7 +29,7 @@ Only users that are collaborators in the target issue can be added as assignees.
 ...
 ```
 
-**Hidden from command list and restricted to editors:**
+**Hidden from commands list and restricted to editors:**
 ```yaml
 ...
   responders:

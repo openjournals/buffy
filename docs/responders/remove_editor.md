@@ -1,7 +1,7 @@
 Remove editor
 =============
 
-This responder removes the assigned editor from the body of the issue (the one that can be assign using the [Assign Editor responder](./assign_editor)). The user will also be removed from the issue's assignees.
+This responder removes the assigned editor from the body of the issue (the one that can be assigned using the [Assign Editor responder](./assign_editor)). The user will also be removed from the issue's assignees.
 
 ## Listens to
 
@@ -51,7 +51,7 @@ In the body of the issue the editor should be enclosed in HTML comments.
 ...
 ```
 
-**Restrict access to editors, use custom text for not assigned reviewers:**
+**Restrict access to editors, use custom text when there's not editor:**
 ```yaml
 ...
   responders:

@@ -26,7 +26,7 @@ Hello @botname
 ...
 ```
 
-**Hide from public command list**
+**Hidden from public commands list**
 ```yaml
 ...
   responders:
