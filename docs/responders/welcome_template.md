@@ -26,11 +26,11 @@ In order to use a template, Buffy will look for the file declared in the `templa
 The values needed by the template that are listed in the `data_from_issue` param must be extractable: they have to be enclosed in HTML comments:
 
 ```html
-<!--<name>-value--> Info to extract <!--end-<name>-value-->
+<!--<name>--> Info to extract <!--end-<name>-->
 ```
 So, for example, if you want to use the value of _version_ in the template, the body of the issue must include it inside HTML comments:
 ```html
-<!--version-value--> v2.1 <!--end-version-value-->
+<!--version--> v2.1 <!--end-version-->
 ```
 Then it should be declared in the settings file, listed in the _data_from_issue_ param:
 ```yaml
