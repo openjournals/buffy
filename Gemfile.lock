@@ -4,6 +4,8 @@ GEM
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     backports (3.18.2)
+    concurrent-ruby (1.1.6)
+    connection_pool (2.2.2)
     crack (0.4.4)
     diff-lcs (1.4.4)
     faraday (1.0.1)
@@ -26,6 +28,7 @@ GEM
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
+    redis (3.3.5)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
@@ -43,6 +46,11 @@ GEM
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
+    sidekiq (4.2.10)
+      concurrent-ruby (~> 1.0)
+      connection_pool (~> 2.2, >= 2.2.0)
+      rack-protection (>= 1.5.0)
+      redis (~> 3.2, >= 3.2.1)
     sinatra (2.0.8.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -70,6 +78,7 @@ DEPENDENCIES
   puma
   rack-test
   rspec
+  sidekiq
   sinatra (= 2.0.8.1)
   sinatra-contrib (= 2.0.8.1)
   webmock
