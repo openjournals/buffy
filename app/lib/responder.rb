@@ -73,6 +73,8 @@ class Responder
     end
   end
 
+  # Checks if command is set via settings.
+  # If needed and it's not present raises an error
   def command
     if params[:command].nil? || params[:command].strip.empty?
       raise "Configuration Error in #{self.class.name}: No value for command."
@@ -82,6 +84,7 @@ class Responder
     @command
   end
 
+  # True if the responder is configured as hidden
   def hidden?
     @params[:hidden] == true
   end
