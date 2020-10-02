@@ -15,15 +15,6 @@ class LabelCommandResponder < Responder
     end
   end
 
-  def command
-    if params[:command].nil? || params[:command].strip.empty?
-      raise "Configuration Error in LabelCommandResponder: No value for command."
-    else
-      @command ||= params[:command].strip
-    end
-    @command
-  end
-
   def labels
     if params[:labels].nil? || !params[:labels].is_a?(Array) || params[:labels].uniq.compact.empty?
       if labels_to_remove.empty?

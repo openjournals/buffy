@@ -73,6 +73,15 @@ class Responder
     end
   end
 
+  def command
+    if params[:command].nil? || params[:command].strip.empty?
+      raise "Configuration Error in #{self.class.name}: No value for command."
+    else
+      @command ||= params[:command].strip
+    end
+    @command
+  end
+
   def hidden?
     @params[:hidden] == true
   end

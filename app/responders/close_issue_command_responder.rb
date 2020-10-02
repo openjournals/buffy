@@ -11,15 +11,6 @@ class CloseIssueCommandResponder < Responder
     close_issue(labels_options)
   end
 
-  def command
-    if params[:command].nil? || params[:command].strip.empty?
-      raise "Configuration Error in CloseIssueCommandResponder: No value for command."
-    else
-      @command ||= params[:command].strip
-    end
-    @command
-  end
-
   def labels
     if params[:labels].nil? || !params[:labels].is_a?(Array) || params[:labels].uniq.compact.empty?
       @labels = []
