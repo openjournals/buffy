@@ -4,6 +4,13 @@ buffy:
     editors: 3824115
     eics:
     reviewers:
+  services:
+    dummy:
+      url: https://example.org/api
+      method: post
+      mapping:
+        q: repo
+        id: issue_id
   responders:
     help:
     hello:

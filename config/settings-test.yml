@@ -6,6 +6,9 @@ buffy:
     editors: 2009411
     eics:
     reviewers:
+  services:
+    ropensci_check:
+      url: https://ropensci.org/code_quality
   responders:
     hello:
       only: editors

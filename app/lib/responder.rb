@@ -23,6 +23,7 @@ class Responder
   def initialize(settings, params)
     settings = default_settings.merge(settings)
     @teams = settings[:teams]
+    @services = settings[:services]
     @bot_name = settings[:bot_github_user]
     @params = params || {}
     @settings = settings
