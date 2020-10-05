@@ -1,6 +1,7 @@
 require 'rack/test'
 require 'rspec'
 require 'webmock/rspec'
+require 'sidekiq/testing'
 WebMock.disable_net_connect!(allow_localhost: true)
 
 ENV['RACK_ENV'] = 'test'
@@ -27,6 +28,7 @@ end
 
 RSpec.configure do |config|
   config.before(:each) do
+    Sidekiq::Worker.clear_all
     stub_request(:any, /api.github.com/).to_rack(FakeGitHub)
   end
 

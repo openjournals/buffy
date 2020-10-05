@@ -3,6 +3,7 @@ require_relative 'authorizations'
 require_relative 'defaults'
 require_relative 'github'
 require_relative 'templating'
+require_relative 'workers'
 
 class Responder
   include Actions
