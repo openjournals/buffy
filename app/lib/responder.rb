@@ -86,6 +86,23 @@ class Responder
     @command
   end
 
+  # Create a hash with the basic config info
+  # and adds any data from the body issue requested via :data_from_issue param
+  def locals
+    from_context = { issue_id: context.issue_id,
+                     repo: context.repo,
+                     sender: context.sender,
+                     bot_name: bot_name }
+    from_body = {}
+    if params[:data_from_issue].is_a? Array
+      params[:data_from_issue].each do |varname|
+        from_body[varname] = read_from_body("<!--#{varname}-->", "<!--end-#{varname}-->")
+      end
+    end
+
+    from_context.merge from_body
+  end
+
   # True if the responder is configured as hidden
   def hidden?
     @params[:hidden] == true

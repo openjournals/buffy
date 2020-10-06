@@ -113,6 +113,27 @@ describe Responder do
     end
   end
 
+  describe "#locals" do
+    before do
+      @responder = described_class.new({ bot_github_user: 'botsci' }, {})
+      @responder.context = OpenStruct.new(issue_id: 5,
+                                          repo: "openjournals/buffy",
+                                          sender: "user33",
+                                          issue_body: "Test Software Review\n\n<!--reviewer-->@xuanxu<!--end-reviewer-->")
+    end
+
+    it "should include basic config info" do
+      expected_locals = { issue_id: 5, bot_name: "botsci", repo: "openjournals/buffy", sender: "user33" }
+      expect(@responder.locals).to eq(expected_locals)
+    end
+
+    it "should add info from the issue body if requested" do
+      @responder.params = {data_from_issue: ["reviewer"]}
+      expected_locals = { issue_id: 5, bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
+      expect(@responder.locals).to eq(expected_locals)
+    end
+  end
+
   describe "#hidden?" do
     it "should be true if params[:hidden] is true" do
       responder = described_class.new({}, { hidden: true })
