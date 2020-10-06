@@ -4,6 +4,9 @@ buffy:
   gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
     editors: 3824115
+  services:
+    echo:
+      url: https://dummy-external-service.herokuapp.com/echo
   responders:
     help:
     hello:
@@ -56,3 +59,8 @@ buffy:
       command: reject
       labels:
         - rejected
+    external_service:
+      service: echo
+      description: Replies whatever you throw at it
+      message: waiting for echo to reply...
+
