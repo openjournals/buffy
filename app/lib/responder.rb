@@ -16,6 +16,7 @@ class Responder
   attr_accessor :event_action
   attr_accessor :params
   attr_accessor :teams
+  attr_accessor :services
   attr_accessor :bot_name
   attr_accessor :match_data
   attr_accessor :context
