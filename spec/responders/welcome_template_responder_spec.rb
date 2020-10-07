@@ -7,7 +7,7 @@ describe WelcomeTemplateResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({bot_github_user: "botsci"}, {}) }
+    before { @responder = subject.new({bot_github_user: "botsci"}, { template_file: "test.md" }) }
 
     it "should listen to new issues" do
       expect(@responder.event_action).to eq("issues.opened")
@@ -47,16 +47,14 @@ describe WelcomeTemplateResponder do
 
   describe "misconfiguration" do
     it "should raise error if template_file is missing from config" do
-      responder = subject.new({ bot_github_user: "botsci" }, {})
       expect {
-        responder.process_message("")
+        subject.new({ bot_github_user: "botsci" }, {})
       }.to raise_error "Configuration Error in WelcomeTemplateResponder: No value for template_file."
     end
 
     it "should raise error if template_file is empty" do
-      responder = subject.new({ bot_github_user: "botsci" }, { template_file: "    " })
       expect {
-        responder.process_message("")
+        subject.new({ bot_github_user: "botsci" }, { template_file: "    " })
       }.to raise_error "Configuration Error in WelcomeTemplateResponder: No value for template_file."
     end
   end

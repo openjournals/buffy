@@ -3,6 +3,8 @@ require_relative "../lib/responder"
 class SetValueResponder < Responder
 
   def define_listening
+    required_params :name
+
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} set (.*) as #{name}\s*\z/i
   end
@@ -23,15 +25,6 @@ class SetValueResponder < Responder
 
   def example_invocation
     "@#{@bot_name} set #{params[:sample_value] || 'xxxxx'} as #{name}"
-  end
-
-  def name
-    if params[:name].nil? || params[:name].strip.empty?
-      raise "Configuration Error in SetValueResponder: No value for name."
-    else
-      @name ||= params[:name].strip
-    end
-    @name
   end
 
 end

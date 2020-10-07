@@ -7,7 +7,7 @@ describe LabelCommandResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({ bot_github_user: "botsci" }, { command: "recommend publication" }) }
+    before { @responder = subject.new({ bot_github_user: "botsci" }, { command: "recommend publication", labels: ["ok"] }) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -108,28 +108,26 @@ describe LabelCommandResponder do
   end
 
   describe "documentation" do
-    before do
-      @responder = subject.new({ bot_github_user: "botsci" }, { command: "review finished" })
-    end
-
     it "#example_invocation shows the custom command" do
-       expect(@responder.example_invocation).to eq("@botsci review finished")
+      responder = subject.new({ bot_github_user: "botsci" }, { command: "review finished", labels: ["reviewed"] })
+      expect(responder.example_invocation).to eq("@botsci review finished")
     end
 
     it "#description should include only labels" do
-      @responder.params[:labels] = ["reviewed"]
-      expect(@responder.description).to eq("Label issue with: reviewed")
+      responder = subject.new({ bot_github_user: "botsci" }, { command: "review finished", labels: ["reviewed"] })
+      expect(responder.description).to eq("Label issue with: reviewed")
     end
 
     it "#description should include only removed labels" do
-      @responder.params[:remove] = ["pending-review", "ongoing"]
-      expect(@responder.description).to eq("Remove labels: pending-review, ongoing")
+      params = { command: "review finished", remove: ["pending-review", "ongoing"] }
+      responder = subject.new({ bot_github_user: "botsci" }, params)
+      expect(responder.description).to eq("Remove labels: pending-review, ongoing")
     end
 
     it "#description should include added and removed labels" do
-      @responder.params[:labels] = ["accepted"]
-      @responder.params[:remove] = ["ongoing review"]
-      expect(@responder.description).to eq("Label issue with: accepted. Remove labels: ongoing review")
+      params = { command: "review finished", labels: ["accepted"], remove: ["ongoing review"] }
+      responder = subject.new({ bot_github_user: "botsci" }, params)
+      expect(responder.description).to eq("Label issue with: accepted. Remove labels: ongoing review")
     end
   end
 end

@@ -3,6 +3,8 @@ require_relative '../lib/responder'
 class CloseIssueCommandResponder < Responder
 
   def define_listening
+    required_params :command
+
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} #{command}\s*\z/i
   end
