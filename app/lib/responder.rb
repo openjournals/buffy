@@ -16,7 +16,6 @@ class Responder
   attr_accessor :event_action
   attr_accessor :params
   attr_accessor :teams
-  attr_accessor :services
   attr_accessor :bot_name
   attr_accessor :match_data
   attr_accessor :context
@@ -25,7 +24,6 @@ class Responder
   def initialize(settings, params)
     settings = default_settings.merge(settings)
     @teams = settings[:teams]
-    @services = settings[:services]
     @bot_name = settings[:bot_github_user]
     @params = params || {}
     @settings = settings

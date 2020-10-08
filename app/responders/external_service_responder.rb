@@ -3,7 +3,7 @@ require_relative '../lib/responder'
 class ExternalServiceResponder < Responder
 
   def define_listening
-    required_params :service
+    required_params :name, :command, :url
 
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} #{command}\s*\z/i
@@ -11,7 +11,7 @@ class ExternalServiceResponder < Responder
 
   def process_message(message)
     respond(params[:message]) if params[:message]
-    ExternalServiceWorker.perform_async(@service, locals)
+    ExternalServiceWorker.perform_async(params, locals)
   end
 
   def description
