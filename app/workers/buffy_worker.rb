@@ -1,5 +1,6 @@
 require 'yaml'
 require 'erb'
+require 'faraday'
 
 require_relative '../lib/defaults'
 require_relative '../lib/github'
