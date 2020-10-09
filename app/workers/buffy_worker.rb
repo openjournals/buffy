@@ -5,14 +5,17 @@ require 'sidekiq'
 
 require_relative '../lib/defaults'
 require_relative '../lib/github'
+require_relative '../lib/actions'
 require_relative '../lib/templating'
 
 class BuffyWorker
   include Sidekiq::Worker
+  include Defaults
   include GitHub
+  include Actions
   include Templating
 
-  attr_accessor :settings, :buffy_settings
+  attr_accessor :settings, :buffy_settings, :context
 
   def rack_environment
     ENV['RACK_ENV'] || 'test'
