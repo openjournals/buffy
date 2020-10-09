@@ -1,6 +1,7 @@
 require 'yaml'
 require 'erb'
 require 'faraday'
+require 'sidekiq'
 
 require_relative '../lib/defaults'
 require_relative '../lib/github'
@@ -11,8 +12,10 @@ class BuffyWorker
   include GitHub
   include Templating
 
+  attr_accessor :settings, :buffy_settings
+
   def rack_environment
-    ENV['RACK_ENV'] || "test"
+    ENV['RACK_ENV'] || 'test'
   end
 
   def path
@@ -25,12 +28,12 @@ class BuffyWorker
       repo: config[:repo],
     )
 
-    document = ERB.new(IO.read("../../config/settings-#{rack_environment}.yml")).result
+    document = ERB.new(IO.read("#{File.expand_path '../../../config', __FILE__}/settings-#{rack_environment}.yml")).result
     yaml = YAML.load(document)
-    buffy_settings = yaml[:buffy]
+    @buffy_settings = yaml['buffy']
 
     @settings = {}
-    @settings[:templates_path] = buffy_settings[:templates_path] || default_settings[:templates_path]
-    @settings[:gh_access_token] = buffy_settings[:gh_access_token] || default_settings[:gh_access_token]
+    @settings[:templates_path] = buffy_settings['templates_path'] || default_settings[:templates_path]
+    @settings[:gh_access_token] = buffy_settings['gh_access_token'] || default_settings[:gh_access_token]
   end
 end
