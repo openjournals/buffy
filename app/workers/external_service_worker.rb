@@ -28,7 +28,7 @@ class ExternalServiceWorker < BuffyWorker
       parsed_response = JSON.parse(response.body)
       respond_external_template(service[:template_file], parsed_response)
     else
-      respond(response)
+      respond(response.body)
     end
   end
 end
