@@ -15,6 +15,8 @@ class BuffyWorker
   include Actions
   include Templating
 
+  sidekiq_options retry: false
+
   attr_accessor :settings, :buffy_settings, :context
 
   def rack_environment
