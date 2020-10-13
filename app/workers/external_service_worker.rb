@@ -3,15 +3,15 @@ class ExternalServiceWorker < BuffyWorker
   def perform(service, locals)
     load_context_and_settings(locals)
 
-    http_method = service[:method] || 'post'
-    url = service[:url]
+    http_method = service['method'] || 'post'
+    url = service['url']
     template = nil
 
-    query_parameters = service[:query_params] || {}
-    service_mapping = service[:mapping] || {}
+    query_parameters = service['query_params'] || {}
+    service_mapping = service['mapping'] || {}
     mapped_parameters = {}
 
-    service[:mapping].each_pair do |k, v|
+    service_mapping.each_pair do |k, v|
       mapped_parameters[k] = locals.delete(v)
     end
 
@@ -20,7 +20,7 @@ class ExternalServiceWorker < BuffyWorker
     if http_method.downcase == 'get'
       response = Faraday.get(url, parameters)
     else
-      headers = {"Content-Type" => "application/json", 'Accept' => 'application/json'}
+      headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json'}
       response = Faraday.post(url, parameters.to_json, headers)
     end
 
