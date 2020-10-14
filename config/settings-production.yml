@@ -58,6 +58,7 @@ buffy:
         - rejected
     external_service:
       - code_quality:
+          only: editors
           command: analyze code
           description: Reports on the quality of the code
           message: Inspecting code...
