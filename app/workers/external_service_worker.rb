@@ -24,11 +24,15 @@ class ExternalServiceWorker < BuffyWorker
       response = Faraday.post(url, parameters.to_json, headers)
     end
 
-    if service[:template_file]
-      parsed_response = JSON.parse(response.body)
-      respond_external_template(service[:template_file], parsed_response)
-    else
-      respond(response.body)
+    if response.status.between?(200, 299)
+      if service[:template_file]
+        parsed_response = JSON.parse(response.body)
+        respond_external_template(service[:template_file], parsed_response)
+      else
+        respond(response.body)
+      end
+    elsif response.status.between?(400, 599)
+      respond("Error. The #{service['name']} service is currently unavailable")
     end
   end
 end
