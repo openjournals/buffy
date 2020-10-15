@@ -50,8 +50,8 @@ describe ExternalServiceWorker do
     end
 
     it "should respond using a template if present when a 200 response is received" do
-      service_params = @service_params.merge({ template_file: 'test_service_reply.md' })
-      expect(URI).to receive(:parse).and_return(URI("buf.fy"))
+      service_params = @service_params.merge({ 'template_file' => 'test_service_reply.md' })
+      expect(URI).to receive(:parse).at_least(:once).and_return(URI("buf.fy"))
       expect_any_instance_of(URI::Generic).to receive(:read).once.and_return("Tests {{result}}")
 
       expect(Faraday).to receive(:post).and_return(response_200_template)
