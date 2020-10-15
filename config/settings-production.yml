@@ -70,4 +70,12 @@ buffy:
             - target-repo
           mapping:
             target_url: target-repo
-
+      - cat_facts:
+          command: tell me something about cats
+          description: Random facts about cats
+          url: "https://cat-fact.herokuapp.com/facts/random"
+          method: get
+          query_params:
+              animal_type: cat
+              amount: 1
+          template_file: cats.md
