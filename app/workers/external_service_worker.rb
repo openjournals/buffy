@@ -25,9 +25,9 @@ class ExternalServiceWorker < BuffyWorker
     end
 
     if response.status.between?(200, 299)
-      if service[:template_file]
+      if service['template_file']
         parsed_response = JSON.parse(response.body)
-        respond_external_template(service[:template_file], parsed_response)
+        respond_external_template(service['template_file'], parsed_response)
       else
         respond(response.body)
       end
