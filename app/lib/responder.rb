@@ -24,7 +24,6 @@ class Responder
   def initialize(settings, params)
     settings = default_settings.merge(settings)
     @teams = settings[:teams]
-    @services = settings[:services]
     @bot_name = settings[:bot_github_user]
     @params = params || {}
     @settings = settings
@@ -75,15 +74,18 @@ class Responder
     end
   end
 
-  # Checks if command is set via settings.
-  # If needed and it's not present raises an error
-  def command
-    if params[:command].nil? || params[:command].strip.empty?
-      raise "Configuration Error in #{self.class.name}: No value for command."
-    else
-      @command ||= params[:command].strip
+  # Check required params
+  # Raise an error if any of them is missing
+  # Create an reader method for each param name
+  def required_params(*param_names)
+    param_names.each do |param_name|
+      param_name = param_name.to_sym
+      if params[param_name].nil? || params[param_name].strip.empty?
+        raise "Configuration Error in #{self.class.name}: No value for #{param_name}."
+      else
+        self.class.define_method(param_name.to_s) { params[param_name].strip }
+      end
     end
-    @command
   end
 
   # Create a hash with the basic config info
@@ -108,7 +110,7 @@ class Responder
     @params[:hidden] == true
   end
 
-  # To be overwritten by subclasses with events and actions they respond to
+  # To be overwritten by subclasses with settings needed and events/actions they respond to
   def define_listening
   end
 

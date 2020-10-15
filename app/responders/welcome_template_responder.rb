@@ -3,6 +3,8 @@ require_relative '../lib/responder'
 class WelcomeTemplateResponder < Responder
 
   def define_listening
+    required_params :template_file
+
     @event_action = "issues.opened"
     @event_regex = nil
   end
@@ -17,15 +19,6 @@ class WelcomeTemplateResponder < Responder
 
   def example_invocation
     "Is invoked once, when an issue is created"
-  end
-
-  def template_file
-    if params[:template_file].nil? || params[:template_file].strip.empty?
-      raise "Configuration Error in WelcomeTemplateResponder: No value for template_file."
-    else
-      @template_file ||= params[:template_file].strip
-    end
-    @template_file
   end
 
   def hidden?

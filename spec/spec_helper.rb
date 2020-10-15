@@ -2,6 +2,7 @@ require 'rack/test'
 require 'rspec'
 require 'webmock/rspec'
 require 'sidekiq/testing'
+require 'sidekiq/api'
 WebMock.disable_net_connect!(allow_localhost: true)
 
 ENV['RACK_ENV'] = 'test'

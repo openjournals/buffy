@@ -187,4 +187,21 @@ describe Responder do
       end
     end
   end
+
+  describe "required_params" do
+    it "should raise error if param is not present" do
+      expect {
+        subject.required_params(:non_existent)
+      }.to raise_error "Configuration Error in Responder: No value for non_existent."
+    end
+
+    it "should create reader methods for param values" do
+      subject.params = { first_name: "Buffy", last_name: "Summers", location: "Sunnydale" }
+      subject.required_params :first_name, :last_name, "location"
+
+      expect(subject.first_name).to eq("Buffy")
+      expect(subject.last_name).to eq("Summers")
+      expect(subject.location).to eq("Sunnydale")
+    end
+  end
 end

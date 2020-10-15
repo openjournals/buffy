@@ -1,3 +1,5 @@
+require 'sinatra/indifferent_hash'
+
 module Defaults
 
   # Default value for needed settings.

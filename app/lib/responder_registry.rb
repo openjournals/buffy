@@ -18,6 +18,7 @@ class ResponderRegistry
     "welcome"             => WelcomeResponder,
     "welcome_template"    => WelcomeTemplateResponder,
     "close_issue_command" => CloseIssueCommandResponder,
+    "external_service"    => ExternalServiceResponder,
   }
 
   attr_accessor :responders
