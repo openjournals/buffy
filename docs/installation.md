@@ -32,7 +32,7 @@ This will be the user responding to commands in the reviews repo.
 
 We will use here [Heroku](https://www.heroku.com) as an example service to deploy Buffy but you can use any other server or platform.
 
-**1.** Create a new app in heroku linked to the url of your fork of Buffy. Automatically Heroku will use the `heroku/ruby` buildpack.
+**1.** Create a new app in heroku linked to the url of your fork of Buffy. Automatically Heroku will use the `heroku/ruby` buildpack. To process background jobs Buffy needs `redis` installed, several add-ons providing it are available: Heroku Redis, RedisGreen, Redis To Go, etc.
 
 **2.** In the app settings add the following Config Vars:
 
