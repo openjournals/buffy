@@ -7,6 +7,8 @@ class ExternalServiceWorker < BuffyWorker
     url = service['url']
     template = nil
 
+    headers = service['headers'] || {}
+
     query_parameters = service['query_params'] || {}
     service_mapping = service['mapping'] || {}
     mapped_parameters = {}
@@ -18,10 +20,10 @@ class ExternalServiceWorker < BuffyWorker
     parameters = {}.merge(query_parameters, mapped_parameters, locals)
 
     if http_method.downcase == 'get'
-      response = Faraday.get(url, parameters)
+      response = Faraday.get(url, parameters, headers)
     else
-      headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json'}
-      response = Faraday.post(url, parameters.to_json, headers)
+      post_headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json'}.merge(headers)
+      response = Faraday.post(url, parameters.to_json, post_headers)
     end
 
     if response.status.between?(200, 299)

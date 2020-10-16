@@ -70,6 +70,9 @@ buffy:
             - target-repo
           mapping:
             target_url: target-repo
+          headers:
+            Authorization: OAUTH-token 123456
+            Time-Zone: Europe/Amsterdam
       - cat_facts:
           command: tell me something about cats
           description: Random facts about cats

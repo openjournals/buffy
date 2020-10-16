@@ -31,9 +31,10 @@ describe ExternalServiceWorker do
     it "should use GET method if set via settings" do
       expected_url = @service_params['url']
       expected_params = @locals
+      expected_headers = {}
 
       expect(Faraday).to_not receive(:post)
-      expect(Faraday).to receive(:get).with(expected_url, expected_params).and_return(response_200)
+      expect(Faraday).to receive(:get).with(expected_url, expected_params, expected_headers).and_return(response_200)
       @worker.perform(@service_params.merge({'method' => 'get'}), @locals)
     end
 
@@ -61,7 +62,7 @@ describe ExternalServiceWorker do
 
   end
 
-  describe "service query" do
+  describe "service request" do
     before do
       @null_response = OpenStruct.new(status: 700, body: "no reply")
       @service = { 'name' => 'tests', 'command' => 'run specs', 'url' => 'URL' }
@@ -79,12 +80,24 @@ describe ExternalServiceWorker do
       locals = { 'repo' => 'openjournals/tests', 'sender' => 'editor1' }
 
       expected_url = @service['url']
-      expected_headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json'}
       expected_params = query_params.merge(mapped_params, locals).to_json
+      expected_headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json'}
 
       expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(@null_response)
 
       params = @service.merge({ 'query_params' => query_params, 'mapping' => mapping })
+      @worker.perform(params, @locals)
+    end
+
+    it "should set custom headers" do
+      params = @service.merge({ 'headers' => { 'X-Auth' => "secret-token" } })
+
+      expected_url = @service['url']
+      expected_params = @locals.to_json
+      expected_headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json', 'X-Auth' => "secret-token"}
+
+      expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(@null_response)
+
       @worker.perform(params, @locals)
     end
   end
