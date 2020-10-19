@@ -5,7 +5,7 @@ Several Buffy responders can reply with a template. Please read each Responder d
 
 ## Template files
 
-Templates must be created in the repository using Buffy. Every template is a different file in the repo. To make use of them Buffy needs to know where the templetes are located, and the individual name of each template file. As the comments in GitHub issues are rendered using markdown, usually the templates will be plain text or .md files, but that is not mandatory for Buffy to use them.
+Templates must be created in the repository using Buffy. Every template is a different file in the repo. To make use of them Buffy needs to know where the templates are located, and the individual name of each template file. As the comments in GitHub issues are rendered using markdown, usually the templates will be plain text or .md files, but that is not mandatory for Buffy to use them.
 
 ### Location
 
