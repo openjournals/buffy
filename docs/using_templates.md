@@ -14,7 +14,7 @@ Buffy will look for the templates in the target repository. By default it will l
 
 ### Name
 
-In the responders allowing templates for replies, the template is specified using the `template_file` setting for that responder.
+In the responders allowing templates for replies, the template is specified using the `template_file` setting for that responder. Value should be the name of the file including the extension if it has one.
 
 ### Example
 
@@ -36,3 +36,18 @@ responders:
 ```
 
 Buffy will use the content of _https://github.com/scientific-journal/astronomy/.templates/welcome.md_ to respond.
+
+## Populating templates
+
+The content of a template can include placeholders to be filled with the actual values of a variable. The syntax is:
+```
+{{variable_name}}
+```
+
+When rendering a template Buffy will use a hash of `key:value` pairs. When a placeholder is found in the template it will look up for the corresponding key in the hash and insert the value in the template. The hash will always include _at least_:
+- **issue_id**: The id of the issue
+- **repo**: the name of the repository
+- **sender**: the handle of the user creating the comment/issue triggering the responder
+- **bot_name**: the name of the bot user responding
+
+The hash can also include fields extracted from the body of the issue and specific settings from the responder being used. Check each responder documentation for details on the values available to use in templates.
