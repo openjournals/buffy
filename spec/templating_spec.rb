@@ -52,6 +52,22 @@ describe "Templating" do
     end
   end
 
+  describe "#render_external_template" do
+    before { disable_github_calls_for subject }
+
+    it "should return the rendered external template with passed locals" do
+      template_file = "welcome_msg.md"
+      locals =  { sender: "buffy bot" }
+
+      expect(subject).to receive(:template_url).once.with("welcome_msg.md").and_return("TEMPLATE_URL")
+      expect(URI).to receive(:parse).once.with("TEMPLATE_URL").and_return(URI("buf.fy"))
+      expect_any_instance_of(URI::Generic).to receive(:read).once.and_return("Welcome {{sender}}!")
+      expected_response = "Welcome buffy bot!"
+
+      expect(subject.render_external_template(template_file, locals)).to eq expected_response
+    end
+  end
+
   describe "#apply_hash_to_template" do
     it "should use values from locals hash" do
       template = "Hi {{name}}, welcome to {{service}} {{goodbye}}"

@@ -51,3 +51,4 @@ When rendering a template Buffy will use a hash of `key:value` pairs. When a pla
 - **bot_name**: the name of the bot user responding
 
 The hash can also include fields extracted from the body of the issue and specific settings from the responder being used. Check each responder documentation for details on the values available to use in templates.
+
