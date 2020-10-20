@@ -11,6 +11,12 @@ module Actions
     update_issue({ body: new_body })
   end
 
+  # Add text at the end of the body of the issue
+  def append_to_body(text)
+    new_body = issue_body + text
+    update_issue({ body: new_body })
+  end
+
   # Invite a user to collaborate in the repo
   def invite_user(username)
     pending_msg = "The reviewer already has a pending invitation.\n\n#{username} please accept the invite here: #{invitations_url}"

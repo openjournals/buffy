@@ -29,6 +29,18 @@ describe "Actions" do
     end
   end
 
+  describe "#append_to_body" do
+    it "should call update_issue on new body" do
+      issue_body = "Hi <before> there! <after> this is the end"
+      allow(subject).to receive(:issue_body).and_return(issue_body)
+
+      expected_new_body = "Hi <before> there! <after> this is the end\nNow this is the new end"
+
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.append_to_body("\nNow this is the new end")
+    end
+  end
+
   describe "#read_from_body" do
     before { allow(subject).to receive(:issue_body).and_return("... <before> Here! <after> ...") }
     it "should return stripped text between marks" do
