@@ -7,13 +7,23 @@ module Actions
 
   # Update the body of the issue between marks
   def update_body(start_mark, end_mark, new_text)
-    new_body = issue_body.gsub(/#{start_mark}(.*)#{end_mark}/i, "#{start_mark}#{new_text}#{end_mark}")
+    new_body = issue_body.gsub(/#{start_mark}.*#{end_mark}/i, "#{start_mark}#{new_text}#{end_mark}")
     update_issue({ body: new_body })
   end
 
   # Add text at the end of the body of the issue
   def append_to_body(text)
     new_body = issue_body + text
+    update_issue({ body: new_body })
+  end
+
+  # Remove a block of text from the body of the issue optionally including start/end marks
+  def delete_from_body(start_mark, end_mark, delete_marks=false)
+    if delete_marks
+      new_body = issue_body.gsub(/#{start_mark}.*#{end_mark}/i, "")
+    else
+      new_body = issue_body.gsub(/#{start_mark}.*#{end_mark}/i, "#{start_mark}#{end_mark}")
+    end
     update_issue({ body: new_body })
   end
 

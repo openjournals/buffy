@@ -41,6 +41,34 @@ describe "Actions" do
     end
   end
 
+  describe "#delete_from_body" do
+    before do
+      issue_body = "Intro <before> Here! <after> Final"
+      allow(subject).to receive(:issue_body).and_return(issue_body)
+    end
+
+    it "should not remove marks by default" do
+      expected_new_body = "Intro <before><after> Final"
+
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.delete_from_body("<before>", "<after>")
+    end
+
+    it "should call update_issue on new body removing block content" do
+      expected_new_body = "Intro <before><after> Final"
+
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.delete_from_body("<before>", "<after>", false)
+    end
+
+    it "should call update_issue on new body removing block and marks" do
+      expected_new_body = "Intro  Final"
+
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.delete_from_body("<before>", "<after>", true)
+    end
+  end
+
   describe "#read_from_body" do
     before { allow(subject).to receive(:issue_body).and_return("... <before> Here! <after> ...") }
     it "should return stripped text between marks" do
