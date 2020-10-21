@@ -4,21 +4,22 @@ Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].sort.each { |f| 
 class ResponderRegistry
 
   RESPONDER_MAPPING = {
-    "help"                => HelpResponder,
-    "hello"               => HelloResponder,
-    "assign_reviewer_n"   => AssignReviewerNResponder,
-    "remove_reviewer_n"   => RemoveReviewerNResponder,
-    "assign_editor"       => AssignEditorResponder,
-    "remove_editor"       => RemoveEditorResponder,
-    "invite"              => InviteResponder,
-    "set_value"           => SetValueResponder,
-    "add_remove_assignee" => AddAndRemoveAssigneeResponder,
-    "label_command"       => LabelCommandResponder,
-    "thanks"              => ThanksResponder,
-    "welcome"             => WelcomeResponder,
-    "welcome_template"    => WelcomeTemplateResponder,
-    "close_issue_command" => CloseIssueCommandResponder,
-    "external_service"    => ExternalServiceResponder,
+    "help"                 => HelpResponder,
+    "hello"                => HelloResponder,
+    "assign_reviewer_n"    => AssignReviewerNResponder,
+    "remove_reviewer_n"    => RemoveReviewerNResponder,
+    "assign_editor"        => AssignEditorResponder,
+    "remove_editor"        => RemoveEditorResponder,
+    "invite"               => InviteResponder,
+    "set_value"            => SetValueResponder,
+    "add_remove_assignee"  => AddAndRemoveAssigneeResponder,
+    "label_command"        => LabelCommandResponder,
+    "thanks"               => ThanksResponder,
+    "welcome"              => WelcomeResponder,
+    "welcome_template"     => WelcomeTemplateResponder,
+    "close_issue_command"  => CloseIssueCommandResponder,
+    "external_service"     => ExternalServiceResponder,
+    "add_remove_checklist" => AddAndRemoveUserChecklistResponder,
   }
 
   attr_accessor :responders
