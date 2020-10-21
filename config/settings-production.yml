@@ -82,3 +82,9 @@ buffy:
               animal_type: cat
               amount: 1
           template_file: cats.md
+    add_remove_checklist:
+      only: editors
+      template_file: reviewer_checklist.md
+      data_from_issue:
+            - target-repository
+            - author-handle
