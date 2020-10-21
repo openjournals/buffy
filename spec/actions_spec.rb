@@ -43,7 +43,7 @@ describe "Actions" do
 
   describe "#delete_from_body" do
     before do
-      issue_body = "Intro <before> Here! <after> Final"
+      issue_body = "Intro <before> Here!\n <after> Final"
       allow(subject).to receive(:issue_body).and_return(issue_body)
     end
 
