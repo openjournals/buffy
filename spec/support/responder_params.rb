@@ -7,6 +7,7 @@ module ResponderParams
       CloseIssueCommandResponder => { command: "close_command_#{n}", labels: ["label_#{n}"] },
       WelcomeTemplateResponder => { template_file: "test.md" },
       ExternalServiceResponder => { name: "external_service_#{n}", command: "bot call service #{n}", url: "https://github.com/openjournals"},
+      AddAndRemoveUserChecklistResponder => { template_file: "checklist.md" },
     }
 
     params_by_responder[responder_class] || {}
