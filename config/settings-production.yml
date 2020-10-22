@@ -86,5 +86,5 @@ buffy:
       only: editors
       template_file: reviewer_checklist.md
       data_from_issue:
-            - target-repository
-            - author-handle
+        - target-repository
+        - author-handle
