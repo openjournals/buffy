@@ -28,10 +28,7 @@ class BuffyWorker
   end
 
   def load_context_and_settings(config)
-    @context = OpenStruct.new(
-      issue_id: config['issue_id'],
-      repo: config['repo'],
-    )
+    @context = OpenStruct.new(config)
 
     document = ERB.new(IO.read("#{File.expand_path '../../../config', __FILE__}/settings-#{rack_environment}.yml")).result
     yaml = YAML.load(document)

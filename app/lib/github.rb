@@ -2,7 +2,7 @@ require 'octokit'
 
 # This module includes all the methods involving calls to the GitHub API
 # It reuses a memoized Octokit::Client instance
-# Context is an OpenStruct created in lib/github_webhook_parser
+# Context is an OpenStruct object created in lib/github_webhook_parser or in a BuffyWorker
 module GitHub
 
   # Authenticated Octokit
