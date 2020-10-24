@@ -2,7 +2,7 @@ language: ruby
 os: linux
 
 services:
-  - redis-server
+  - redis
 rvm:
   - 2.7.1
   - ruby-head
