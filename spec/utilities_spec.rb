@@ -89,6 +89,12 @@ describe "Utilities" do
 
       expect(subject.change_branch("newbranch", "local/folder")).to be_falsy
     end
+
+    it "should do nothing and return true if branch is nil" do
+      expect(Open3).to_not receive(:capture3)
+      expect(subject.change_branch(nil, "local/folder")).to be_truthy
+      expect(subject.change_branch("", "local/folder")).to be_truthy
+    end
   end
 
 end

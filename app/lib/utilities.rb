@@ -57,6 +57,7 @@ module Utilities
   end
 
   def change_branch(branch, local_path)
+    return true if (branch.nil? || branch.strip.empty?)
     stdout, stderr, status = Open3.capture3 "git -C #{local_path} checkout #{branch}"
     status.success?
   end
