@@ -8,6 +8,7 @@ require_relative '../lib/github'
 require_relative '../lib/actions'
 require_relative '../lib/templating'
 require_relative '../lib/utilities'
+require_relative '../lib/paper_file'
 
 class BuffyWorker
   include Sidekiq::Worker
