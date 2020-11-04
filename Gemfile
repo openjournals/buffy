@@ -7,6 +7,7 @@ gem 'openssl'
 gem 'puma'
 gem 'sidekiq'
 gem 'bibtex-ruby'
+gem 'serrano'
 
 group :test do
   gem 'rack-test'

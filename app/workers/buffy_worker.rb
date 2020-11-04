@@ -9,6 +9,7 @@ require_relative '../lib/actions'
 require_relative '../lib/templating'
 require_relative '../lib/utilities'
 require_relative '../lib/paper_file'
+require_relative '../lib/doi_checker'
 
 class BuffyWorker
   include Sidekiq::Worker
