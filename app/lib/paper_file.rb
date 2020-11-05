@@ -5,8 +5,9 @@ class PaperFile
   attr_accessor :bibtex_entries
   attr_accessor :bibtex_error
 
-  def initialize(path)
+  def initialize(path=nil)
     @paper_path = path
+    @bibtex_error = "No paper file path" if @paper_path.nil?
   end
 
   def bibtex_entries
@@ -36,6 +37,21 @@ class PaperFile
     else
       paper_path
     end
+  end
+
+  def self.find(search_path)
+    paper_path = nil
+
+    if Dir.exists? search_path
+      Find.find(search_path).each do |path|
+        if path =~ /paper\.tex$|paper\.md$/
+          paper_path = path
+          break
+        end
+      end
+    end
+
+    PaperFile.new paper_path
   end
 
 end

@@ -6,8 +6,16 @@ describe PaperFile do
     described_class.new("./doc/paper.md")
   end
 
-  it "should initialize paper_path" do
-    expect(subject.paper_path).to eq("./doc/paper.md")
+  describe "Initialization" do
+    it "should initialize paper_path" do
+      expect(subject.paper_path).to eq("./doc/paper.md")
+      expect(subject.bibtex_error).to be_nil
+    end
+
+    it "should add error if no path" do
+      paper_file = PaperFile.new
+      expect(paper_file.bibtex_error).to_not be_nil
+    end
   end
 
   describe "#metadata path" do
@@ -59,6 +67,37 @@ describe PaperFile do
     it "should be empty if errors parsing the file" do
       expect(BibTeX).to receive(:open).and_raise BibTeX::ParseError
       expect(subject.bibtex_entries).to eq([])
+    end
+  end
+
+  describe ".find" do
+    it "should return a PaperFile initialized with the paper path if present" do
+      expect(Dir).to receive(:exists?).with("/repo/path/").and_return(true)
+      expect(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers", "./docs/paper.md", "app"])
+
+      paper_file = PaperFile.find("/repo/path/")
+
+      expect(paper_file).to be_kind_of PaperFile
+      expect(paper_file.paper_path).to eq("./docs/paper.md")
+    end
+
+    it "should return a nil PaperFile if search_path does not exists" do
+      expect(Dir).to receive(:exists?).with("/repo/path/").and_return(false)
+
+      paper_file = PaperFile.find("/repo/path/")
+
+      expect(paper_file).to be_kind_of PaperFile
+      expect(paper_file.paper_path).to be_nil
+    end
+
+    it "should return a nil PaperFile if no paper file found" do
+      expect(Dir).to receive(:exists?).with("/repo/path/").and_return(true)
+      allow(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers.pdf", "./docs", "app"])
+
+      paper_file = PaperFile.find("/repo/path/")
+
+      expect(paper_file).to be_kind_of PaperFile
+      expect(paper_file.paper_path).to be_nil
     end
   end
 

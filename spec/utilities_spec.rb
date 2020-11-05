@@ -15,18 +15,6 @@ describe "Utilities" do
     disable_github_calls_for(subject)
   end
 
-  describe "#find_paper_file" do
-    it "should return paper path if present" do
-      allow(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers", "./docs/paper.md", "app"])
-      expect(subject.find_paper_file("/repo/path/")).to eq "./docs/paper.md"
-    end
-
-    it "should return nil if no paper file found" do
-      allow(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers.pdf", "./docs", "app"])
-      expect(subject.find_paper_file("/repo/path/")).to be_nil
-    end
-  end
-
   describe "#clone_repo" do
     it "should return true when succesfully cloned a repo to a local path" do
       expect(Open3).to receive(:capture3).

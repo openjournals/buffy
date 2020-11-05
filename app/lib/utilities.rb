@@ -3,19 +3,6 @@ require 'open3'
 
 module Utilities
 
-  def find_paper_file(search_path)
-    paper_path = nil
-
-    Find.find(search_path).each do |path|
-      if path =~ /paper\.tex$|paper\.md$/
-        paper_path = path
-        break
-      end
-    end
-
-    paper_path
-  end
-
   def clone_repo(url, local_path)
     url = URI.extract(url.to_s).first
     return false if url.nil?
