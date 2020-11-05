@@ -45,7 +45,7 @@ class BuffyWorker
 
   def setup_local_repo(url, branch)
     msg_no_repo = "Downloading of the repository failed. Please make sure the URL is correct."
-    msg_no_branch = "Couldn't check the bibtex because branch name is incorrect"
+    msg_no_branch = "Couldn't check the bibtex because branch name is incorrect: #{branch.to_s}"
 
     error = clone_repo(url, path) ? nil : msg_no_repo
     (error = change_branch(branch, path) ? nil : msg_no_branch) unless error

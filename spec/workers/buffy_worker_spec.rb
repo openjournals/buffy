@@ -55,7 +55,7 @@ describe BuffyWorker do
     end
 
     it "should error if branch is not present" do
-      msg_no_branch = "Couldn't check the bibtex because branch name is incorrect"
+      msg_no_branch = "Couldn't check the bibtex because branch name is incorrect: wrong_branch"
       expect(@worker).to receive(:clone_repo).and_return(true)
       expect(@worker).to receive(:change_branch).and_return(false)
       expect(@worker).to receive(:respond).with(msg_no_branch)
