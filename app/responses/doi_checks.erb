@@ -1,0 +1,14 @@
+```
+Reference check summary (note 'MISSING' DOIs are suggestions that need verification):
+<% doi_summary.each do |type, messages| %>
+
+<%= type.to_s.upcase %> DOIs
+
+<% if messages.empty? %>
+- None
+<% else %>
+  <% messages.each do |message| %>
+- <%= message%>
+  <% end %>
+<% end %>
+```
