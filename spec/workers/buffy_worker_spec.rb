@@ -63,6 +63,14 @@ describe BuffyWorker do
       expect(@worker.setup_local_repo("correct_url", "wrong_branch")).to be_falsy
     end
 
+    it "should not checkout branch if branch is nil" do
+      expect(@worker).to receive(:clone_repo).and_return(true)
+      expect(@worker).to_not receive(:change_branch)
+      expect(@worker).to_not receive(:respond)
+
+      expect(@worker.setup_local_repo("correct_url", nil)).to be_truthy
+    end
+
     it "should clone repo and checkout branch" do
       msg_no_branch = "Couldn't check the bibtex because branch name is incorrect"
       expect(@worker).to receive(:clone_repo).and_return(true)
