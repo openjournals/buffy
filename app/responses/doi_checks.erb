@@ -4,11 +4,12 @@ Reference check summary (note 'MISSING' DOIs are suggestions that need verificat
 
 <%= type.to_s.upcase %> DOIs
 
-<% if messages.empty? %>
+  <% if messages.empty? %>
 - None
-<% else %>
-  <% messages.each do |message| %>
+  <% else %>
+    <% messages.each do |message| %>
 - <%= message%>
+    <% end %>
   <% end %>
 <% end %>
 ```
