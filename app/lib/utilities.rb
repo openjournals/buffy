@@ -7,6 +7,7 @@ module Utilities
     url = URI.extract(url.to_s).first
     return false if url.nil?
 
+    FileUtils.mkdir_p(local_path)
     stdout, stderr, status = Open3.capture3 "git clone #{url} #{local_path}"
     status.success?
   end
