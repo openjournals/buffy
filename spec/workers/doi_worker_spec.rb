@@ -37,6 +37,23 @@ describe DOIWorker do
       expect(doi_checker).to receive(:check_dois).and_return(expected_doi_summary)
 
       expect(@worker).to receive(:respond_template).once.with(:doi_checks, doi_summary: expected_doi_summary)
+
+      @worker.perform({}, 'url', 'main')
+    end
+
+    it "should cleanup created folder" do
+      expect(@worker).to receive(:setup_local_repo).and_return(true)
+
+      paper_file = PaperFile.new("path/to/paper.md")
+      expect(PaperFile).to receive(:find).and_return(paper_file)
+      expect(paper_file).to receive(:bibtex_entries).and_return(["bibtex_entries"])
+
+      doi_checker = DOIChecker.new(["bibtex_entries"])
+      expected_doi_summary = {ok: ["10.1234/567"], invalid: ["wrong-doi"], missing: []}
+      expect(DOIChecker).to receive(:new).with(["bibtex_entries"]).and_return(doi_checker)
+      expect(doi_checker).to receive(:check_dois).and_return(expected_doi_summary)
+
+      expect(@worker).to receive(:cleanup)
       @worker.perform({}, 'url', 'main')
     end
   end

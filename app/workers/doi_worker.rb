@@ -13,5 +13,7 @@ class DOIWorker < BuffyWorker
       doi_summary = DOIChecker.new(entries).check_dois
       respond_template :doi_checks, { doi_summary: doi_summary }
     end
+
+    cleanup
   end
 end
