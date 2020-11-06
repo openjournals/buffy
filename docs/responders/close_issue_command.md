@@ -1,7 +1,7 @@
 Close issue command
 ===================
 
-This responder replies to a specific command closing the issue and posibly adding some labels.
+This responder replies to a specific command closing the issue and possibly adding some labels.
 
 ## Listens to
 
