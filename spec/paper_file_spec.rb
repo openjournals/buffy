@@ -72,7 +72,7 @@ describe PaperFile do
 
   describe ".find" do
     it "should return a PaperFile initialized with the paper path if present" do
-      expect(Dir).to receive(:exists?).with("/repo/path/").and_return(true)
+      expect(Dir).to receive(:exist?).with("/repo/path/").and_return(true)
       expect(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers", "./docs/paper.md", "app"])
 
       paper_file = PaperFile.find("/repo/path/")
@@ -82,7 +82,7 @@ describe PaperFile do
     end
 
     it "should return a nil PaperFile if search_path does not exists" do
-      expect(Dir).to receive(:exists?).with("/repo/path/").and_return(false)
+      expect(Dir).to receive(:exist?).with("/repo/path/").and_return(false)
 
       paper_file = PaperFile.find("/repo/path/")
 
@@ -91,7 +91,7 @@ describe PaperFile do
     end
 
     it "should return a nil PaperFile if no paper file found" do
-      expect(Dir).to receive(:exists?).with("/repo/path/").and_return(true)
+      expect(Dir).to receive(:exist?).with("/repo/path/").and_return(true)
       allow(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers.pdf", "./docs", "app"])
 
       paper_file = PaperFile.find("/repo/path/")

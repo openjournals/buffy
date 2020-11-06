@@ -42,7 +42,7 @@ class PaperFile
   def self.find(search_path)
     paper_path = nil
 
-    if Dir.exists? search_path
+    if Dir.exist? search_path
       Find.find(search_path).each do |path|
         if path =~ /paper\.tex$|paper\.md$/
           paper_path = path
