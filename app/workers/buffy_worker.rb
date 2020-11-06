@@ -31,6 +31,10 @@ class BuffyWorker
     "tmp/#{jid}"
   end
 
+  def cleanup
+    FileUtils.rm_rf(path) if Dir.exist?(path)
+  end
+
   def load_context_and_settings(config)
     @context = OpenStruct.new(config)
 

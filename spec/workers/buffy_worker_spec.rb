@@ -72,4 +72,26 @@ describe BuffyWorker do
       expect(@worker.setup_local_repo("correct_url", "correct_branch")).to be_truthy
     end
   end
+
+  describe "#cleanup" do
+    before do
+      @worker = BuffyWorker.new
+    end
+
+    it "should remove the worker folder if it exists" do
+      expect(@worker).to receive(:path).twice.and_return("path/to/worker/dir")
+      expect(Dir).to receive(:exist?).with("path/to/worker/dir").and_return(true)
+      expect(FileUtils).to receive(:rm_rf).with("path/to/worker/dir")
+
+      @worker.cleanup
+    end
+
+    it "should do nothing if the worker folder doesn't exists" do
+      expect(@worker).to receive(:path).and_return("path/to/worker/dir")
+      expect(Dir).to receive(:exist?).with("path/to/worker/dir").and_return(false)
+      expect(FileUtils).to_not receive(:rm_rf)
+
+      @worker.cleanup
+    end
+  end
 end
