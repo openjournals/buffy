@@ -20,6 +20,7 @@ class ResponderRegistry
     "close_issue_command"  => CloseIssueCommandResponder,
     "external_service"     => ExternalServiceResponder,
     "add_remove_checklist" => AddAndRemoveUserChecklistResponder,
+    "check_references"     => CheckReferencesResponder,
   }
 
   attr_accessor :responders

@@ -2,10 +2,6 @@ require_relative "../spec_helper.rb"
 
 describe ExternalServiceWorker do
 
-  subject do
-    described_class
-  end
-
   let(:response_200) { OpenStruct.new(status: 200, body: "Tests suite OK, build passed") }
   let(:response_200_template) { OpenStruct.new(status: 200, body: '{"result":"passed"}') }
   let(:response_400) { OpenStruct.new(status: 400, body: "error") }

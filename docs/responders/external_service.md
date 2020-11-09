@@ -9,9 +9,9 @@ This responder creates a background job to asynchronously call an external servi
 @botname <command>
 ```
 
-For example, if you configure the command to be _check references_, it would respond to:
+For example, if you configure the command to be _analyze code_, it would respond to:
 ```
-@botname check references
+@botname analyze code
 ```
 
 ## Requirements

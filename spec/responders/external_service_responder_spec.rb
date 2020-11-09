@@ -13,11 +13,11 @@ describe ExternalServiceResponder do
       @responder = subject.new(settings, params)
     end
 
-    it "should listen to new issues" do
+    it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
     end
 
-    it "should not define regex" do
+    it "should define regex" do
       expect(@responder.event_regex).to match("@botsci run tests")
       expect(@responder.event_regex).to match("@botsci run tests   \r\n")
     end
