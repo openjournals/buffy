@@ -4,34 +4,43 @@ class CheckReferencesResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} check references(?: from branch ([\w-]*))?\s*\z/i
+    @event_regex = /\A@#{@bot_name} check references(?: from branch ([\w-]+))?\s*\z/i
   end
 
   def process_message(message)
     if url.empty?
-      respond("I couldn't find the target repo value")
+      respond("I couldn't find URL for the target repository")
     else
       DOIWorker.perform_async(locals, url, branch)
     end
   end
 
   def branch
-    mark = "<!--branch-value-->"
-    end_mark = "<!--end-branch-value-->"
-    branch_in_body = read_from_body(mark, end_mark)
+    if params[:branch_field].nil? || params[:branch_field].empty?
+      branch_field = "branch"
+    else
+      branch_field = params[:branch_field].strip
+    end
+    mark = "<!--#{branch_field}-->"
+    end_mark = "<!--end-#{branch_field}-->"
 
     if @match_data.nil? || @match_data[1].nil?
-      branch_in_command = nil
+      branch_name = read_from_body(mark, end_mark)
     else
-      branch_in_command = @match_data[1]
+      branch_name = @match_data[1]
     end
 
-    [branch_in_command, branch_in_body].compact.select {|s| !s.strip.empty? }.first
+    branch_name.empty? ? nil : branch_name
   end
 
   def url
-    mark = "<!--target-repository-->"
-    end_mark = "<!--end-target-repository-->"
+    if params[:url_field].nil? || params[:url_field].empty?
+      url_field = "target-repository"
+    else
+      url_field = params[:url_field].strip
+    end
+    mark = "<!--#{url_field}-->"
+    end_mark = "<!--end-#{url_field}-->"
     @target_repo_url ||= read_from_body(mark, end_mark)
   end
 

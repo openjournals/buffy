@@ -26,7 +26,6 @@ describe AddAndRemoveUserChecklistResponder do
 
   describe "#process_message" do
     before do
-      @responder.context = OpenStruct.new(repo: "openjournals/joss")
       @responder.context = OpenStruct.new(issue_id: 5,
                                           repo: "openjournals/buffy",
                                           sender: "user33",
