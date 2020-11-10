@@ -25,19 +25,19 @@ class LabelCommandResponder < Responder
   end
 
   def labels_to_add
-    if params[:labels].nil? || !params[:labels].is_a?(Array) || params[:labels].uniq.compact.empty?
+    if params[:add_labels].nil? || !params[:add_labels].is_a?(Array) || params[:add_labels].uniq.compact.empty?
       @labels_to_add = []
     end
 
-    @labels_to_add ||= params[:labels].uniq.compact
+    @labels_to_add ||= params[:add_labels].uniq.compact
   end
 
   def labels_to_remove
-    if params[:remove].nil? || !params[:remove].is_a?(Array) || params[:remove].uniq.compact.empty?
+    if params[:remove_labels].nil? || !params[:remove_labels].is_a?(Array) || params[:remove_labels].uniq.compact.empty?
       @labels_to_remove = []
     end
 
-    @labels_to_remove ||= params[:remove].uniq.compact
+    @labels_to_remove ||= params[:remove_labels].uniq.compact
   end
 
   def description

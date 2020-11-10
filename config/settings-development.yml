@@ -29,9 +29,9 @@ buffy:
       only: editors
     label_command:
       command: review successful
-      labels:
+      add_labels:
         - reviewed
         - pending publication
-      remove:
+      remove_labels:
         - pending review
     welcome:
