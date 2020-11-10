@@ -29,12 +29,12 @@ describe SetValueResponder do
       @msg = "@botsci set v0.0.33-alpha as version"
       @responder.match_data = @responder.event_regex.match(@msg)
 
-      issue_body = "...Latest Version: <!--version-value-->Pending<!--end-version-value--> ..."
+      issue_body = "...Latest Version: <!--version-->Pending<!--end-version--> ..."
       allow(@responder).to receive(:issue_body).and_return(issue_body)
     end
 
     it "should update value in the body of the issue" do
-      expected_new_body = "...Latest Version: <!--version-value-->v0.0.33-alpha<!--end-version-value--> ..."
+      expected_new_body = "...Latest Version: <!--version-->v0.0.33-alpha<!--end-version--> ..."
       expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
       @responder.process_message(@msg)
     end

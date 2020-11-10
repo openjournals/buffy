@@ -19,11 +19,11 @@ For example, if you configure this responder to change the value of the _version
 The body of the issue should have the target field placeholder marked with HTML comments.
 
 ```html
-<!--<name>-value-->  <!--end-<name>-value-->
+<!--<name>-->  <!--end-<name>-->
 ```
 Following the previous example if the name of the field is _version_:
 ```html
-<!--version-value-->  <!--end-version-value-->
+<!--version-->  <!--end-version-->
 ```
 
 ## Settings key

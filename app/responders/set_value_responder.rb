@@ -10,8 +10,8 @@ class SetValueResponder < Responder
   end
 
   def process_message(message)
-    mark = "<!--#{name}-value-->"
-    end_mark = "<!--end-#{name}-value-->"
+    mark = "<!--#{name}-->"
+    end_mark = "<!--end-#{name}-->"
 
     new_value = @match_data[1]
 
