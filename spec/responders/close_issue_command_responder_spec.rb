@@ -47,6 +47,12 @@ describe CloseIssueCommandResponder do
       expect(@responder).to receive(:close_issue).with({})
       @responder.process_message(@msg)
     end
+
+    it "should process removing of labels" do
+      expect(@responder).to receive(:close_issue)
+      expect(@responder).to receive(:process_removing_labels)
+      @responder.process_message(@msg)
+    end
   end
 
   describe "misconfiguration" do

@@ -11,6 +11,7 @@ class CloseIssueCommandResponder < Responder
 
   def process_message(message)
     close_issue(labels_options)
+    process_removing_labels
   end
 
   def labels_options
