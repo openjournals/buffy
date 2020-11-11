@@ -267,5 +267,14 @@ describe Responder do
         @responder.process_labeling
       end
     end
+
+    describe "#process_reverse_labeling" do
+      it "should reverse add and remove labels" do
+        expect(@responder).to receive(:process_labeling)
+        @responder.process_reverse_labeling
+        expect(@responder.labels_to_add).to eq(["pending review", "ongoing"])
+        expect(@responder.labels_to_remove).to eq(["reviewed", "approved", "pending publication"])
+      end
+    end
   end
 end
