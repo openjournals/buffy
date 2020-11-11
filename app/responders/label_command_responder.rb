@@ -24,22 +24,6 @@ class LabelCommandResponder < Responder
     end
   end
 
-  def labels_to_add
-    if params[:add_labels].nil? || !params[:add_labels].is_a?(Array) || params[:add_labels].uniq.compact.empty?
-      @labels_to_add = []
-    end
-
-    @labels_to_add ||= params[:add_labels].uniq.compact
-  end
-
-  def labels_to_remove
-    if params[:remove_labels].nil? || !params[:remove_labels].is_a?(Array) || params[:remove_labels].uniq.compact.empty?
-      @labels_to_remove = []
-    end
-
-    @labels_to_remove ||= params[:remove_labels].uniq.compact
-  end
-
   def description
     add_labels = labels_to_add.empty? ? nil : "Label issue with: #{labels_to_add.join(', ')}"
     remove_labels = labels_to_remove.empty? ? nil : "Remove labels: #{labels_to_remove.join(', ')}"

@@ -105,6 +105,24 @@ class Responder
     from_context.merge from_body
   end
 
+  # Read the :add_labels setting for this responder
+  def labels_to_add
+    if params[:add_labels].nil? || !params[:add_labels].is_a?(Array) || params[:add_labels].uniq.compact.empty?
+      @labels_to_add = []
+    end
+
+    @labels_to_add ||= params[:add_labels].uniq.compact
+  end
+
+  # Read the :remove_labels setting for this responder
+  def labels_to_remove
+    if params[:remove_labels].nil? || !params[:remove_labels].is_a?(Array) || params[:remove_labels].uniq.compact.empty?
+      @labels_to_remove = []
+    end
+
+    @labels_to_remove ||= params[:remove_labels].uniq.compact
+  end
+
   # True if the responder is configured as hidden
   def hidden?
     @params[:hidden] == true

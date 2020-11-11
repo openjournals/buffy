@@ -188,7 +188,7 @@ describe Responder do
     end
   end
 
-  describe "required_params" do
+  describe "#required_params" do
     it "should raise error if param is not present" do
       expect {
         subject.required_params(:non_existent)
@@ -202,6 +202,30 @@ describe Responder do
       expect(subject.first_name).to eq("Buffy")
       expect(subject.last_name).to eq("Summers")
       expect(subject.location).to eq("Sunnydale")
+    end
+  end
+
+  describe "#labels_to_add" do
+    it "should be [] in no labels" do
+      expect(subject.labels_to_add).to eq([])
+    end
+
+    it "should return an array of labels to add" do
+      subject.params = { add_labels: ["reviewed", "pending-publication"] }
+
+      expect(subject.labels_to_add).to eq(["reviewed", "pending-publication"])
+    end
+  end
+
+  describe "#labels_to_remove" do
+    it "should be [] in no labels" do
+      expect(subject.labels_to_remove).to eq([])
+    end
+
+    it "should return an array of labels to remove" do
+      subject.params = { remove_labels: ["pending-review", "paused"] }
+
+      expect(subject.labels_to_remove).to eq(["pending-review", "paused"])
     end
   end
 end
