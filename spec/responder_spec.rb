@@ -228,4 +228,44 @@ describe Responder do
       expect(subject.labels_to_remove).to eq(["pending-review", "paused"])
     end
   end
+
+  describe "labeling" do
+    before do
+      @responder = described_class.new({ bot_github_user: "botsci" },
+                               { add_labels: ["reviewed", "approved", "pending publication"],
+                                 remove_labels: ["pending review", "ongoing"] })
+      disable_github_calls_for(@responder)
+    end
+
+    describe "#process_adding_labels" do
+      it "should label issue with defined labels" do
+        expect(@responder).to receive(:label_issue).with(["reviewed", "approved", "pending publication"])
+        @responder.process_adding_labels
+      end
+    end
+
+    describe "#process_removing_labels" do
+      it "should remove labels from issue" do
+        expect(@responder).to receive(:issue_labels).and_return(["pending review", "ongoing"])
+        expect(@responder).to receive(:unlabel_issue).with("pending review")
+        expect(@responder).to receive(:unlabel_issue).with("ongoing")
+        @responder.process_removing_labels
+      end
+
+      it "should remove only present labels from issue" do
+        expect(@responder).to receive(:issue_labels).and_return(["reviewers assigned", "ongoing"])
+        expect(@responder).to_not receive(:unlabel_issue).with("pending review")
+        expect(@responder).to receive(:unlabel_issue).with("ongoing")
+        @responder.process_removing_labels
+      end
+    end
+
+    describe "#process_labeling" do
+      it "should add and remove labels" do
+        expect(@responder).to receive(:process_adding_labels)
+        expect(@responder).to receive(:process_removing_labels)
+        @responder.process_labeling
+      end
+    end
+  end
 end

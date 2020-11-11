@@ -105,6 +105,24 @@ class Responder
     from_context.merge from_body
   end
 
+  # Add/remove labels as configured in the responder' settings
+  def process_labeling
+    process_adding_labels
+    process_removing_labels
+  end
+
+  # Add labels if :add_labels is present in the responder' settings
+  def process_adding_labels
+    label_issue(labels_to_add) unless labels_to_add.empty?
+  end
+
+  # Remove labels if :remove_labels is present in the responder' settings
+  def process_removing_labels
+    unless labels_to_remove.empty?
+      (labels_to_remove & issue_labels).each {|label| unlabel_issue(label)}
+    end
+  end
+
   # Read the :add_labels setting for this responder
   def labels_to_add
     if params[:add_labels].nil? || !params[:add_labels].is_a?(Array) || params[:add_labels].uniq.compact.empty?
