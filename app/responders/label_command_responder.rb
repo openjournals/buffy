@@ -11,11 +11,7 @@ class LabelCommandResponder < Responder
   end
 
   def process_message(message)
-    label_issue(labels_to_add) unless labels_to_add.empty?
-
-    unless labels_to_remove.empty?
-      (labels_to_remove & issue_labels).each {|label| unlabel_issue(label)}
-    end
+    process_labeling
   end
 
   def check_labels_present
