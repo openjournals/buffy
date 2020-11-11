@@ -2,6 +2,7 @@ Add/Remove assignee
 ===================
 
 This responder adds and removes users to the assignees list of the issue.
+Allows [labeling](../labeling).
 
 ## Listens to
 

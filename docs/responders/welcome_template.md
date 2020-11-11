@@ -14,6 +14,8 @@ If the template needs some other value included in the body of the issue, they c
 {{variable_name}}
 ```
 
+Allows [labeling](../labeling).
+
 ## Listens to
 
 New issue opened event.
