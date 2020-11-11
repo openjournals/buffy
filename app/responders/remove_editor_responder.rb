@@ -16,6 +16,7 @@ class RemoveEditorResponder < Responder
     update_body(mark, end_mark, no_editor_text)
     remove_assignee(old_editor) if (old_editor != no_editor_text && username?(old_editor))
     respond("Editor removed!")
+    process_labeling
   end
 
   def no_editor_text

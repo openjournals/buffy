@@ -22,6 +22,7 @@ class AddAndRemoveAssigneeResponder < Responder
     if can_be_assignee?(user)
       add_assignee(user)
       respond("#{user} added as assignee.")
+      process_labeling
     else
       respond("#{user} lacks permissions to be an assignee.")
     end
@@ -30,6 +31,7 @@ class AddAndRemoveAssigneeResponder < Responder
   def remove(user)
     remove_assignee(user)
     respond("#{user} removed from assignees.")
+    process_reverse_labeling
   end
 
   def description

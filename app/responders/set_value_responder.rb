@@ -17,6 +17,7 @@ class SetValueResponder < Responder
 
     update_body(mark, end_mark, new_value)
     respond("Done! #{name} is now #{new_value}")
+    process_labeling
   end
 
   def description

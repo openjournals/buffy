@@ -79,5 +79,10 @@ describe AssignReviewerNResponder do
       expect(@responder).to receive(:respond).with("Reviewer 3 assigned!")
       @responder.process_message(@msg)
     end
+
+    it "should process labels" do
+      expect(@responder).to receive(:process_labeling)
+      @responder.process_message(@msg)
+    end
   end
 end

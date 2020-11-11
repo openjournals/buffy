@@ -9,6 +9,7 @@ class WelcomeResponder < Responder
 
   def process_message(message)
     respond(reply)
+    process_labeling
   end
 
   def description

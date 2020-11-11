@@ -40,6 +40,8 @@ describe AddAndRemoveAssigneeResponder do
         expect(@responder).to_not receive(:remove_assignee)
         expect(@responder).to receive(:add_assignee).with("@arfon")
         expect(@responder).to receive(:respond).with("@arfon added as assignee.")
+        expect(@responder).to receive(:process_labeling)
+        expect(@responder).to_not receive(:process_reverse_labeling)
         @responder.process_message(@msg)
       end
 
@@ -48,6 +50,7 @@ describe AddAndRemoveAssigneeResponder do
         expect(@responder).to_not receive(:remove_assignee)
         expect(@responder).to_not receive(:add_assignee)
         expect(@responder).to receive(:respond).with("@arfon lacks permissions to be an assignee.")
+        expect(@responder).to_not receive(:process_labeling)
         @responder.process_message(@msg)
       end
     end
@@ -63,6 +66,11 @@ describe AddAndRemoveAssigneeResponder do
         expect(@responder).to_not receive(:add_assignee)
         expect(@responder).to receive(:remove_assignee).with("@arfon")
         expect(@responder).to receive(:respond).with("@arfon removed from assignees.")
+        @responder.process_message(@msg)
+      end
+
+      it "should process reverse labeling" do
+        expect(@responder).to receive(:process_reverse_labeling)
         @responder.process_message(@msg)
       end
     end

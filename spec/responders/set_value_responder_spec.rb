@@ -43,6 +43,12 @@ describe SetValueResponder do
       expect(@responder).to receive(:respond).with("Done! version is now v0.0.33-alpha")
       @responder.process_message(@msg)
     end
+
+    it "should process labels" do
+      expect(@responder).to receive(:process_labeling)
+      expect(@responder).to_not receive(:process_reverse_labeling)
+      @responder.process_message(@msg)
+    end
   end
 
   describe "misconfiguration" do

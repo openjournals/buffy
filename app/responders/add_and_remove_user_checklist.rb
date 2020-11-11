@@ -34,6 +34,7 @@ class AddAndRemoveUserChecklistResponder < Responder
 
       append_to_body checklist
       respond("Checklist added for #{user}")
+      process_labeling
     else
       respond("There is already a checklist for #{user}")
     end
@@ -45,6 +46,7 @@ class AddAndRemoveUserChecklistResponder < Responder
     else
       delete_from_body(@mark, @end_mark, true)
       respond("Checklist for #{user} removed")
+      process_reverse_labeling
     end
   end
 

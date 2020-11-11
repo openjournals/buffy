@@ -20,6 +20,7 @@ class AssignReviewerNResponder < Responder
     add_collaborator(new_reviewer) if add_as_collaborator?
     replace_assignee(old_reviewer, new_reviewer) if add_as_assignee?
     respond("Reviewer #{@match_data[2]} assigned!")
+    process_labeling
   end
 
   def description
