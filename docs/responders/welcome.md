@@ -2,6 +2,7 @@ Welcome
 =======
 
 This responder sends a message when a new issue is opened.
+Allows [labeling](../labeling).
 
 ## Listens to
 

@@ -11,33 +11,13 @@ class LabelCommandResponder < Responder
   end
 
   def process_message(message)
-    label_issue(labels_to_add) unless labels_to_add.empty?
-
-    unless labels_to_remove.empty?
-      (labels_to_remove & issue_labels).each {|label| unlabel_issue(label)}
-    end
+    process_labeling
   end
 
   def check_labels_present
     if labels_to_add.empty? && labels_to_remove.empty?
       raise "Configuration Error in LabelCommandResponder: No labels specified."
     end
-  end
-
-  def labels_to_add
-    if params[:labels].nil? || !params[:labels].is_a?(Array) || params[:labels].uniq.compact.empty?
-      @labels_to_add = []
-    end
-
-    @labels_to_add ||= params[:labels].uniq.compact
-  end
-
-  def labels_to_remove
-    if params[:remove].nil? || !params[:remove].is_a?(Array) || params[:remove].uniq.compact.empty?
-      @labels_to_remove = []
-    end
-
-    @labels_to_remove ||= params[:remove].uniq.compact
   end
 
   def description

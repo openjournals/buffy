@@ -35,5 +35,11 @@ describe WelcomeResponder do
       expect(@responder).to receive(:respond).with(reply)
       @responder.process_message("")
     end
+
+    it "should process labels" do
+      expect(@responder).to receive(:process_labeling)
+      expect(@responder).to_not receive(:process_reverse_labeling)
+      @responder.process_message("")
+    end
   end
 end

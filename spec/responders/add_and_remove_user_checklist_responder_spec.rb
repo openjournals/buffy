@@ -50,6 +50,8 @@ describe AddAndRemoveUserChecklistResponder do
         expect(@responder).to receive(:render_external_template).with("checklist.md", expected_locals).and_return("[] A")
         expect(@responder).to receive(:append_to_body).with(expected_checklist)
         expect(@responder).to receive(:respond).with("Checklist added for @arfon")
+        expect(@responder).to receive(:process_labeling)
+        expect(@responder).to_not receive(:process_reverse_labeling)
         @responder.process_message(@msg)
       end
 
@@ -58,6 +60,7 @@ describe AddAndRemoveUserChecklistResponder do
         @responder.match_data = @responder.event_regex.match(msg)
 
         expect(@responder).to receive(:respond).with("There is already a checklist for @xuanxu")
+        expect(@responder).to_not receive(:process_labeling)
         @responder.process_message(@msg)
       end
     end
@@ -71,6 +74,7 @@ describe AddAndRemoveUserChecklistResponder do
         expected_end_mark = "<!--end-checklist-for-@xuanxu-->"
         expect(@responder).to receive(:delete_from_body).with(expected_mark, expected_end_mark, true)
         expect(@responder).to receive(:respond).with("Checklist for @xuanxu removed")
+        expect(@responder).to receive(:process_reverse_labeling)
         @responder.process_message(@msg)
       end
 
@@ -78,6 +82,7 @@ describe AddAndRemoveUserChecklistResponder do
         msg = "@botsci remove checklist for @arfon"
         @responder.match_data = @responder.event_regex.match(msg)
         expect(@responder).to receive(:respond).with("There is not a checklist for @arfon")
+        expect(@responder).to_not receive(:process_labeling)
         @responder.process_message(@msg)
       end
     end

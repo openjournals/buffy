@@ -11,6 +11,7 @@ class WelcomeTemplateResponder < Responder
 
   def process_message(message)
     respond_external_template template_file, locals
+    process_labeling
   end
 
   def description

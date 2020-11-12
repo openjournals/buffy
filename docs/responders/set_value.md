@@ -2,6 +2,7 @@ Set value
 =========
 
 This responder can be used to update the value of any field in the body of the issue.
+Allows [labeling](../labeling).
 
 ## Listens to
 

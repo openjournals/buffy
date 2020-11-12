@@ -79,6 +79,11 @@ describe AssignEditorResponder do
       @responder.process_message(@msg)
     end
 
+    it "should process labels" do
+      expect(@responder).to receive(:process_labeling)
+      @responder.process_message(@msg)
+    end
+
     it "should understand 'assign me'" do
       msg = "@botsci assign me as editor"
       @responder.context.sender = "xuanxu"

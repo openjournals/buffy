@@ -21,8 +21,8 @@ For example, if you configure the command to be _review successful_, it would re
 ## Params
 ```eval_rst
 :command: The command this responder will listen to.
-:labels:  *<Array>* A list of text labels to add to the issue.
-:remove:  *<Array>* A list of text labels to remove from the labels of the issue.
+:add_labels:  *<Array>* A list of text labels to add to the issue.
+:remove_labels:  *<Array>* A list of text labels to remove from the labels of the issue.
 ```
 
 ## Examples
@@ -36,7 +36,7 @@ Just add a label.
   responders:
     label_command:
       command: review successful
-      labels:
+      add_labels:
         - recommend publication
 ...
 ```
@@ -49,17 +49,17 @@ Just add a label.
       - review_ok:
           only: editors
           command: review successful
-          labels:
+          add_labels:
             - reviewed
             - recommend publication
             - pending publication
-          remove:
+          remove_labels:
             - ongoing
             - pending review
       - review_nok:
           only: editors
           command: review failed
-          labels:
+          add_labels:
             - recommend rejection
 ...
 ```

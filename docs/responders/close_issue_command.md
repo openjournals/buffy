@@ -2,6 +2,7 @@ Close issue command
 ===================
 
 This responder replies to a specific command closing the issue and possibly adding some labels.
+Allows [labeling](../labeling).
 
 ## Listens to
 
@@ -23,6 +24,7 @@ For example, if you configure the command to be _reject_, it would respond to:
 ```eval_rst
 :command: The command this responder will listen to.
 :labels:  *Optional <Array>* A list of text labels to add to the issue.
+:description:  *Optional* String to show when the help command is invoked (if the responder is not hidden).
 ```
 
 ## Examples
@@ -46,7 +48,7 @@ Just close the issue.
     close_issue_command:
       only: editors
       command: reject
-      labels:
+      add_labels:
         - rejected
 ...
 ```

@@ -36,17 +36,17 @@ buffy:
       - review_ok:
           only: editors
           command: review successful
-          labels:
+          add_labels:
             - reviewed
             - recommend publication
             - pending publication
-          remove:
+          remove_labels:
             - ongoing
             - pending review
       - review_nok:
           only: editors
           command: review failed
-          labels:
+          add_labels:
             - recommend rejection
     welcome_template:
       template_file: welcome.md
@@ -55,7 +55,7 @@ buffy:
     close_issue_command:
       only: editors
       command: reject
-      labels:
+      add_labels:
         - rejected
     external_service:
       - code_quality:

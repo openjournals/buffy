@@ -2,6 +2,7 @@ Remove reviewer N
 =================
 
 This responder removes any numbered reviewer from the body of the issue (the ones that can be set by the [Assign Reviewer N responder](./assign_reviewer_n)).
+Allows [labeling](../labeling).
 
 ## Listens to
 

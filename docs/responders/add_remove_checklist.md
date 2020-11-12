@@ -2,6 +2,7 @@ Add/Remove checklist
 ====================
 
 This responder adds and removes checklists for reviewers at the end of the body of the issue.
+Allows [labeling](../labeling).
 
 ## Listens to
 

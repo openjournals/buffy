@@ -105,6 +105,54 @@ class Responder
     from_context.merge from_body
   end
 
+  # Add/remove labels as configured in the responder' settings
+  def process_labeling
+    process_adding_labels
+    process_removing_labels
+  end
+
+  # Add labels if :add_labels is present in the responder' settings
+  def process_adding_labels
+    label_issue(labels_to_add) unless labels_to_add.empty?
+  end
+
+  # Remove labels if :remove_labels is present in the responder' settings
+  def process_removing_labels
+    unless labels_to_remove.empty?
+      (labels_to_remove & issue_labels).each {|label| unlabel_issue(label)}
+    end
+  end
+
+  # Read the :add_labels setting for this responder
+  def labels_to_add
+    if params[:add_labels].nil? || !params[:add_labels].is_a?(Array) || params[:add_labels].uniq.compact.empty?
+      @labels_to_add ||= []
+    end
+
+    @labels_to_add ||= params[:add_labels].uniq.compact
+  end
+
+  # Read the :remove_labels setting for this responder
+  def labels_to_remove
+    if params[:remove_labels].nil? || !params[:remove_labels].is_a?(Array) || params[:remove_labels].uniq.compact.empty?
+      @labels_to_remove ||= []
+    end
+
+    @labels_to_remove ||= params[:remove_labels].uniq.compact
+  end
+
+  # Process labels in reverse to undo a labeling action
+  # It will add the :remove_labels and remove the :add_labels
+  def process_reverse_labeling
+    removed = labels_to_remove
+    added = labels_to_add
+
+    @labels_to_remove = added
+    @labels_to_add = removed
+
+    process_labeling
+  end
+
   # True if the responder is configured as hidden
   def hidden?
     @params[:hidden] == true

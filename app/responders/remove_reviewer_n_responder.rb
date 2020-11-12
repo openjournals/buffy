@@ -16,6 +16,7 @@ class RemoveReviewerNResponder < Responder
     update_body(mark, end_mark, no_reviewer_text)
     remove_assignee(old_reviewer) if (old_reviewer != no_reviewer_text && username?(old_reviewer))
     respond("Reviewer #{@match_data[1]} removed!")
+    process_labeling
   end
 
   def no_reviewer_text

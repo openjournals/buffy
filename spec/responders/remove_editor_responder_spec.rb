@@ -67,5 +67,11 @@ describe RemoveEditorResponder do
       expect(@responder).to receive(:respond).with("Editor removed!")
       @responder.process_message(@msg)
     end
+
+    it "should process labels" do
+      expect(@responder).to receive(:process_labeling)
+      expect(@responder).to_not receive(:process_reverse_labeling)
+      @responder.process_message(@msg)
+    end
   end
 end

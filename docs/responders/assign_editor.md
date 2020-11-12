@@ -2,6 +2,7 @@ Assign editor
 =============
 
 Use this responder to update the value of the editor in the body of the issue.
+Allows [labeling](../labeling).
 
 ## Listens to
 

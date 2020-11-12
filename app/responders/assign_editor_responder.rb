@@ -21,6 +21,7 @@ class AssignEditorResponder < Responder
     add_collaborator(new_editor) if add_as_collaborator?
     replace_assignee(old_editor, new_editor) if add_as_assignee?
     respond("Assigned! #{new_editor} is now the editor")
+    process_labeling
   end
 
   def description

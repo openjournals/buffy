@@ -26,7 +26,7 @@ describe CloseIssueCommandResponder do
       @responder = subject.new({ bot_github_user: "botsci" },
                                { name: "review_ok",
                                  command: "reject",
-                                 labels: ["rejected"] })
+                                 add_labels: ["rejected"] })
       disable_github_calls_for(@responder)
 
       @msg = "@botsci reject"
@@ -39,6 +39,18 @@ describe CloseIssueCommandResponder do
 
     it "should label issue with defined labels" do
       expect(@responder).to receive(:close_issue).with({labels: ["rejected"]})
+      @responder.process_message(@msg)
+    end
+
+    it "should not label the issue if not labels are defined" do
+      @responder.params[:add_labels] = nil
+      expect(@responder).to receive(:close_issue).with({})
+      @responder.process_message(@msg)
+    end
+
+    it "should process removing of labels" do
+      expect(@responder).to receive(:close_issue)
+      expect(@responder).to receive(:process_removing_labels)
       @responder.process_message(@msg)
     end
   end
@@ -71,8 +83,13 @@ describe CloseIssueCommandResponder do
     end
 
     it "#description should include labels if present" do
-      @responder.params[:labels] = ["rejected", "no-published"]
-      expect(@responder.description).to eq("Label the issue with: [rejected, no-published] and close it.")
+      @responder.params[:add_labels] = ["rejected", "no-published"]
+      expect(@responder.description).to eq("Close the issue")
+    end
+
+    it "should allow description customization" do
+      @responder.params[:description] = "Finish the review"
+      expect(@responder.description).to eq("Finish the review")
     end
   end
 end

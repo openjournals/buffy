@@ -2,6 +2,7 @@ Remove editor
 =============
 
 This responder removes the assigned editor from the body of the issue (the one that can be assigned using the [Assign Editor responder](./assign_editor)). The user will also be removed from the issue's assignees.
+Allows [labeling](../labeling).
 
 ## Listens to
 

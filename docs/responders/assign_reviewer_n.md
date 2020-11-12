@@ -2,6 +2,7 @@ Assign reviewer N
 =================
 
 Use this responder to update the value of a numbered reviewer in the body of the issue.
+Allows [labeling](../labeling).
 
 ## Listens to
 

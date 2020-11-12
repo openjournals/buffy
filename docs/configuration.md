@@ -120,6 +120,8 @@ For security reasons is a good practice to load the secret values from your envi
   </dd>
 </dl>
 
+Several responders also allow [adding or removing labels](./labeling).
+
 ### Multiple instances of the same responder
 
 Sometimes you want to use a responder more than once, with different parameters. In that case under the name of the responder you can declare an array of instances, and the key for each instance will be passed to the responder as the `name` parameter.
