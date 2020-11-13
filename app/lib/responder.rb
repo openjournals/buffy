@@ -153,6 +153,25 @@ class Responder
     process_labeling
   end
 
+  # Finds the value of the url of the target-repository in the body of the issue
+  # by default reads the field called "target-repository"
+  # unless a diferent name is set using param :url_field
+  def target_repo_value
+    @target_repo_url ||= value_of_or_default(params[:url_field], "target-repository")
+  end
+
+  # Finds the name of the branch in the body of the issue
+  # by default reads the field called "branch"
+  # unless a diferent name is set using param :branch_field
+  # or if it comes in the match_data in the specified position
+  def branch_name_value(branch_index=1)
+    if @match_data.nil? || @match_data[branch_index].nil?
+      branch_name = value_of_or_default(params[:branch_field], 'branch')
+    else
+      branch_name = @match_data[branch_index]
+    end
+  end
+
   # True if the responder is configured as hidden
   def hidden?
     @params[:hidden] == true

@@ -277,4 +277,66 @@ describe Responder do
       end
     end
   end
+
+  describe "#target_repo_value" do
+    before do
+      @responder = Responder.new({}, {})
+      @responder.context = OpenStruct.new(issue_body: "Test Review\n\n ... description ...")
+      disable_github_calls_for(@responder)
+    end
+
+    it "should be empty if not URL found" do
+      expect(@responder.target_repo_value).to be_empty
+    end
+
+    it "should use target-repository as the default value for url_field" do
+      @responder.context.issue_body +=  "<!--target-repository-->" +
+                                        "http://software-to-review.test/git_repo" +
+                                        "<!--end-target-repository-->"
+      expect(@responder.target_repo_value).to eq("http://software-to-review.test/git_repo")
+    end
+
+    it "should use the settings value for url_field if present" do
+      @responder.context.issue_body +=  "<!--target-repository-->" +
+                                        "http://software-to-review.test/git_repo" +
+                                        "<!--end-target-repository-->" +
+                                        "<!--paper-url-->https://custom-url.test<!--end-paper-url-->"
+      @responder.params = { url_field: "paper-url" }
+      expect(@responder.target_repo_value).to eq("https://custom-url.test")
+    end
+  end
+
+  describe "#branch_name_value" do
+    before do
+      @responder = Responder.new({}, {})
+      @responder.context = OpenStruct.new(issue_body: "Test Review\n\n ... description ...")
+      @responder.event_regex = /\A@bot run tests(?: from branch ([\w-]+))?\s*\z/i
+      disable_github_calls_for(@responder)
+    end
+    it "should be empty if no branch found" do
+      @responder.match_data = nil
+      expect(@responder.branch_name_value).to be_empty
+    end
+
+    it "should use branch as the default value for branch_field" do
+      @responder.context.issue_body +=  "<!--branch-->dev<!--end-branch-->"
+      expect(@responder.branch_name_value).to eq("dev")
+    end
+
+    it "should use the settings value for branch_field if present" do
+      @responder.context.issue_body +=  "<!--branch-->dev<!--end-branch-->\n" +
+                                        "<!--review-branch-->paper<!--end-review-branch-->\n"
+      @responder.params = { branch_field: "review-branch" }
+      expect(@responder.branch_name_value).to eq("paper")
+
+    end
+
+    it "branch name in command should take precedence over value in the body of the issue" do
+      @responder.context.issue_body +=  "<!--branch-->dev<!--end-branch-->"
+      command = "@bot run tests from branch custom-branch"
+      @responder.match_data = @responder.event_regex.match(command)
+
+      expect(@responder.branch_name_value).to eq("custom-branch")
+    end
+  end
 end

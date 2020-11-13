@@ -8,40 +8,11 @@ class CheckReferencesResponder < Responder
   end
 
   def process_message(message)
-    if url.empty?
+    if target_repo_value.empty?
       respond("I couldn't find URL for the target repository")
     else
-      DOIWorker.perform_async(locals, url, branch)
+      DOIWorker.perform_async(locals, target_repo_value, branch_name_value)
     end
-  end
-
-  def branch
-    if params[:branch_field].nil? || params[:branch_field].empty?
-      branch_field = "branch"
-    else
-      branch_field = params[:branch_field].strip
-    end
-    mark = "<!--#{branch_field}-->"
-    end_mark = "<!--end-#{branch_field}-->"
-
-    if @match_data.nil? || @match_data[1].nil?
-      branch_name = read_from_body(mark, end_mark)
-    else
-      branch_name = @match_data[1]
-    end
-
-    branch_name.empty? ? nil : branch_name
-  end
-
-  def url
-    if params[:url_field].nil? || params[:url_field].empty?
-      url_field = "target-repository"
-    else
-      url_field = params[:url_field].strip
-    end
-    mark = "<!--#{url_field}-->"
-    end_mark = "<!--end-#{url_field}-->"
-    @target_repo_url ||= read_from_body(mark, end_mark)
   end
 
   def description
