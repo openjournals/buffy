@@ -84,6 +84,47 @@ describe "Actions" do
     end
   end
 
+  describe "#read_value_from_body" do
+    before { allow(subject).to receive(:issue_body).and_return("... <!--where--> Here! <!--end-where--> ...") }
+    it "should return stripped text between HTML comments" do
+      expected_text = "Here!"
+
+      expect(subject.read_value_from_body("where")).to eq expected_text
+    end
+
+    it "should return empty string if nothing matches" do
+      expected_text = ""
+
+      expect(subject.read_value_from_body("nomatch")).to eq expected_text
+    end
+  end
+
+  describe "#value_of_or_default" do
+    before { allow(subject).to receive(:issue_body).and_return("... <!--version--> 3.1.2 <!--end-version--> ...\n" +
+                                                               "... <!--v--> 0.0.1-alpha <!--end-v--> ...") }
+    it "should return stripped text from default value name" do
+      expected_text = "3.1.2"
+
+      expect(subject.value_of_or_default(nil, "version")).to eq expected_text
+      expect(subject.value_of_or_default("", "version")).to eq expected_text
+    end
+
+    it "should return stripped text from value if value name is passed" do
+      expected_text = "0.0.1-alpha"
+
+      expect(subject.value_of_or_default("v", "version")).to eq expected_text
+      expect(subject.value_of_or_default("v", nil)).to eq expected_text
+    end
+
+    it "should return empty string if no matches" do
+      expected_text = ""
+
+      expect(subject.value_of_or_default("nomatch", "version")).to eq expected_text
+      expect(subject.value_of_or_default(nil, "nomatch")).to eq expected_text
+      expect(subject.value_of_or_default(nil, nil)).to eq expected_text
+    end
+  end
+
   describe "#replace_assignee" do
     before { disable_github_calls_for(subject) }
 
