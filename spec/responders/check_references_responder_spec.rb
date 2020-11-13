@@ -28,7 +28,7 @@ describe CheckReferencesResponder do
     let(:expected_locals) { {bot_name: "botsci", issue_id: nil, repo: nil, sender: nil} }
 
     it "should respond an error message if no url" do
-      expect(@responder).to receive(:respond).with("I couldn't find URL for the target repository")
+      expect(@responder).to receive(:respond).with("I couldn't find the URL for the target repository")
       @responder.process_message("@botsci check references")
     end
 

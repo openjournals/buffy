@@ -9,7 +9,7 @@ class CheckReferencesResponder < Responder
 
   def process_message(message)
     if target_repo_value.empty?
-      respond("I couldn't find URL for the target repository")
+      respond("I couldn't find the URL for the target repository")
     else
       DOIWorker.perform_async(locals, target_repo_value, branch_name_value)
     end
