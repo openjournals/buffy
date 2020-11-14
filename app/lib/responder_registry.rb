@@ -21,6 +21,7 @@ class ResponderRegistry
     "external_service"     => ExternalServiceResponder,
     "add_remove_checklist" => AddAndRemoveUserChecklistResponder,
     "check_references"     => CheckReferencesResponder,
+    "repo_checks"          => RepoChecksResponder,
   }
 
   attr_accessor :responders
