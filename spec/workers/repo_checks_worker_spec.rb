@@ -10,7 +10,7 @@ describe RepoChecksWorker do
 
   describe "perform" do
     it "should setup local repo" do
-      expect(@worker).to receive(:setup_local_repo).and_return(true)
+      expect(@worker).to receive(:setup_local_repo).and_return(false)
       @worker.perform({}, 'url', 'main', [])
     end
 
