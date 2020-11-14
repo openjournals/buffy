@@ -25,7 +25,7 @@ buffy:
     add_remove_assignee:
       only: editors
     check_references:
-    check_repository:
+    repo_checks:
     set_value:
       - version:
           only: editors
