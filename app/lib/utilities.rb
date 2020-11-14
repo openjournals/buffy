@@ -18,4 +18,14 @@ module Utilities
     status.success?
   end
 
+  def run_cloc(local_path)
+    result, stderr, status = Open3.capture3("cloc --quiet #{local_path}")
+    status.success? ? result : nil
+  end
+
+  def run_gitinspector(local_path)
+    result, stderr, status = Open3.capture3("PYTHONIOENCODING=utf-8 gitinspector #{local_path}")
+    status.success? ? result : nil
+  end
+
 end
