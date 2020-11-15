@@ -84,7 +84,7 @@ describe "Utilities" do
   describe "#run_gitinspector" do
     it "should run cloc return true" do
       expect(Open3).to receive(:capture3).
-                       with("PYTHONIOENCODING=utf-8 gitinspector tmp/543/repo").
+                       with("PYTHONIOENCODING=utf-8 gitinspector -f** tmp/543/repo").
                        and_return(["OK", "", OpenStruct.new(success?: true)])
 
       expect(subject.run_gitinspector("tmp/543/repo")).to be_truthy
@@ -92,7 +92,7 @@ describe "Utilities" do
 
     it "should return nil if command fails" do
       expect(Open3).to receive(:capture3).
-                       with("PYTHONIOENCODING=utf-8 gitinspector tmp/543/repo").
+                       with("PYTHONIOENCODING=utf-8 gitinspector -f** tmp/543/repo").
                        and_return(["", "stats failed", OpenStruct.new(success?: false)])
 
       expect(subject.run_gitinspector("tmp/543/repo")).to be_falsy
