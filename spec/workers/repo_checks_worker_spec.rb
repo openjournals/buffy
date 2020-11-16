@@ -16,12 +16,14 @@ describe RepoChecksWorker do
 
     it "should run all available checks if checks is nil/empty" do
       expect(@worker).to receive(:repo_summary)
+      expect(@worker).to receive(:detect_languages)
 
       @worker.perform({}, 'url', 'main', nil)
     end
 
     it "should run only specified checks" do
       expect(@worker).to receive(:repo_summary)
+      expect(@worker).to_not receive(:detect_languages)
       @worker.perform({}, 'url', 'main', ["repo summary"])
 
       expect(@worker).to_not receive(:repo_summary)
@@ -30,6 +32,7 @@ describe RepoChecksWorker do
 
     it "should cleanup created folder" do
       expect(@worker).to receive(:repo_summary).and_return(true)
+      expect(@worker).to receive(:detect_languages).and_return(true)
 
       expect(@worker).to receive(:cleanup)
       @worker.perform({}, 'url', 'main', nil)
@@ -64,5 +67,20 @@ describe RepoChecksWorker do
       @worker.repo_summary
     end
   end
+
+  describe "#detect_languages" do
+    before do
+      repo = OpenStruct.new(head: OpenStruct.new(target_id: 33))
+      expected_languages = OpenStruct.new(languages: {"Ruby"=>176110, "HTML"=>664, "TeX"=>475, "Go"=>21})
+      allow(Rugged::Repository).to receive(:new).and_return(repo)
+      allow(Linguist::Repository).to receive(:new).with(repo, 33).and_return(expected_languages)
+    end
+
+    it "should label issue with top 3 languages" do
+      expect(@worker).to receive(:label_issue).with(["Ruby", "HTML", "TeX"])
+      @worker.detect_languages
+    end
+  end
+
 
 end

@@ -5,16 +5,24 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     bibtex-ruby (5.1.5)
       latex-decode (~> 0.0)
+    charlock_holmes (0.7.7)
     connection_pool (2.2.3)
     crack (0.4.4)
     diff-lcs (1.4.4)
+    escape_utils (1.2.1)
     faraday (1.1.0)
       multipart-post (>= 1.2, < 3)
       ruby2_keywords
     faraday_middleware (1.0.0)
       faraday (~> 1.0)
+    github-linguist (7.12.0)
+      charlock_holmes (~> 0.7.7)
+      escape_utils (~> 1.2.0)
+      mini_mime (~> 1.0)
+      rugged (>= 0.25.1)
     hashdiff (1.0.1)
     latex-decode (0.3.2)
+    mini_mime (1.0.2)
     multi_json (1.15.0)
     multipart-post (2.1.1)
     mustermann (1.1.1)
@@ -47,6 +55,7 @@ GEM
       rspec-support (~> 3.10.0)
     rspec-support (3.10.0)
     ruby2_keywords (0.0.2)
+    rugged (1.1.0)
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
@@ -82,6 +91,7 @@ PLATFORMS
 
 DEPENDENCIES
   bibtex-ruby
+  github-linguist
   octokit
   openssl
   puma

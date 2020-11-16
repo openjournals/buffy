@@ -1,6 +1,9 @@
+require 'rugged'
+require 'linguist'
+
 class RepoChecksWorker < BuffyWorker
 
-  AVAILABLE_CHECKS = ["repo summary"]
+  AVAILABLE_CHECKS = ["repo summary", "languages"]
 
   def perform(locals, url, branch, checks)
     load_context_and_settings(locals)
@@ -14,6 +17,7 @@ class RepoChecksWorker < BuffyWorker
     end
 
     repo_summary if perform_checks.include?("repo summary")
+    detect_languages if perform_checks.include?("languages")
 
     cleanup
   end
@@ -39,6 +43,14 @@ class RepoChecksWorker < BuffyWorker
     message << "\n```"
 
     respond(message)
+  end
+
+  def detect_languages
+    repo = Rugged::Repository.new(path)
+    project = Linguist::Repository.new(repo, repo.head.target_id)
+
+    top_3 = project.languages.keys.take(3)
+    label_issue(top_3) unless top_3.empty?
   end
 
 end
