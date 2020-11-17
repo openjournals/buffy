@@ -80,7 +80,28 @@ describe RepoChecksWorker do
       expect(@worker).to receive(:label_issue).with(["Ruby", "HTML", "TeX"])
       @worker.detect_languages
     end
+
+    it "should not add labels if no languages found" do
+      allow(Linguist::Repository).to receive(:new).and_return(OpenStruct.new(languages: {}))
+      expect(@worker).to_not receive(:label_issue)
+      @worker.detect_languages
+    end
   end
 
+  describe "#detect_license" do
 
+    it "should do nothing if license found" do
+      project = OpenStruct.new(license: "MIT")
+      allow(Licensee).to receive(:project).and_return(project)
+      expect(@worker).to_not receive(:respond)
+      @worker.detect_license
+    end
+
+    it "should respond error message if no license found" do
+      project = OpenStruct.new(license: nil)
+      allow(Licensee).to receive(:project).and_return(project)
+      expect(@worker).to receive(:respond).with("Failed to discover a valid open source license.")
+      @worker.detect_license
+    end
+  end
 end
