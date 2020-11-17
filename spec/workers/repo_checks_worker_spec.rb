@@ -89,7 +89,6 @@ describe RepoChecksWorker do
   end
 
   describe "#detect_license" do
-
     it "should do nothing if license found" do
       project = OpenStruct.new(license: "MIT")
       allow(Licensee).to receive(:project).and_return(project)
@@ -100,8 +99,25 @@ describe RepoChecksWorker do
     it "should respond error message if no license found" do
       project = OpenStruct.new(license: nil)
       allow(Licensee).to receive(:project).and_return(project)
-      expect(@worker).to receive(:respond).with("Failed to discover a valid open source license.")
+      expect(@worker).to receive(:respond).with("Failed to discover a valid open source license")
       @worker.detect_license
+    end
+  end
+
+  describe "#detect_statement_of_need" do
+    it "should do nothing if statement of need found" do
+      paper = OpenStruct.new(text: "# Statement of Need\nVery important research")
+      allow(PaperFile).to receive(:find).with(@worker.path).and_return(paper)
+
+      expect(@worker).to_not receive(:respond)
+      @worker.detect_statement_of_need
+    end
+
+    it "should respond error message if no statement of need found" do
+      paper = OpenStruct.new(text: "Very important research")
+      allow(PaperFile).to receive(:find).with(@worker.path).and_return(paper)
+      expect(@worker).to receive(:respond).with("Failed to discover a `Statement of need` section in paper")
+      @worker.detect_statement_of_need
     end
   end
 end

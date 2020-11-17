@@ -4,7 +4,7 @@ require 'licensee'
 
 class RepoChecksWorker < BuffyWorker
 
-  AVAILABLE_CHECKS = ["repo summary", "languages", "license"]
+  AVAILABLE_CHECKS = ["repo summary", "languages", "license", "statement of need"]
 
   def perform(locals, url, branch, checks)
     load_context_and_settings(locals)
@@ -20,6 +20,7 @@ class RepoChecksWorker < BuffyWorker
     repo_summary if perform_checks.include?("repo summary")
     detect_languages if perform_checks.include?("languages")
     detect_license if perform_checks.include?("license")
+    detect_statement_of_need if perform_checks.include?("statement of need")
 
     cleanup
   end
@@ -57,7 +58,13 @@ class RepoChecksWorker < BuffyWorker
 
   def detect_license
     license = Licensee.project(path).license
-    respond("Failed to discover a valid open source license.") if license.nil?
+    respond("Failed to discover a valid open source license") if license.nil?
+  end
+
+  def detect_statement_of_need
+    unless PaperFile.find(path).text =~ /# Statement of Need/i
+      respond("Failed to discover a `Statement of need` section in paper")
+    end
   end
 
 end
