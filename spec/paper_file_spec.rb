@@ -101,4 +101,21 @@ describe PaperFile do
     end
   end
 
+  describe "#text" do
+    it "should return the contents of the paper file" do
+      file = OpenStruct.new(read: "paper content")
+      expect(File).to receive(:open).with("./path/to/paper.md").and_return(file)
+
+      paper = PaperFile.new("./path/to/paper.md")
+      expect(paper.text).to eq("paper content")
+    end
+
+    it "should return '' if paper_path is not present" do
+      paper = PaperFile.new(nil)
+      expect(paper.text).to eq("")
+
+      paper = PaperFile.new("")
+      expect(paper.text).to eq("")
+    end
+  end
 end

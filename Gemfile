@@ -8,6 +8,8 @@ gem 'puma'
 gem 'sidekiq'
 gem 'bibtex-ruby'
 gem 'serrano'
+gem 'github-linguist'
+gem 'licensee'
 
 group :test do
   gem 'rack-test'

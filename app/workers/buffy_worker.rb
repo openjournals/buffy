@@ -52,7 +52,7 @@ class BuffyWorker
     msg_no_branch = "Couldn't check the bibtex because branch name is incorrect: #{branch.to_s}"
 
     error = clone_repo(url, path) ? nil : msg_no_repo
-    (error = change_branch(branch, path) ? nil : msg_no_branch) unless (error || branch.nil?)
+    (error = change_branch(branch, path) ? nil : msg_no_branch) unless error
 
     respond(error) if error
     error.nil?

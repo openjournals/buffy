@@ -54,4 +54,9 @@ class PaperFile
     PaperFile.new paper_path
   end
 
+  def text
+    return "" if @paper_path.nil? || @paper_path.empty?
+    File.open(@paper_path).read
+  end
+
 end

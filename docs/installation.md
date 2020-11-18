@@ -30,9 +30,23 @@ This will be the user responding to commands in the reviews repo.
 
 ### Deploy Buffy
 
+#### Server requirements
+
+Some applications and services must be available to use by Buffy:
+
+- **[Redis](https://redis.io/)**: To process background jobs Buffy needs `redis` installed.
+- **[Gitinspector](https://github.com/ejwa/gitinspector)**: The *Respository Checks Responder* performs a statistical analysis using it.
+- **[cloc](https://github.com/AlDanial/cloc)**: The *Respository Checks Responder* can analyze source code, to run this check `cloc` is used.
+
+#### Deployment
+
 We will use here [Heroku](https://www.heroku.com) as an example service to deploy Buffy but you can use any other server or platform.
 
-**1.** Create a new app in heroku linked to the url of your fork of Buffy. Automatically Heroku will use the `heroku/ruby` buildpack. To process background jobs Buffy needs `redis` installed, several add-ons providing it are available: Heroku Redis, RedisGreen, Redis To Go, etc.
+**1.** Create a new app in heroku linked to the url of your fork of Buffy. Automatically Heroku will use the `heroku/ruby` buildpack.
+
+- To process background jobs Buffy needs `redis` installed, several add-ons providing it are available: Heroku Redis, RedisGreen, Redis To Go, etc.
+- To install the `cloc` dependency there's a buildpack for Heroku available [here](https://github.com/openjournals/heroku-buildpack-cloc).
+- Gitinspector can be installed [using npm](https://www.npmjs.com/package/gitinspector). To do so in Heroku, the `heroku/nodejs` buildpack can be added.
 
 **2.** In the app settings add the following Config Vars:
 

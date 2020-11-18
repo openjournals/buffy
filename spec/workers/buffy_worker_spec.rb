@@ -65,7 +65,7 @@ describe BuffyWorker do
 
     it "should not checkout branch if branch is nil" do
       expect(@worker).to receive(:clone_repo).and_return(true)
-      expect(@worker).to_not receive(:change_branch)
+      expect(Open3).to_not receive(:capture3)
       expect(@worker).to_not receive(:respond)
 
       expect(@worker.setup_local_repo("correct_url", nil)).to be_truthy

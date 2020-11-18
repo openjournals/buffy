@@ -24,6 +24,7 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/add_remove_checklist
    responders/label_command
    responders/check_references
+   responders/repo_checks
    responders/thanks
    responders/welcome
    responders/welcome_template

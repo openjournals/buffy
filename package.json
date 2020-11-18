@@ -1,0 +1,9 @@
+{
+  "name": "buffy-dependencies",
+  "description": "Some dependencies to install on deployment",
+  "scripts": {
+    "preinstall": "npm install -g gitinspector"
+  },
+  "author": "Juanjo Bazán",
+  "license": "MIT"
+}

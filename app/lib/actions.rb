@@ -40,6 +40,7 @@ module Actions
     return error_msg
   end
 
+  # Read string in issue's body between start_mark and end_mark
   def read_from_body(start_mark, end_mark)
     text = ""
     issue_body.match(/#{start_mark}(.*)#{end_mark}/im) do |m|
@@ -48,6 +49,25 @@ module Actions
     text.strip
   end
 
+  # Read value in issue's body between HTML comments
+  def read_value_from_body(value_name)
+    start_mark = "<!--#{value_name}-->"
+    end_mark = "<!--end-#{value_name}-->"
+    read_from_body(start_mark, end_mark)
+  end
+
+  # Read value in issue's body between HTML comments
+  # if value name exists, otherwise use default value name
+  def value_of_or_default(option_1, default_value)
+    if option_1.nil? || option_1.empty?
+      value_name = default_value
+    else
+      value_name = option_1.strip
+    end
+    read_value_from_body(value_name)
+  end
+
+  # Replace an assigned user from the assignees list of the issue
   def replace_assignee(old_assignee, new_assignee)
     remove_assignee old_assignee unless old_assignee.nil? || old_assignee.empty?
     add_assignee new_assignee unless new_assignee.nil? || new_assignee.empty?
