@@ -12,6 +12,7 @@ class ResponderRegistry
     "remove_editor"        => RemoveEditorResponder,
     "invite"               => InviteResponder,
     "set_value"            => SetValueResponder,
+    "list_of_values"       => ListOfValuesResponder,
     "add_remove_assignee"  => AddAndRemoveAssigneeResponder,
     "label_command"        => LabelCommandResponder,
     "thanks"               => ThanksResponder,
