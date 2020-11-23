@@ -135,7 +135,7 @@ module GitHub
 
   # Returns true if the string is a valid GitHub isername (starts with @)
   def username?(username)
-    username.match(/\A@/)
+    username.match?(/\A@/)
   end
 
 
