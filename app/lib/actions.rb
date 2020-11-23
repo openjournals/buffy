@@ -40,6 +40,13 @@ module Actions
     return error_msg
   end
 
+  # Return whether placeholder HTML comments is present in the issue's body
+  def issue_body_has?(value_name)
+    start_mark = "<!--#{value_name}-->"
+    end_mark = "<!--end-#{value_name}-->"
+    issue_body.match?(/#{start_mark}(.*)#{end_mark}/im)
+  end
+
   # Read string in issue's body between start_mark and end_mark
   def read_from_body(start_mark, end_mark)
     text = ""
@@ -65,6 +72,20 @@ module Actions
       value_name = option_1.strip
     end
     read_value_from_body(value_name)
+  end
+
+  # Update value in issue's body between HTML comments
+  def update_value(value_name, text)
+    start_mark = "<!--#{value_name}-->"
+    end_mark = "<!--end-#{value_name}-->"
+    update_body(start_mark, end_mark, text)
+  end
+
+  # Update list in issue's body between HTML comments
+  def update_list(list_name, text)
+    start_mark = "<!--#{list_name}-list-->"
+    end_mark = "<!--end-#{list_name}-list-->"
+    update_body(start_mark, end_mark, text)
   end
 
   # Replace an assigned user from the assignees list of the issue

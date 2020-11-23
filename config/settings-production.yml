@@ -15,6 +15,11 @@ buffy:
     remove_reviewer_n:
       only: editors
       no_reviewer_text: "TBD"
+    list_of_values:
+      - reviewers:
+          only: editors
+          sample_value: "@username"
+          add_as_assignee: true
     assign_editor:
       only: editors
     remove_editor:
