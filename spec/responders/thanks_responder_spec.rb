@@ -39,5 +39,4 @@ describe ThanksResponder do
       @responder.process_message("@botsci thank you!")
     end
   end
-
 end
