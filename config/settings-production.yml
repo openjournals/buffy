@@ -13,12 +13,14 @@ buffy:
     basic_command:
       - code_of_conduct:
           command: code of conduct
+          description: Show our community Code of Conduct and Guidelines
           messages:
             - "Our CoC: https://github.com/openjournals/joss/blob/master/CODE_OF_CONDUCT.md"
             - "It's adapted from the Contributor Covenant: http://contributor-covenant.org"
             - "Reports of abusive or harassing behavior may be reported to reports@theoj.org"
       - editor_list:
           command: list editors
+          description: List all current topic editors
           template_file: editors.md
     assign_reviewer_n:
       only: editors
