@@ -6,6 +6,7 @@ class ResponderRegistry
   RESPONDER_MAPPING = {
     "help"                 => HelpResponder,
     "hello"                => HelloResponder,
+    "basic_command"        => BasicCommandResponder,
     "assign_reviewer_n"    => AssignReviewerNResponder,
     "remove_reviewer_n"    => RemoveReviewerNResponder,
     "assign_editor"        => AssignEditorResponder,

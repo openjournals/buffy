@@ -16,7 +16,7 @@ module CommonActions
 
   def disable_github_calls_for(responder)
     allow(responder).to receive(:issue).and_return(true)
-    allow(responder).to receive(:template_url).and_return(true)
+    allow(responder).to receive(:template_url).and_return("")
     allow(responder).to receive(:bg_respond).and_return(true)
     allow(responder).to receive(:label_issue).and_return(true)
     allow(responder).to receive(:issue_labels).and_return(true)
