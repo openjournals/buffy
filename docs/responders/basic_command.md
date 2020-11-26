@@ -22,6 +22,7 @@ For example, if you configure the command to be _list editors_, it would respond
 ## Params
 ```eval_rst
 :command: The command this responder will listen to.
+:description:  *Optional* String to show when the help command is invoked.
 :message: *Optional* A text message to use as reply.
 :messages: *Optional <Array>* A list of text messages to respond with.
 :template_file: *Optional* A template file to use to build the response message.
@@ -51,12 +52,14 @@ Reply with a preconfigured text
     basic_command:
       - code_of_conduct:
           command: code of conduct
+          description: Show our community Code of Conduct and Guidelines
           messages:
             - "Our CoC: https://github.com/openjournals/joss/blob/master/CODE_OF_CONDUCT.md"
             - "It's adapted from the Contributor Covenant: http://contributor-covenant.org"
             - "Reports of abusive or harassing behavior may be reported to reports@theoj.org"
       - editor_list:
           command: list editors
+          description: List all current topic editors
           template_file: editors.md
 ...
 ```
