@@ -50,5 +50,16 @@ When rendering a template Buffy will use a hash of `key:value` pairs. When a pla
 - **sender**: the handle of the user creating the comment/issue triggering the responder
 - **bot_name**: the name of the bot user responding
 
-The hash can also include fields extracted from the body of the issue and specific settings from the responder being used. Check each responder documentation for details on the values available to use in templates.
+The hash can also include fields extracted from the body of the issue. To add fileds use the `data_from_issue` setting. For example, to have the `target-repository` and `author` values from the issue available in the template this would do:
+```yaml
+...
+responders:
+  welcome_template:
+    template_file: welcome.md
+    data_from_issue:
+        - target-repository
+        - author
+...
+```
 
+Check each responder documentation for details on other values available to use in templates.
