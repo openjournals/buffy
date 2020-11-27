@@ -96,6 +96,8 @@ For security reasons is a good practice to load the secret values from your envi
 
  The responders node lists all the responders that will be available. The key for each entry is the name of the responder and nested under it the configuration options for that responder are declared.
 
+### Common options
+
  All the responders share some options available to all of them. They can also have their own particular configurable parameters (see [docs for each responder](./available_responders)). The common parameters are:
 
 <dl>
@@ -123,7 +125,7 @@ For security reasons is a good practice to load the secret values from your envi
   <dd>This setting is used to impose conditions on the responder. It can include several options:
 
 ```eval_rst
-:title: *<String>* or *<Regular Expresion>* Responder will run only if issue title matches this.
+:title: *<String>* or *<Regular Expresion>* Responder will run only if issue' title matches this.
 :body: *<String>* or *<Regular Expresion>* Responder will run only if the body of the issue matches this.
 :value: *<String>* Responder will run only if there is a value for this in the issue (marked with HTML comments).
 :role_assigned: *<String>* Responder will be run only if there is a username assigned for the specified value.
