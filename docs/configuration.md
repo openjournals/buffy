@@ -118,6 +118,29 @@ For security reasons is a good practice to load the secret values from your envi
   ```
 
   </dd>
+
+  <dt>if</dt>
+  <dd>This setting is used to impose conditions on the responder. It can include several options:
+
+```eval_rst
+:title: *<String>* or *<Regular Expresion>* Responder will run only if issue title matches this.
+:body: *<String>* or *<Regular Expresion>* Responder will run only if the body of the issue matches this.
+:value: *<String>* Responder will run only if there is a value for this in the issue (marked with HTML comments).
+:role_assigned: *<String>* Responder will be run only if there is a username assigned for the specified value.
+```
+
+  Example:
+
+  ```yaml
+    assign_reviewer:
+      if:
+        role_assigned: editor
+    start_review:
+      if:
+        title: "^\\[PRE-REVIEW\\]"
+  ```
+  </dd>
+
 </dl>
 
 Several responders also allow [adding or removing labels](./labeling).
