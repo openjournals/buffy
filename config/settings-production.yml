@@ -24,6 +24,8 @@ buffy:
           template_file: editors.md
     assign_reviewer_n:
       only: editors
+      if:
+        role_assigned: editor
     remove_reviewer_n:
       only: editors
       no_reviewer_text: "TBD"

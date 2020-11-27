@@ -68,6 +68,113 @@ describe Responder do
     end
   end
 
+  describe "#meet_conditions?" do
+    before do
+      @responder = Responder.new({}, {})
+      @responder.context = OpenStruct.new(issue_title: "[REVIEW] Software review",
+                                          issue_body: "Test Review\n\n ... description ...\n" +
+                                                      "<!--editor-->@editor<!--end-editor-->\n" +
+                                                      "<!--editor-2-->L.B.<!--end-editor-2-->\n" +
+                                                      "<!--author--><!--end-author-->\n")
+      disable_github_calls_for(@responder)
+      @context = OpenStruct.new({ if: { title: "[REVIEW]", body:"<!--REVIEW-->", value: "editor" } })
+    end
+
+    it "should be true if there is not conditions (via :if setting)" do
+      @responder.params = {}
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {}}
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {title: nil, body: nil, value: nil}}
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {title: "", body: "", value: ""}}
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+
+    it "should be false if title condition is not met" do
+      @responder.params = { if: {title: "PRE-REVIEW"} }
+      expect(@responder).to receive(:respond).with("I can't do that in this kind of issue")
+      expect(@responder.meet_conditions?).to be_falsy
+    end
+
+    it "should be false if body condition is not met" do
+      @responder.params = { if: {body: "ABCDEFG"} }
+      expect(@responder).to receive(:respond).with("I can't do that. Data in the body of the issue is incorrect")
+      expect(@responder.meet_conditions?).to be_falsy
+    end
+
+    it "should be false if value condition is not met" do
+      @responder.params = { if: {value: "author"} }
+      expect(@responder).to receive(:respond).with("That can't be done if there is no author")
+      expect(@responder.meet_conditions?).to be_falsy
+
+      @responder.params = { if: {value: "reviewers"} }
+      expect(@responder).to receive(:respond).with("That can't be done if there is no reviewers")
+      expect(@responder.meet_conditions?).to be_falsy
+    end
+
+    it "should be false if role_assigned condition is not met" do
+      @responder.params = { if: {role_assigned: "editor-2"} } #no username
+      expect(@responder).to receive(:respond).with("That can't be done if there is no editor-2 assigned")
+      expect(@responder.meet_conditions?).to be_falsy
+
+      @responder.params = { if: {role_assigned: "author"} } # empty
+      expect(@responder).to receive(:respond).with("That can't be done if there is no author assigned")
+      expect(@responder.meet_conditions?).to be_falsy
+
+      @responder.params = { if: {role_assigned: "reviewers"} } #no present
+      expect(@responder).to receive(:respond).with("That can't be done if there is no reviewers assigned")
+      expect(@responder.meet_conditions?).to be_falsy
+    end
+
+    it "should be false if any condition is not met" do
+      @responder.params = { if: {title: "REVIEW", body: "^Test Review", value: "author"} }
+      expect(@responder).to receive(:respond)
+      expect(@responder.meet_conditions?).to be_falsey
+    end
+
+    it "should be true if title condition is met" do
+      @responder.params = { if: {title: "^\\[REVIEW\\]"} }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {title: "REVIEW"} }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+
+    it "should be true if body condition is met" do
+      @responder.params = { if: {body: "^Test Review"} }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {body: "description"} }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+
+    it "should be true if value condition is met" do
+      @responder.params = { if: {value: "editor-2"} }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+
+    it "should be true if role_assigned condition is met" do
+      @responder.params = { if: {role_assigned: "editor"} }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+
+    it "should be true only if all conditions are met" do
+      @responder.params = { if: {title: "REVIEW", body: "^Test Review", value: "editor-2", role_assigned: "editor"} }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+  end
+
   describe "#call" do
     it "should not process message if responds_on? is false" do
       allow(subject).to receive(:responds_on?).and_return(false)
