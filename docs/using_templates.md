@@ -44,13 +44,13 @@ The content of a template can include placeholders to be filled with the actual 
 {{variable_name}}
 ```
 
-When rendering a template Buffy will use a hash of `key:value` pairs. When a placeholder is found in the template it will look up for the corresponding key in the hash and insert the value in the template. The hash will always include _at least_:
+When rendering a template, Buffy will use a hash of `key:value` pairs. When a placeholder is found in the template, it will look up for the corresponding key in the hash and insert the value in the template. The hash will always include _at least_:
 - **issue_id**: The id of the issue
 - **repo**: the name of the repository
 - **sender**: the handle of the user creating the comment/issue triggering the responder
 - **bot_name**: the name of the bot user responding
 
-The hash can also include fields extracted from the body of the issue. To add fileds use the `data_from_issue` setting. For example, to have the `target-repository` and `author` values from the issue available in the template this would do:
+The hash can also include fields extracted from the body of the issue. To add fields use the `data_from_issue` setting. For example, to have the `target-repository` and `author` values from the issue available in the template this would do:
 ```yaml
 ...
 responders:
