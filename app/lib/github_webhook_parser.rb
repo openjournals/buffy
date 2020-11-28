@@ -32,6 +32,7 @@ module GitHubWebhookParser
     end
 
     @issue_id = @payload.dig('issue', 'number')
+    @issue_title = @payload.dig('issue', 'title')
     @issue_body = @payload.dig('issue', 'body')
     @repo = @payload.dig('repository', 'full_name')
 
@@ -39,6 +40,7 @@ module GitHubWebhookParser
       action: @action,
       event: @event,
       issue_id: @issue_id,
+      issue_title: @issue_title,
       issue_body: @issue_body,
       message: @message,
       repo: @repo,

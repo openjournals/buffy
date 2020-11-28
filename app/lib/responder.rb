@@ -60,14 +60,49 @@ class Responder
     end
   end
 
-  # If user can perform action and the responder responds to
-  # this event and message then process_message is called
+  # Check conditions set in the config file
+  # Returns true if all conditions are met
+  # or there's no conditions. False otherwise.
+  def meet_conditions?
+    return true if params[:if].nil? || params[:if].empty?
+    title_condition = params[:if][:title].nil? ? "" : params[:if][:title]
+    body_condition = params[:if][:body].nil? ? "" : params[:if][:body]
+    value_condition = params[:if][:value].nil? ? "" : params[:if][:value]
+    role_assigned_condition = params[:if][:role_assigned].nil? ? "" : params[:if][:role_assigned]
+
+    unless title_condition.empty? || Regexp.new(title_condition).match?(@context.issue_title)
+      respond("I can't do that in this kind of issue")
+      return false
+    end
+
+    unless body_condition.empty? || Regexp.new(body_condition).match?(@context.issue_body)
+      respond("I can't do that. Data in the body of the issue is incorrect")
+      return false
+    end
+
+    unless value_condition.empty? || !read_value_from_body(value_condition).empty?
+      respond("That can't be done if there is no #{value_condition}")
+      return false
+    end
+
+    unless role_assigned_condition.empty? || username?(read_value_from_body(role_assigned_condition))
+      respond("That can't be done if there is no #{role_assigned_condition} assigned")
+      return false
+    end
+
+    return true
+  end
+
+  # If user can perform action
+  # and the responder responds to this event and message
+  # and all conditions from settings are met
+  # then process_message is called
   def call(message, buffy_context)
     return false unless responds_on?(buffy_context)
     return false unless responds_to?(message)
     @context = buffy_context
     if authorized?(buffy_context)
-      process_message(message)
+      process_message(message) if meet_conditions?
     else
       respond "I'm sorry @#{buffy_context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do."
       false
