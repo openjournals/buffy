@@ -3,7 +3,7 @@ require_relative "./spec_helper.rb"
 describe "Github methods" do
 
   subject do
-    settings = Sinatra::IndifferentHash[teams: { editors: 11, reviewers: 22, eics: 33 }]
+    settings = Sinatra::IndifferentHash[env: {}, teams: { editors: 11, reviewers: 22, eics: 33 }]
     params ={ only: ["editors", "eics"] }
     Responder.new(settings, params)
   end

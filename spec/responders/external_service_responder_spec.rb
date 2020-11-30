@@ -8,7 +8,7 @@ describe ExternalServiceResponder do
 
   describe "listening" do
     before do
-      settings = { bot_github_user: "botsci" }
+      settings = { env: {bot_github_user: "botsci"} }
       params = { name: 'test-service', command: 'run tests', url: 'http://testing.openjournals.org' }
       @responder = subject.new(settings, params)
     end
@@ -25,7 +25,7 @@ describe ExternalServiceResponder do
 
   describe "#process_message" do
     before do
-      settings = { bot_github_user: "botsci" }
+      settings = { env: {bot_github_user: "botsci"} }
       params = { name: 'test-service', command: 'run tests', url: 'http://testing.openjournals.org' }
       @responder = subject.new(settings, params)
       @responder.context = OpenStruct.new(issue_id: 33,
@@ -61,19 +61,19 @@ describe ExternalServiceResponder do
   describe "misconfiguration" do
     it "should raise error if name is missing from config" do
       expect {
-        subject.new({ bot_github_user: "botsci" }, { command: 'run tests', url: 'URL' })
+        subject.new({env: {bot_github_user: "botsci"}}, { command: 'run tests', url: 'URL' })
       }.to raise_error "Configuration Error in ExternalServiceResponder: No value for name."
     end
 
     it "should raise error if there is no command" do
       expect {
-        subject.new({ bot_github_user: "botsci" }, { name: 'test', command: ' ', url: 'URL' })
+        subject.new({env: {bot_github_user: "botsci"}}, { name: 'test', command: ' ', url: 'URL' })
       }.to raise_error "Configuration Error in ExternalServiceResponder: No value for command."
     end
 
     it "should raise error if there is no url" do
       expect {
-        subject.new({ bot_github_user: "botsci" }, { name: 'test', command: 'run tests' })
+        subject.new({env: {bot_github_user: "botsci"}}, { name: 'test', command: 'run tests' })
       }.to raise_error "Configuration Error in ExternalServiceResponder: No value for url."
     end
   end

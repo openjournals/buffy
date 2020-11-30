@@ -7,7 +7,7 @@ describe SetValueResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({ bot_github_user: "botsci" }, { name: "version" }) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "version" }) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -23,7 +23,7 @@ describe SetValueResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({ bot_github_user: "botsci" }, { name: "version" })
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "version" })
       disable_github_calls_for(@responder)
 
       @msg = "@botsci set v0.0.33-alpha as version"
@@ -54,20 +54,20 @@ describe SetValueResponder do
   describe "misconfiguration" do
     it "should raise error if name is missing from config" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, {})
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       }.to raise_error "Configuration Error in SetValueResponder: No value for name."
     end
 
     it "should raise error if name is empty" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { name: "    " })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "    " })
       }.to raise_error "Configuration Error in SetValueResponder: No value for name."
     end
   end
 
   describe "documentation" do
     before do
-      @responder = subject.new({ bot_github_user: "botsci" }, { name: "archive", sample_value: "10.21105/joss.12345"})
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "archive", sample_value: "10.21105/joss.12345"})
     end
 
     it "#description should include name" do

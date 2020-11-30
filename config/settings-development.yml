@@ -1,5 +1,6 @@
 buffy:
-  bot_github_user: <%= ENV['BUFFY_BOT_GH_USER'] || 'botsci' %>
+  env:
+    bot_github_user: <%= ENV['BUFFY_BOT_GH_USER'] || 'botsci' %>
   teams:
     editors: 3824115
     eics:

@@ -8,9 +8,9 @@ describe Buffy do
 
   describe "initialization" do
     it "should parse the config file" do
-      expect(subject.settings.buffy["bot_github_user"]).to eq("botsci")
-      expect(subject.settings.buffy["gh_access_token"]).to eq("secret-access")
-      expect(subject.settings.buffy["gh_secret_token"]).to eq("secret-token")
+      expect(subject.settings.buffy["env"]["bot_github_user"]).to eq("botsci")
+      expect(subject.settings.buffy["env"]["gh_access_token"]).to eq("secret-access")
+      expect(subject.settings.buffy["env"]["gh_secret_token"]).to eq("secret-token")
       expect(subject.settings.buffy["teams"]["editors"]).to eq(2009411)
       expect(subject.settings.buffy["responders"]["hello"]["only"]).to eq("editors")
       expect(subject.settings.buffy["responders"]["thanks"]["hidden"]).to eq(true)

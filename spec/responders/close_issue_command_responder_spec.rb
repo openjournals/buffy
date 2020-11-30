@@ -7,7 +7,7 @@ describe CloseIssueCommandResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({ bot_github_user: "botsci" }, { command: "reject" }) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "reject" }) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -23,7 +23,7 @@ describe CloseIssueCommandResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({ bot_github_user: "botsci" },
+      @responder = subject.new({ env: {bot_github_user: "botsci"}},
                                { name: "review_ok",
                                  command: "reject",
                                  add_labels: ["rejected"] })
@@ -58,20 +58,20 @@ describe CloseIssueCommandResponder do
   describe "misconfiguration" do
     it "should raise error if command is missing from config" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, {})
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       }.to raise_error "Configuration Error in CloseIssueCommandResponder: No value for command."
     end
 
     it "should raise error if command is empty" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "    " })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "    " })
       }.to raise_error "Configuration Error in CloseIssueCommandResponder: No value for command."
     end
   end
 
   describe "documentation" do
     before do
-      @responder = subject.new({ bot_github_user: "botsci" }, { command: "reject submission" })
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "reject submission" })
     end
 
     it "#example_invocation shows the custom command" do

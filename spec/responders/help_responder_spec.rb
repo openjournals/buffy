@@ -7,7 +7,7 @@ describe HelpResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({bot_github_user: "botsci"}, {}) }
+    before { @responder = subject.new({env: { bot_github_user: "botsci" }}, {}) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -19,7 +19,7 @@ describe HelpResponder do
     end
 
     it "should allow invocation with custom command" do
-      custom_responder = subject.new({bot_github_user: "botsci"}, {help_command: "commands"})
+      custom_responder = subject.new({env: {bot_github_user: "botsci"}}, {help_command: "commands"})
       expect(custom_responder.event_regex).to match("@botsci commands")
       expect(custom_responder.event_regex).to_not match("@botsci help")
       expect(custom_responder.example_invocation).to eq("@botsci commands")
@@ -28,7 +28,7 @@ describe HelpResponder do
 
   describe "#process_message" do
     before do
-      @settings = { bot_github_user: "botsci",
+      @settings = { env: { bot_github_user: "botsci" },
                     teams: { editors: 2009411 },
                     responders: { "hello" => nil,
                                   "help" => nil,
@@ -57,7 +57,7 @@ describe HelpResponder do
     end
 
     it "should manage responder with multiple invocations" do
-      settings = { bot_github_user: "botsci", responders: { "help" => nil, "add_remove_assignee" => nil }}
+      settings = { env: { bot_github_user: "botsci" }, responders: { "help" => nil, "add_remove_assignee" => nil }}
       multiple_invocations = AddAndRemoveAssigneeResponder.new(settings, {})
       expected = [[@help.description, @help.example_invocation],
                   [multiple_invocations.description[0], multiple_invocations.example_invocation[0]],

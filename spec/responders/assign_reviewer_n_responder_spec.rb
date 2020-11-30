@@ -7,7 +7,7 @@ describe AssignReviewerNResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({bot_github_user: 'botsci'}, {}) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, {}) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -25,7 +25,7 @@ describe AssignReviewerNResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({ bot_github_user: 'botsci' }, {})
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       disable_github_calls_for(@responder)
 
       @msg = "@botsci assign @arfon as reviewer 3"

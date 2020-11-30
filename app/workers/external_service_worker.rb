@@ -1,7 +1,7 @@
 class ExternalServiceWorker < BuffyWorker
 
   def perform(service, locals)
-    load_context_and_settings(locals)
+    load_context_and_env(locals)
 
     http_method = service['method'] || 'post'
     url = service['url']

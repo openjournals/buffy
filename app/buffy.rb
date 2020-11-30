@@ -16,6 +16,6 @@ class Buffy < Sinatra::Base
   end
 
   get '/status' do
-    "#{settings.buffy[:bot_github_user]} in #{settings.environment}: up and running!"
+    "#{settings.buffy[:env][:bot_github_user]} in #{settings.environment}: up and running!"
   end
 end

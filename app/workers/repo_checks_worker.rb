@@ -7,7 +7,7 @@ class RepoChecksWorker < BuffyWorker
   AVAILABLE_CHECKS = ["repo summary", "languages", "license", "statement of need"]
 
   def perform(locals, url, branch, checks)
-    load_context_and_settings(locals)
+    load_context_and_env(locals)
     return unless setup_local_repo(url, branch)
 
     if checks.nil? || checks.empty?

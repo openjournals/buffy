@@ -1,9 +1,9 @@
 module CommonActions
   def with_secret_token(new_value, &block)
-      old_value = subject.settings.buffy[:gh_secret_token]
-      subject.settings.buffy[:gh_secret_token] = new_value
+      old_value = subject.settings.buffy[:env][:gh_secret_token]
+      subject.settings.buffy[:env][:gh_secret_token] = new_value
       yield
-      subject.settings.buffy[:gh_secret_token] = old_value
+      subject.settings.buffy[:env][:gh_secret_token] = old_value
     end
 
   def signature_for(payload)

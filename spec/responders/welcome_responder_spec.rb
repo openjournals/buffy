@@ -7,7 +7,7 @@ describe WelcomeResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({bot_github_user: "botsci"}, {}) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, {}) }
 
     it "should listen to new issues" do
       expect(@responder.event_action).to eq("issues.opened")
@@ -20,7 +20,7 @@ describe WelcomeResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({ bot_github_user: 'botsci' }, {})
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       disable_github_calls_for(@responder)
     end
 

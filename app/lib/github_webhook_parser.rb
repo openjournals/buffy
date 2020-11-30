@@ -27,7 +27,7 @@ module GitHubWebhookParser
     end
 
     @sender = @payload.dig('sender', 'login')
-    if @sender == settings.buffy[:bot_github_user]
+    if @sender == settings.buffy[:env][:bot_github_user]
       halt 200, "Event origin discarded"
     end
 
@@ -51,7 +51,7 @@ module GitHubWebhookParser
   end
 
   def verify_signature
-    secret_token = settings.buffy[:gh_secret_token]
+    secret_token = settings.buffy[:env][:gh_secret_token]
     gh_signature = request.get_header 'HTTP_X_HUB_SIGNATURE'
     return halt 500, "Can't compute signature" if secret_token.nil? || secret_token.empty?
     return halt 403, 'Request missing signature' if gh_signature.nil? || gh_signature.empty?

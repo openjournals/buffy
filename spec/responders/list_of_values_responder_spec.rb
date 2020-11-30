@@ -7,7 +7,7 @@ describe ListOfValuesResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({ bot_github_user: "botsci" }, { name: "reviewers" }) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "reviewers" }) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -23,7 +23,7 @@ describe ListOfValuesResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({ bot_github_user: "botsci" }, { name: "reviewers" })
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "reviewers" })
       disable_github_calls_for(@responder)
     end
 
@@ -159,7 +159,7 @@ describe ListOfValuesResponder do
   end
 
   describe "#add_as_collaborator?" do
-    before { @responder = subject.new({ bot_github_user: "botsci" }, { name: "reviewers" }) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "reviewers" }) }
 
     it "is false if value is not a username" do
       expect(@responder.username?("not username value")).to be_falsy
@@ -180,7 +180,7 @@ describe ListOfValuesResponder do
   end
 
   describe "#add_as_assignee?" do
-    before { @responder = subject.new({ bot_github_user: "botsci" }, { name: "reviewers" }) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "reviewers" }) }
 
     it "is false if value is not a username" do
       expect(@responder.username?("not username value")).to be_falsy
@@ -203,20 +203,20 @@ describe ListOfValuesResponder do
   describe "misconfiguration" do
     it "should raise error if name is missing from config" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, {})
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       }.to raise_error "Configuration Error in ListOfValuesResponder: No value for name."
     end
 
     it "should raise error if name is empty" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { name: "    " })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "    " })
       }.to raise_error "Configuration Error in ListOfValuesResponder: No value for name."
     end
   end
 
   describe "documentation" do
     before do
-      @responder = subject.new({ bot_github_user: "botsci" }, { name: "observers", sample_value: "@observer_username"})
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "observers", sample_value: "@observer_username"})
     end
 
     it "#description should include name" do

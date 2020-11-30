@@ -7,7 +7,7 @@ module GitHub
 
   # Authenticated Octokit
   def github_client
-    @github_client ||= Octokit::Client.new(access_token: @settings[:gh_access_token], auto_paginate: true)
+    @github_client ||= Octokit::Client.new(access_token: @env[:gh_access_token], auto_paginate: true)
   end
 
   # returns the URL for a given template in the repo

@@ -21,7 +21,7 @@ class BuffyWorker
 
   sidekiq_options retry: false
 
-  attr_accessor :settings, :buffy_settings, :context
+  attr_accessor :env, :buffy_settings, :context
 
   def rack_environment
     ENV['RACK_ENV'] || 'test'
@@ -35,16 +35,16 @@ class BuffyWorker
     FileUtils.rm_rf(path) if Dir.exist?(path)
   end
 
-  def load_context_and_settings(config)
+  def load_context_and_env(config)
     @context = OpenStruct.new(config)
 
     document = ERB.new(IO.read("#{File.expand_path '../../../config', __FILE__}/settings-#{rack_environment}.yml")).result
     yaml = YAML.load(document)
     @buffy_settings = yaml['buffy']
 
-    @settings = {}
-    @settings[:templates_path] = buffy_settings['templates_path'] || default_settings[:templates_path]
-    @settings[:gh_access_token] = buffy_settings['gh_access_token'] || default_settings[:gh_access_token]
+    @env = {}
+    @env[:templates_path] = buffy_settings['env']['templates_path'] || default_settings[:templates_path]
+    @env[:gh_access_token] = buffy_settings['env']['gh_access_token'] || default_settings[:gh_access_token]
   end
 
   def setup_local_repo(url, branch)
