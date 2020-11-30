@@ -7,9 +7,10 @@ A sample settings file will look similar to this:
 
 ```yaml
 buffy:
-  bot_github_user: <%= ENV['BUFFY_BOT_GH_USER'] %>
-  gh_access_token: <%= ENV['BUFFY_GH_ACCESS_TOKEN'] %>
-  gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
+  env:
+    bot_github_user: <%= ENV['BUFFY_BOT_GH_USER'] %>
+    gh_access_token: <%= ENV['BUFFY_GH_ACCESS_TOKEN'] %>
+    gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
     editors: 3824115
     eics: myorg/editor-in-chief-team
@@ -44,15 +45,22 @@ buffy:
 The structure of the settings file starts with a single root node called `buffy`.
 It contains three main parts:
 
-  - A few simple key/value settings
+  - The `env` node
   - The `teams` node
   - The `responders` node
 
 A detailed description of all of them:
 
-## General configuration settings
+## Env: General configuration settings
 
-For security reasons is a good practice to load the secret values from your environment instead of hardcoding them in the code.
+```yaml
+  env:
+    bot_github_user: <%= ENV['BUFFY_BOT_GH_USER'] %>
+    gh_access_token: <%= ENV['BUFFY_GH_ACCESS_TOKEN'] %>
+    gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
+    templates_path: ".templates"
+```
+The _env_ section is used to declare general key/value settings. For security reasons is a good practice to load the secret values from your environment instead of hardcoding them in the code.
 
 <dl>
   <dt>bot_github_user</dt>

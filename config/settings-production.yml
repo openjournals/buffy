@@ -89,9 +89,9 @@ buffy:
           query_params:
             secret: A1234567890Z
           data_from_issue:
-            - target-repo
+            - target-repository
           mapping:
-            target_url: target-repo
+            target_url: target-repository
           headers:
             Authorization: OAUTH-token 123456
             Time-Zone: Europe/Amsterdam
