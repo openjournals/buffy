@@ -7,7 +7,7 @@ describe InviteResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({bot_github_user: 'botsci'}, {}) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, {}) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -24,7 +24,7 @@ describe InviteResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({bot_github_user: 'botsci'}, {})
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       allow(@responder).to receive(:invitations_url).and_return("../invitations")
       allow(@responder).to receive(:is_invited?).and_return(false)
       allow(@responder).to receive(:is_collaborator?).and_return(false)

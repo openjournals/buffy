@@ -3,7 +3,7 @@ require_relative "../spec_helper.rb"
 describe CheckReferencesResponder do
 
   before do
-    settings = { bot_github_user: "botsci" }
+    settings = { env: { bot_github_user: "botsci" }}
     @responder = CheckReferencesResponder.new(settings, {})
     @responder.context = OpenStruct.new(issue_body: "Test Review\n\n ... description ...")
     disable_github_calls_for(@responder)

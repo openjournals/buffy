@@ -16,17 +16,19 @@ class Responder
   attr_accessor :event_action
   attr_accessor :params
   attr_accessor :teams
+  attr_accessor :env
   attr_accessor :bot_name
   attr_accessor :match_data
   attr_accessor :context
 
 
   def initialize(settings, params)
-    settings = default_settings.merge(settings)
-    @teams = settings[:teams]
-    @bot_name = settings[:bot_github_user]
-    @params = params || {}
+    settings[:env] = default_settings.merge(settings[:env] || {})
     @settings = settings
+    @env = @settings[:env]
+    @teams = settings[:teams]
+    @params = params || {}
+    @bot_name = @env[:bot_github_user]
     @context = nil
     define_listening
   end

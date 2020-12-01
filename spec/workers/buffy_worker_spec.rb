@@ -17,15 +17,15 @@ describe BuffyWorker do
     expect(BuffyWorker.new.rack_environment).to eq('test')
   end
 
-  describe "#load_context_and_settings" do
+  describe "#load_context_and_env" do
     before do
       config = { 'issue_id' => 333, 'repo' => 'openjournals/testing' }
       @worker = BuffyWorker.new
-      @worker.load_context_and_settings(config)
+      @worker.load_context_and_env(config)
     end
 
     it "should read settings file" do
-      expect(@worker.buffy_settings['gh_secret_token']).to eq('secret-token')
+      expect(@worker.buffy_settings['env']['gh_secret_token']).to eq('secret-token')
       expect(@worker.buffy_settings['teams']['editors']).to eq(2009411)
     end
 
@@ -34,9 +34,9 @@ describe BuffyWorker do
       expect(@worker.context[:repo]).to eq('openjournals/testing')
     end
 
-    it "should load settings" do
-      expect(@worker.settings[:templates_path]).to eq('.buffy/templates')
-      expect(@worker.settings[:gh_access_token]).to eq('secret-access')
+    it "should load env" do
+      expect(@worker.env[:templates_path]).to eq('.buffy/templates')
+      expect(@worker.env[:gh_access_token]).to eq('secret-access')
     end
   end
 

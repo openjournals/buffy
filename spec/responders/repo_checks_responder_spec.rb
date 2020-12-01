@@ -3,7 +3,7 @@ require_relative "../spec_helper.rb"
 describe RepoChecksResponder do
 
   before do
-    settings = { bot_github_user: "botsci" }
+    settings = { env: { bot_github_user: "botsci" }}
     @responder = RepoChecksResponder.new(settings, {})
     @responder.context = OpenStruct.new(issue_body: "Test Review\n\n ... description ...")
     @responder.context.issue_body +=  "<!--target-repository-->http://repo.url<!--end-target-repository-->"

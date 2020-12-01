@@ -2,7 +2,7 @@ require 'sinatra/indifferent_hash'
 
 module Defaults
 
-  # Default value for needed settings.
+  # Default value for needed env settings.
   # Can be overriden from the config/settings YAML file.
   def default_settings
     @defaults ||= Sinatra::IndifferentHash[

@@ -7,7 +7,7 @@ describe AddAndRemoveUserChecklistResponder do
   end
 
   before do
-    @responder = subject.new({bot_github_user: 'botsci'}, {template_file: 'checklist.md'})
+    @responder = subject.new({env: {bot_github_user: "botsci"}}, {template_file: 'checklist.md'})
   end
 
   describe "listening" do

@@ -222,7 +222,7 @@ describe Responder do
 
   describe "#locals" do
     before do
-      @responder = described_class.new({ bot_github_user: 'botsci' }, {})
+      @responder = described_class.new({ env: {bot_github_user: 'botsci'} }, {})
       @responder.context = OpenStruct.new(issue_id: 5,
                                           repo: "openjournals/buffy",
                                           sender: "user33",

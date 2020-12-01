@@ -1,7 +1,7 @@
 class DOIWorker < BuffyWorker
 
   def perform(locals, url, branch)
-    load_context_and_settings(locals)
+    load_context_and_env(locals)
     return unless setup_local_repo(url, branch)
 
     paper = PaperFile.find(path)

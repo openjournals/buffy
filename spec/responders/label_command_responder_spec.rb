@@ -7,7 +7,7 @@ describe LabelCommandResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({ bot_github_user: "botsci" }, { command: "recommend publication", add_labels: ["ok"] }) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "recommend publication", add_labels: ["ok"] }) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -24,7 +24,7 @@ describe LabelCommandResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({ bot_github_user: "botsci" },
+      @responder = subject.new({ env: {bot_github_user: "botsci"}},
                                { name: "review_ok",
                                  command: "recommend publication",
                                  add_labels: ["reviewed", "approved", "pending publication"],
@@ -58,33 +58,33 @@ describe LabelCommandResponder do
   describe "misconfiguration" do
     it "should raise error if command is missing from config" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, {})
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       }.to raise_error "Configuration Error in LabelCommandResponder: No value for command."
     end
 
     it "should raise error if command is empty" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "    " })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "    " })
       }.to raise_error "Configuration Error in LabelCommandResponder: No value for command."
     end
 
     it "should raise error if labels and remove params are missing from config" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "reviewed" })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "reviewed" })
         @responder.process_message(@msg)
       }.to raise_error "Configuration Error in LabelCommandResponder: No labels specified."
     end
 
     it "should raise error if labels and remove params are empty" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "reviewed", add_labels: [], remove_labels: [] })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "reviewed", add_labels: [], remove_labels: [] })
         @responder.process_message(@msg)
       }.to raise_error "Configuration Error in LabelCommandResponder: No labels specified."
     end
 
     it "should raise error if labels param is not an array" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "reviewed", add_labels: "reviewed", remove_labels: [] })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "reviewed", add_labels: "reviewed", remove_labels: [] })
         @responder.process_message(@msg)
       }.to raise_error "Configuration Error in LabelCommandResponder: No labels specified."
     end
@@ -99,7 +99,7 @@ describe LabelCommandResponder do
 
     it "should not raise error if only remove present" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "reviewed", remove_labels: ["pending-review"] })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "reviewed", remove_labels: ["pending-review"] })
         expect(@responder).to receive(:issue_labels).and_return(["pending-review"])
         expect(@responder).to receive(:unlabel_issue).with("pending-review")
         @responder.process_message(@msg)
@@ -109,24 +109,24 @@ describe LabelCommandResponder do
 
   describe "documentation" do
     it "#example_invocation shows the custom command" do
-      responder = subject.new({ bot_github_user: "botsci" }, { command: "review finished", add_labels: ["reviewed"] })
+      responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "review finished", add_labels: ["reviewed"] })
       expect(responder.example_invocation).to eq("@botsci review finished")
     end
 
     it "#description should include only labels" do
-      responder = subject.new({ bot_github_user: "botsci" }, { command: "review finished", add_labels: ["reviewed"] })
+      responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "review finished", add_labels: ["reviewed"] })
       expect(responder.description).to eq("Label issue with: reviewed")
     end
 
     it "#description should include only removed labels" do
       params = { command: "review finished", remove_labels: ["pending-review", "ongoing"] }
-      responder = subject.new({ bot_github_user: "botsci" }, params)
+      responder = subject.new({env: {bot_github_user: "botsci"}}, params)
       expect(responder.description).to eq("Remove labels: pending-review, ongoing")
     end
 
     it "#description should include added and removed labels" do
       params = { command: "review finished", add_labels: ["accepted"], remove_labels: ["ongoing review"] }
-      responder = subject.new({ bot_github_user: "botsci" }, params)
+      responder = subject.new({env: {bot_github_user: "botsci"}}, params)
       expect(responder.description).to eq("Label issue with: accepted. Remove labels: ongoing review")
     end
   end

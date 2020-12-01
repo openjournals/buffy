@@ -7,7 +7,7 @@ describe BasicCommandResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({bot_github_user: "botsci"}, {command: "list editors"}) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, {command: "list editors"}) }
 
     it "should listen to new comments" do
       expect(@responder.event_action).to eq("issue_comment.created")
@@ -29,7 +29,7 @@ describe BasicCommandResponder do
                  messages: ["msg 1", "msg 2"],
                  template_file: "editor_list.md",
                  data_from_issue: ["x"] }
-      @responder = subject.new({ bot_github_user: 'botsci' }, params)
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, params)
       @responder.context = OpenStruct.new(issue_id: 15,
                                           repo: "tests",
                                           sender: "rev33",
@@ -66,20 +66,20 @@ describe BasicCommandResponder do
   describe "misconfiguration" do
     it "should raise error if command is missing from config" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, {})
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       }.to raise_error "Configuration Error in BasicCommandResponder: No value for command."
     end
 
     it "should raise error if command is empty" do
       expect {
-        @responder = subject.new({ bot_github_user: "botsci" }, { command: "    " })
+        @responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "    " })
       }.to raise_error "Configuration Error in BasicCommandResponder: No value for command."
     end
   end
 
   describe "documentation" do
     it "#example_invocation shows the custom command" do
-      responder = subject.new({ bot_github_user: "botsci" }, { command: "list checkpoints" })
+      responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "list checkpoints" })
       expect(responder.example_invocation).to eq("@botsci list checkpoints")
     end
   end

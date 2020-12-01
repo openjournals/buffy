@@ -7,7 +7,7 @@ describe WelcomeTemplateResponder do
   end
 
   describe "listening" do
-    before { @responder = subject.new({bot_github_user: "botsci"}, { template_file: "test.md" }) }
+    before { @responder = subject.new({env: {bot_github_user: "botsci"}}, { template_file: "test.md" }) }
 
     it "should listen to new issues" do
       expect(@responder.event_action).to eq("issues.opened")
@@ -20,7 +20,7 @@ describe WelcomeTemplateResponder do
 
   describe "#process_message" do
     before do
-      @responder = subject.new({ bot_github_user: 'botsci' }, { template_file: "test.md", data_from_issue: ["reviewer"] })
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { template_file: "test.md", data_from_issue: ["reviewer"] })
       @responder.context = OpenStruct.new(issue_id: 5,
                                           repo: "openjournals/buffy",
                                           sender: "user33",
