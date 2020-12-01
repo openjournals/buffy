@@ -9,7 +9,7 @@ Responders allowing labeling will accept in their settings two keys:
 
 ```eval_rst
 :add_labels: an optional Array of labels to add
-:remove_labels: an optional Array of labels to add
+:remove_labels: an optional Array of labels to remove
 ```
 
 **Example:**
