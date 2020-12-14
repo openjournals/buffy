@@ -203,7 +203,7 @@ describe Responder do
       allow(subject).to receive(:process_message).never
       expected_msg = "I'm sorry @tester, I'm afraid I can't do that. That's something only editors and owners are allowed to do."
       expect(subject).to receive(:respond).once.with(expected_msg)
-      expect(subject.call("testing", context)).to be false
+      expect(subject.call("testing", context)).to be true
     end
 
     it "should process message if responds_on?, responds_to? and authorized? are all true" do
