@@ -116,5 +116,8 @@ DEPENDENCIES
   sinatra-contrib (= 2.1.0)
   webmock
 
+RUBY VERSION
+   ruby 2.7.2p137
+
 BUNDLED WITH
    2.1.4
