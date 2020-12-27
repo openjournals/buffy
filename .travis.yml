@@ -5,6 +5,7 @@ services:
   - redis
 rvm:
   - 2.7.2
+  - 3.0.0
   - ruby-head
   - truffleruby
 before_install:
