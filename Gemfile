@@ -9,6 +9,7 @@ gem 'puma'
 gem 'sidekiq'
 gem 'bibtex-ruby'
 gem 'serrano'
+gem 'rexml'
 gem 'github-linguist'
 gem 'licensee'
 

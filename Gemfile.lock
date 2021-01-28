@@ -115,6 +115,7 @@ DEPENDENCIES
   openssl
   puma
   rack-test
+  rexml
   rspec
   serrano
   sidekiq
