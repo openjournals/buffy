@@ -31,25 +31,25 @@ buffy:
             - editors
             - maelle
     assign_reviewer_n:
-          only: 
-            - editors
-            - maelle
+      only: 
+        - editors
+        - maelle
       if:
         role_assigned: editor
     remove_reviewer_n:
-          only: 
-            - editors
-            - maelle
+      only: 
+        - editors
+        - maelle
       no_reviewer_text: "TBD"
     assign_editor:
-          only: 
-            - editors
-            - maelle
+      only: 
+        - editors
+        - maelle
       add_labels:
         - 1/editor-checks
     remove_editor:
-          only: 
-            - editors
-            - maelle
+      only: 
+        - editors
+        - maelle
       no_editor_text: "TBD"
       
