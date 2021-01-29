@@ -42,6 +42,7 @@ buffy:
         - maelle
       no_reviewer_text: "TBD"
     assign_editor:
+      message: "The editor guide can be found at https://devguide.ropensci.org/editorguide.html#editorchecklist"
       only: 
         - editors
         - maelle
