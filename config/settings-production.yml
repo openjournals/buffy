@@ -4,7 +4,7 @@ buffy:
     gh_access_token: <%= ENV['BUFFY_GH_ACCESS_TOKEN'] %>
     gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
-    editors: 3824115
+    editors: 2376878
   responders:
     help:
     hello:
