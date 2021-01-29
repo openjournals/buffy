@@ -26,6 +26,7 @@ buffy:
             - 1/editor-checks
           add_labels:
             - 2/seeking-reviewer(s)
+          only: editors
     assign_reviewer_n:
       only: editors
       if:
@@ -33,83 +34,10 @@ buffy:
     remove_reviewer_n:
       only: editors
       no_reviewer_text: "TBD"
-    list_of_values:
-      - reviewers:
-          only: editors
-          sample_value: "@username"
-          add_as_assignee: true
     assign_editor:
       only: editors
+      add_labels:
+        - 1/editor-checks
     remove_editor:
       only: editors
       no_editor_text: "TBD"
-    invite:
-      only: editors
-    add_remove_assignee:
-      only: editors
-    check_references:
-    repo_checks:
-    set_value:
-      - version:
-          only: editors
-          sample_value: "v1.0.0"
-      - archive:
-          only: editors
-          sample_value: "10.21105/joss.12345"
-    label_command:
-      - review_ok:
-          only: editors
-          command: review successful
-          add_labels:
-            - reviewed
-            - recommend publication
-            - pending publication
-          remove_labels:
-            - ongoing
-            - pending review
-      - review_nok:
-          only: editors
-          command: review failed
-          add_labels:
-            - recommend rejection
-    welcome_template:
-      template_file: welcome.md
-      data_from_issue:
-        - repository
-    close_issue_command:
-      only: editors
-      command: reject
-      add_labels:
-        - rejected
-    external_service:
-      - code_quality:
-          only: editors
-          command: analyze code
-          description: Reports on the quality of the code
-          message: Inspecting code...
-          url: https://dummy-external-service.herokuapp.com/code-analysis
-          method: post
-          query_params:
-            secret: A1234567890Z
-          data_from_issue:
-            - target-repository
-          mapping:
-            target_url: target-repository
-          headers:
-            Authorization: OAUTH-token 123456
-            Time-Zone: Europe/Amsterdam
-      - cat_facts:
-          command: tell me something about cats
-          description: Random facts about cats
-          url: "https://cat-fact.herokuapp.com/facts/random"
-          method: get
-          query_params:
-              animal_type: cat
-              amount: 1
-          template_file: cats.md
-    add_remove_checklist:
-      only: editors
-      template_file: reviewer_checklist.md
-      data_from_issue:
-        - target-repository
-        - author-handle
