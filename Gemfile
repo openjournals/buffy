@@ -1,5 +1,4 @@
 source 'https://rubygems.org'
-ruby ">=2.7.2"
 
 gem 'octokit'
 gem 'sinatra', '2.1.0'
@@ -9,6 +8,7 @@ gem 'puma'
 gem 'sidekiq'
 gem 'bibtex-ruby'
 gem 'serrano'
+gem 'rexml'
 gem 'github-linguist'
 gem 'licensee'
 
