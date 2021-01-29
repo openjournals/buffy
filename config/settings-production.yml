@@ -6,6 +6,7 @@ buffy:
   teams:
     editors: 2376878
     empty: 4475893
+    maelle: 4476094
   responders:
     help:
     hello:
@@ -26,18 +27,28 @@ buffy:
             - 1/editor-checks
           add_labels:
             - 2/seeking-reviewer(s)
-          only: editors
+          only: 
+            - editors
+            - maelle
     assign_reviewer_n:
-      only: editors
+          only: 
+            - editors
+            - maelle
       if:
         role_assigned: editor
     remove_reviewer_n:
-      only: editors
+          only: 
+            - editors
+            - maelle
       no_reviewer_text: "TBD"
     assign_editor:
-      only: editors
+          only: 
+            - editors
+            - maelle
       add_labels:
         - 1/editor-checks
     remove_editor:
-      only: editors
+          only: 
+            - editors
+            - maelle
       no_editor_text: "TBD"
