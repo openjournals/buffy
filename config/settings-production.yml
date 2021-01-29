@@ -5,6 +5,7 @@ buffy:
     gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
     editors: 2376878
+    empty: 4475893
   responders:
     help:
     hello:
@@ -15,6 +16,7 @@ buffy:
       - scope_policies:
           command: policies
           description: Show our policies including aims and scope
+          only: empty
           messages:
             - "Our Policies including aims and scope can be found at https://devguide.ropensci.org/policies.html#aims-and-scope"
       - code_of_conduct:
