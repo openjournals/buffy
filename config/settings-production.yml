@@ -13,21 +13,19 @@ buffy:
     thanks:
       hidden: true
     basic_command:
-      - scope_policies:
-          command: policies
-          description: Show our policies including aims and scope
-          only: empty
-          messages:
-            - "Our Policies including aims and scope can be found at https://devguide.ropensci.org/policies.html#aims-and-scope"
       - code_of_conduct:
           command: code of conduct
           description: Show our Code of Conduct
           messages:
             - "Our Code of Conduct can be found at https://ropensci.org"
-      - editor_list:
-          command: list editors
-          description: List all current topic editors
-          template_file: editors.md
+      - seeking_reviewers:
+          command: seeking reviewers
+          description: Switch to "seeking reviewers"
+          template_file: badge.md
+          remove_labels:
+            - 1/editor-checks
+          add_labels:
+            - 2/seeking-reviewer(s)
     assign_reviewer_n:
       only: editors
       if:
