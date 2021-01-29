@@ -12,6 +12,11 @@ buffy:
     thanks:
       hidden: true
     basic_command:
+      - scope_policies:
+          command: policies
+          description: Show our policies including aims and scope
+          messages:
+            - "Our Policies including aims and scope can be found at https://devguide.ropensci.org/policies.html#aims-and-scope"
       - code_of_conduct:
           command: code of conduct
           description: Show our Code of Conduct
