@@ -22,6 +22,7 @@ module CommonActions
     allow(responder).to receive(:issue_labels).and_return(true)
     allow(responder).to receive(:unlabel_issue).and_return(true)
     allow(responder).to receive(:update_issue).and_return(true)
+    allow(responder).to receive(:close_issue).and_return(nil)
     allow(responder).to receive(:add_collaborator).and_return(true)
     allow(responder).to receive(:add_assignee).and_return(true)
     allow(responder).to receive(:remove_assignee).and_return(true)

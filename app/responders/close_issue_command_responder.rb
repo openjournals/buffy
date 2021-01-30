@@ -10,12 +10,8 @@ class CloseIssueCommandResponder < Responder
   end
 
   def process_message(message)
-    close_issue(labels_options)
-    process_removing_labels
-  end
-
-  def labels_options
-    labels_to_add.empty? ? {} : {labels: labels_to_add}
+    close_issue
+    process_labeling
   end
 
   def description

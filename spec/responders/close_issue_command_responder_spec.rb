@@ -37,20 +37,22 @@ describe CloseIssueCommandResponder do
       @responder.process_message(@msg)
     end
 
+    it "should process labels" do
+      expect(@responder).to receive(:process_labeling)
+      @responder.process_message(@msg)
+    end
+
     it "should label issue with defined labels" do
-      expect(@responder).to receive(:close_issue).with({labels: ["rejected"]})
+      expect(@responder).to receive(:label_issue).with(["rejected"])
       @responder.process_message(@msg)
     end
 
-    it "should not label the issue if not labels are defined" do
+    it "should not label/unlabel the issue if not labels are defined" do
       @responder.params[:add_labels] = nil
-      expect(@responder).to receive(:close_issue).with({})
-      @responder.process_message(@msg)
-    end
+      expect(@responder).to receive(:process_labeling)
+      expect(@responder).to_not receive(:label_issue)
+      expect(@responder).to_not receive(:unlabel_issue)
 
-    it "should process removing of labels" do
-      expect(@responder).to receive(:close_issue)
-      expect(@responder).to receive(:process_removing_labels)
       @responder.process_message(@msg)
     end
   end
