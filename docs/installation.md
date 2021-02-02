@@ -2,7 +2,7 @@ Installation
 ============
 
 Buffy works listening to events received from GitHub and deciding if/how to reply by passing the received payload to different Responders.
-You can fork Buffy and configure the responders you want to use for any specific repository. To have Buffy ready and listening to events you can install it locally or deploy it to a server or service platform.
+You can fork Buffy and configure the responders you want to use for any specific repository. There is no need for the Buffy fork to be located in the same GitHub user/organization as the repo where it will be used. To have Buffy ready and listening to events you can install it locally or deploy it to a server or service platform.
 You'll need the following components:
 
 - A GitHub user to use as the bot with admin permissions on the target repo (usually a member of the organization owning the repo).
