@@ -84,7 +84,7 @@ The _env_ section is used to declare general key/value settings. For security re
     eics: myorg/editor-in-chief-team
     reviewers: 45363564
 ```
- The optional teams node includes entries to reference GitHub teams, used later to grant access to responders only to users belonging to specific teams. Multiple entries can be added to the teams node. All entries follow this simple format:
+ The optional teams node includes entries to reference GitHub teams, used later to grant access to responders only to users belonging to specific teams. The teams referred here must be __visible__ teams of the organization owner of the repositories where the reviews will take place. Multiple entries can be added to the teams node. All entries follow this simple format:
 
  <dl>
   <dt>key: value</dt>
@@ -113,7 +113,7 @@ The _env_ section is used to declare general key/value settings. For security re
   <dd>Defaults to <em>false</em>. If <em>true</em> this responder won't be listed in the help provided to users.</dd>
 
   <dt>only</dt>
-  <dd>List of teams (refered by the name used in the <em>teams</em> node) that can have access to the responder. Used to limit access to the responder. If <em>only</em> is not present the responder is considered public and every user in the repository can invoke it.
+  <dd>List of teams (referred by the name used in the <em>teams</em> node) that can have access to the responder. Used to limit access to the responder. If <em>only</em> is not present the responder is considered public and every user in the repository can invoke it.
 
   Example:
 
