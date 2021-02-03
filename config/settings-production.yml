@@ -68,17 +68,18 @@ buffy:
         - maelle
       no_editor_text: "TBD"
     close_issue_command:
-      only: 
-        - editors
-        - maelle
-      command: out-of-scope
-      add_labels:
-        - out-of-scope
-      remove_labels:
-        - 1/editor-checks
-    close_issue_command:
+  - when_approving:
       only: 
         - editors
         - maelle
       command: approve
+  - out_of_scope:
+      only: 
+        - editors
+        - maelle
+      command: out of scope
+      add_labels:
+        - out-of-scope
+      remove_labels:
+        - 1/editor-checks
       
