@@ -76,4 +76,9 @@ buffy:
         - out-of-scope
       remove_labels:
         - 1/editor-checks
+    close_issue_command:
+      only: 
+        - editors
+        - maelle
+      command: approve
       
