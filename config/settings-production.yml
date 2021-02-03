@@ -30,6 +30,20 @@ buffy:
           only: 
             - editors
             - maelle
+      - approved:
+          command: approve
+          description: Approve the package
+          template_file: approved.md
+          data_from_issue:
+            - reviewer-1
+            - reviewer-2
+          remove_labels:
+            - 5/awaiting-reviewer(s)-response 
+          add_labels:
+            - 6/approved 
+          only: 
+            - editors
+            - maelle
     assign_reviewer_n:
       only: 
         - editors
@@ -60,4 +74,6 @@ buffy:
       command: out-of-scope
       add_labels:
         - out-of-scope
+      remove_labels:
+        - 1/editor-checks
       
