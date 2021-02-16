@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class RepoChecksResponder < Responder
 
+  keyname :repo_checks
+
   def define_listening
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} check repository(?: from branch ([\w-]+))?\s*\z/i

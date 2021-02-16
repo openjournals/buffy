@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class LabelCommandResponder < Responder
 
+  keyname :label_command
+
   def define_listening
     required_params :command
     check_labels_present

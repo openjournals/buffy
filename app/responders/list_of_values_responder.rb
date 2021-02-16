@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class ListOfValuesResponder < Responder
 
+  keyname :list_of_values
+
   def define_listening
     required_params :name
 

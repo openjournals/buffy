@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class WelcomeResponder < Responder
 
+  keyname :welcome
+
   def define_listening
     @event_action = "issues.opened"
     @event_regex = nil

@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class AssignEditorResponder < Responder
 
+  keyname :assign_editor
+
   def define_listening
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} assign (\S+) as editor\s*\z/i

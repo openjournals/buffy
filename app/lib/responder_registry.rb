@@ -3,33 +3,13 @@ Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].sort.each { |f| 
 
 class ResponderRegistry
 
-  RESPONDER_MAPPING = {
-    "help"                 => HelpResponder,
-    "hello"                => HelloResponder,
-    "basic_command"        => BasicCommandResponder,
-    "assign_reviewer_n"    => AssignReviewerNResponder,
-    "remove_reviewer_n"    => RemoveReviewerNResponder,
-    "assign_editor"        => AssignEditorResponder,
-    "remove_editor"        => RemoveEditorResponder,
-    "invite"               => InviteResponder,
-    "set_value"            => SetValueResponder,
-    "list_of_values"       => ListOfValuesResponder,
-    "add_remove_assignee"  => AddAndRemoveAssigneeResponder,
-    "label_command"        => LabelCommandResponder,
-    "thanks"               => ThanksResponder,
-    "welcome"              => WelcomeResponder,
-    "welcome_template"     => WelcomeTemplateResponder,
-    "close_issue_command"  => CloseIssueCommandResponder,
-    "external_service"     => ExternalServiceResponder,
-    "add_remove_checklist" => AddAndRemoveUserChecklistResponder,
-    "check_references"     => CheckReferencesResponder,
-    "repo_checks"          => RepoChecksResponder,
-  }
-
   attr_accessor :responders
   attr_accessor :config
+  attr_reader   :responders_map
+
 
   def initialize(config)
+    @responders_map = ResponderRegistry.available_responders
     @responders ||= Array.new
     @config = config
     load_responders!
@@ -58,13 +38,39 @@ class ResponderRegistry
         params.each do |responder_instances|
           responder_instances.each_pair do |instance_name, subparams|
             subparams = {} if subparams.nil?
-            add_responder(RESPONDER_MAPPING[name].new(config, Sinatra::IndifferentHash[name: instance_name.to_s].merge(subparams)))
+            add_responder(@responders_map[name].new(config, Sinatra::IndifferentHash[name: instance_name.to_s].merge(subparams)))
           end
         end
       else
-        add_responder(RESPONDER_MAPPING[name].new(config, params))
+        add_responder(@responders_map[name].new(config, params))
       end
     end
+  end
+
+  # Create a map of all the classes in the files located in the /responders dir
+  def self.available_responders
+    available_responders = {}
+    responder_files = Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].map do |f|
+      f.match(/.*app\/responders\/(.*).rb/)[1]
+    end
+
+    responder_files = responder_files.compact.sort
+    responder_classes = responder_files.map do |path|
+      path.split("/").map do |subpath|
+        subpath.split('_').each(&:capitalize!).join
+      end.join('::')
+    end
+
+    responder_classes.each do |name|
+      begin
+        responder_class = Object.const_get(name)
+        available_responders[responder_class.key] = responder_class
+      rescue NameError => err
+        logger.warn("There is a mismatch in a Responder class name/module: #{err.message}")
+      end
+    end
+
+    available_responders
   end
 
   def log_error(responder, error)

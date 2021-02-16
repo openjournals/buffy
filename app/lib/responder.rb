@@ -21,6 +21,14 @@ class Responder
   attr_accessor :match_data
   attr_accessor :context
 
+  def self.keyname(key)
+    @key = key.to_s
+  end
+
+  def self.key
+    @key || self.name
+  end
+
 
   def initialize(settings, params)
     settings[:env] = default_settings.merge(settings[:env] || {})

@@ -15,6 +15,11 @@ describe ResponderRegistry do
   end
 
   describe "initialization" do
+    it "should load available responders mapping" do
+      registry = described_class.new(@config)
+      expect(registry.responders_map).to eq(ResponderRegistry.available_responders)
+    end
+
     it "should load single responders" do
       registry = described_class.new(@config)
       single_responder = registry.responders.select { |r| r.kind_of?(AssignReviewerNResponder) }
@@ -58,6 +63,17 @@ describe ResponderRegistry do
         expect(responder.teams[:editors]).to eq(expected_teams[:editors])
         expect(responder.teams[:eics]).to eq(expected_teams[:eics])
       end
+    end
+  end
+
+  describe ".available_responders" do
+    it "should return a map of all available responders" do
+      map = ResponderRegistry.available_responders
+      files_count = Dir["#{File.expand_path '../../app/responders', __FILE__}/**/*.rb"].length
+      expect(map.count).to eq(files_count)
+
+      random_responder_key = map.keys[(0..files_count-1).to_a.sample]
+      expect(map[random_responder_key].key).to eq(random_responder_key)
     end
   end
 

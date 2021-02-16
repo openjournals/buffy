@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class RemoveEditorResponder < Responder
 
+  keyname :remove_editor
+
   def define_listening
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} remove editor\s*\z/i
