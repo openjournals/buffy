@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class ExternalServiceResponder < Responder
 
+  keyname :external_service
+
   def define_listening
     required_params :name, :command, :url
 

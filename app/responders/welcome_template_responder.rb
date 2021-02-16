@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class WelcomeTemplateResponder < Responder
 
+  keyname :welcome_template
+
   def define_listening
     required_params :template_file
 

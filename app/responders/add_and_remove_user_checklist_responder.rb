@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class AddAndRemoveUserChecklistResponder < Responder
 
+  keyname :add_remove_checklist
+
   def define_listening
     required_params :template_file
 

@@ -259,9 +259,29 @@ describe Responder do
     end
   end
 
+  describe ".keyname" do
+    it "should be class name by default" do
+      expect(described_class.key).to eq("Responder")
+    end
+
+    it "should set the key name" do
+      described_class.keyname :buffy_tester
+      expect(described_class.key).to eq("buffy_tester")
+    end
+  end
+
+  describe "#key" do
+    it "should be present for all responders" do
+      ResponderRegistry.available_responders.values.each do |responder_class|
+        expect(responder_class.key).to_not be_nil
+        expect(responder_class.key).to_not eq(responder_class.name)
+      end
+    end
+  end
+
   describe "#description" do
     it "should be present for all responders" do
-      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+      ResponderRegistry.available_responders.values.each do |responder_class|
         responder = responder_class.new({}, sample_params(responder_class))
         expect(responder.respond_to?(:description)).to eq(true)
         expect(responder.description).to_not be_nil
@@ -272,7 +292,7 @@ describe Responder do
 
   describe "#example_invocation" do
     it "should be present for all responders" do
-      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+      ResponderRegistry.available_responders.values.each do |responder_class|
         responder = responder_class.new({}, sample_params(responder_class))
         expect(responder.respond_to?(:example_invocation)).to eq(true)
         expect(responder.example_invocation).to_not be_nil
@@ -283,7 +303,7 @@ describe Responder do
 
   describe "multiple descriptions and example invocations" do
     it "should have the same number of each of them" do
-      ResponderRegistry::RESPONDER_MAPPING.values.each do |responder_class|
+      ResponderRegistry.available_responders.values.each do |responder_class|
         responder = responder_class.new({}, sample_params(responder_class))
         if responder.description.is_a?(Array) || responder.example_invocation.is_a?(Array)
           error_msg = "#{responder_class.name} descriptions and example_invocations sizes don't match"

@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class AddAndRemoveAssigneeResponder < Responder
 
+  keyname :add_remove_assignee
+
   def define_listening
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} (add|remove) assignee: (\S+)\s*\z/i

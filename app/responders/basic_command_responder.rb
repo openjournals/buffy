@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class BasicCommandResponder < Responder
 
+  keyname :basic_command
+
   def define_listening
     required_params :command
 

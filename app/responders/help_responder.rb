@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class HelpResponder < Responder
 
+  keyname :help
+
   def define_listening
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} #{help_command}\s*\z/i

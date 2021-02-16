@@ -2,6 +2,8 @@ require_relative "../lib/responder"
 
 class SetValueResponder < Responder
 
+  keyname :set_value
+
   def define_listening
     required_params :name
 

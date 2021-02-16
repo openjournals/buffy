@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class CloseIssueCommandResponder < Responder
 
+  keyname :close_issue_command
+
   def define_listening
     required_params :command
 

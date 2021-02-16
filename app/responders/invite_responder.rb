@@ -2,6 +2,8 @@ require_relative '../lib/responder'
 
 class InviteResponder < Responder
 
+  keyname :invite
+
   def define_listening
     @event_action = "issue_comment.created"
     @event_regex = /\A@#{@bot_name} invite (\S+)\s*\z/i
