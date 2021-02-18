@@ -22,7 +22,7 @@ module GitHub
 
   # Return the body of issue
   def issue_body
-    @issue_body = context.issue_body
+    @issue_body ||= context.issue_body
     @issue_body ||= issue.body
   end
 

@@ -18,46 +18,65 @@ describe "Actions" do
   end
 
   describe "#update_body" do
+    before do
+      @initial_body = "... <before> Here! <after> ..."
+      @expected_new_body = "... <before> New content! <after> ..."
+      @context = OpenStruct.new(issue_body: @initial_body)
+
+      allow(subject).to receive(:context).and_return(@context)
+      expect(subject).to receive(:update_issue).once.with({body: @expected_new_body})
+
+    end
+
     it "should call update_issue on new body" do
-      issue_body = "... <before> Here! <after> ..."
-      allow(subject).to receive(:issue_body).and_return(issue_body)
-
-      expected_new_body = "... <before> New content! <after> ..."
-
-      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
       subject.update_body("<before>", "<after>" ," New content! ")
+    end
+
+    it "should update @body_issue" do
+      expect(subject.issue_body).to eq(@initial_body)
+      subject.update_body("<before>", "<after>" ," New content! ")
+      expect(subject.issue_body).to eq(@expected_new_body)
     end
   end
 
   describe "#append_to_body" do
+    before do
+      @initial_body = "Hi <before> there! <after> this is the end"
+      @context = OpenStruct.new(issue_body: @initial_body)
+      @expected_new_body = "Hi <before> there! <after> this is the end\nNow this is the new end"
+
+      allow(subject).to receive(:context).and_return(@context)
+      expect(subject).to receive(:update_issue).once.with({body: @expected_new_body})
+    end
+
     it "should call update_issue on new body" do
-      issue_body = "Hi <before> there! <after> this is the end"
-      allow(subject).to receive(:issue_body).and_return(issue_body)
-
-      expected_new_body = "Hi <before> there! <after> this is the end\nNow this is the new end"
-
-      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
       subject.append_to_body("\nNow this is the new end")
+    end
+
+    it "should update @body_issue" do
+      expect(subject.issue_body).to eq(@initial_body)
+      subject.append_to_body("\nNow this is the new end")
+      expect(subject.issue_body).to eq(@expected_new_body)
     end
   end
 
   describe "#delete_from_body" do
     before do
-      issue_body = "Intro <before> Here!\n <after> Final"
-      allow(subject).to receive(:issue_body).and_return(issue_body)
+      @initial_body = "Intro <before> Here!\n <after> Final"
+      @expected_new_body = "Intro <before><after> Final"
+      @context = OpenStruct.new(issue_body: @initial_body)
+      allow(subject).to receive(:context).and_return(@context)
     end
 
-    it "should not remove marks by default" do
-      expected_new_body = "Intro <before><after> Final"
-
-      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+    it "should not remove marks by default and update @body_issue" do
+      expect(subject.issue_body).to eq(@initial_body)
+      expect(subject).to receive(:update_issue).once.with({body: @expected_new_body})
       subject.delete_from_body("<before>", "<after>")
+      expect(subject.issue_body).to eq(@expected_new_body)
     end
 
     it "should call update_issue on new body removing block content" do
-      expected_new_body = "Intro <before><after> Final"
-
-      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      expect(subject).to receive(:update_issue).once.with({body: @expected_new_body})
       subject.delete_from_body("<before>", "<after>", false)
     end
 
