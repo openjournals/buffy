@@ -83,9 +83,7 @@ module Actions
 
   # Update list in issue's body between HTML comments
   def update_list(list_name, text)
-    start_mark = "<!--#{list_name}-list-->"
-    end_mark = "<!--end-#{list_name}-list-->"
-    update_body(start_mark, end_mark, text)
+    update_value("#{list_name}-list", text)
   end
 
   # Replace an assigned user from the assignees list of the issue
