@@ -57,7 +57,7 @@ We will use here [Heroku](https://www.heroku.com) as an example service to deplo
 
 **3.** You can set Heroku to automatically redeploy when new commits are added. You can also add heroku as a git remote and deploy manually using
 
-        $ git push heroku master
+        $ git push heroku main
 
   There are detailed instructions in the Deploy section of your Heroku app.
 
