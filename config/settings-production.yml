@@ -27,7 +27,7 @@ buffy:
             - 1/editor-checks
           add_labels:
             - 2/seeking-reviewer(s)
-          only: 
+          only:
             - editors
             - maelle
       - approved:
@@ -38,43 +38,43 @@ buffy:
             - reviewer-1
             - reviewer-2
           remove_labels:
-            - 5/awaiting-reviewer(s)-response 
+            - 5/awaiting-reviewer(s)-response
           add_labels:
-            - 6/approved 
-          only: 
+            - 6/approved
+          only:
             - editors
             - maelle
-    assign_reviewer_n:
-      only: 
+    ropensci_reviewers:
+      only:
         - editors
         - maelle
       if:
         role_assigned: editor
-    remove_reviewer_n:
-      only: 
-        - editors
-        - maelle
       no_reviewer_text: "TBD"
+      add_labels:
+        - 3/reviewer(s)-assigned
+      remove_labels:
+        - 2/seeking-reviewer(s)
     assign_editor:
       message: "The editor guide can be found at https://devguide.ropensci.org/editorguide.html#editorchecklist"
-      only: 
+      only:
         - editors
         - maelle
       add_labels:
         - 1/editor-checks
     remove_editor:
-      only: 
+      only:
         - editors
         - maelle
       no_editor_text: "TBD"
     close_issue_command:
       - when_approving:
-          only: 
+          only:
             - editors
             - maelle
           command: approve
       - out_of_scope:
-          only: 
+          only:
             - editors
             - maelle
           command: out of scope
@@ -82,4 +82,4 @@ buffy:
             - out-of-scope
           remove_labels:
             - 1/editor-checks
-      
+
