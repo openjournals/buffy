@@ -33,3 +33,10 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/close_issue_command
    responders/external_service
 ```
+
+```eval_rst
+.. toctree::
+   :caption: Custom responders
+   :maxdepth: 1
+
+```
