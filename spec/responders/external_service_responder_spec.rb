@@ -29,6 +29,7 @@ describe ExternalServiceResponder do
       params = { name: 'test-service', command: 'run tests', url: 'http://testing.openjournals.org' }
       @responder = subject.new(settings, params)
       @responder.context = OpenStruct.new(issue_id: 33,
+                                          issue_author: "opener",
                                           repo: "openjournals/testing",
                                           sender: "xuanxu")
       disable_github_calls_for(@responder)
@@ -52,7 +53,7 @@ describe ExternalServiceResponder do
 
     it "should pass right info to the worker" do
       expected_params = { name: 'test-service', command: 'run tests', url: 'http://testing.openjournals.org' }
-      expected_locals = { bot_name: 'botsci', issue_id: 33, repo: 'openjournals/testing', sender: 'xuanxu' }
+      expected_locals = { bot_name: 'botsci', issue_author: "opener", issue_id: 33, repo: 'openjournals/testing', sender: 'xuanxu' }
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
       @responder.process_message('')
     end

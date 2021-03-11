@@ -22,6 +22,7 @@ describe WelcomeTemplateResponder do
     before do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, { template_file: "test.md", data_from_issue: ["reviewer"] })
       @responder.context = OpenStruct.new(issue_id: 5,
+                                          issue_author: "opener",
                                           repo: "openjournals/buffy",
                                           sender: "user33",
                                           issue_body: "Test Software Review\n\n<!--reviewer-->@xuanxu<!--end-reviewer-->")
@@ -29,7 +30,7 @@ describe WelcomeTemplateResponder do
     end
 
     it "should populate locals" do
-      expected_locals = { issue_id: 5, bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
+      expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
 
       expect(@responder).to receive(:respond_external_template).with("test.md", expected_locals)
       @responder.process_message("")

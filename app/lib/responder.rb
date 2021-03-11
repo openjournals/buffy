@@ -137,6 +137,7 @@ class Responder
   # and adds any data from the body issue requested via :data_from_issue param
   def locals
     from_context = { issue_id: context.issue_id,
+                     issue_author: context.issue_author,
                      repo: context.repo,
                      sender: context.sender,
                      bot_name: bot_name }
