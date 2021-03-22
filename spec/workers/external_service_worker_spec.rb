@@ -36,7 +36,11 @@ describe ExternalServiceWorker do
 
     it "should respond error message if a 400 or 500 response is received" do
       expect(Faraday).to receive(:post).and_return(response_400)
-      expect(@worker).to receive(:respond).with("Error. The tests service is currently unavailable")
+      expect(@worker).to receive(:respond).with("Error (400). The tests service is currently unavailable")
+      @worker.perform(@service_params, @locals)
+
+      expect(Faraday).to receive(:post).and_return(OpenStruct.new(status: 500))
+      expect(@worker).to receive(:respond).with("Error (500). The tests service is currently unavailable")
       @worker.perform(@service_params, @locals)
     end
 
