@@ -34,7 +34,7 @@ class ExternalServiceWorker < BuffyWorker
         respond(response.body)
       end
     elsif response.status.between?(400, 599)
-      respond("Error. The #{service['name']} service is currently unavailable")
+      respond("Error (#{response.status}). The #{service['name']} service is currently unavailable")
     end
   end
 end
