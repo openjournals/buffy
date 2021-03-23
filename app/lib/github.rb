@@ -112,7 +112,7 @@ module GitHub
 
   # Returns true if the user in a team member of any of the authorized teams
   # false otherwise
-  def user_authorized?(user_login)
+  def user_in_authorized_teams?(user_login)
     @user_authorized ||= begin
       authorized = []
       authorized_team_ids.each do |team_id|
