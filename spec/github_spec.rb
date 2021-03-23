@@ -224,13 +224,13 @@ describe "Github methods" do
     end
   end
 
-  describe "#user_authorized?" do
+  describe "#user_in_authorized_teams?" do
     it "should return true if user is member of any authorized team" do
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).once.with(11, "sender").and_return(true)
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).never.with(22, "sender")
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).never.with(33, "sender")
 
-      expect(subject.user_authorized?("sender")).to be_truthy
+      expect(subject.user_in_authorized_teams?("sender")).to be_truthy
     end
 
     it "should return false if user is not member of any authorized team" do
@@ -238,7 +238,7 @@ describe "Github methods" do
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).never.with(22, "sender")
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).once.with(33, "sender").and_return(false)
 
-      expect(subject.user_authorized?("sender")).to be_falsey
+      expect(subject.user_in_authorized_teams?("sender")).to be_falsey
     end
   end
 

@@ -83,12 +83,21 @@ The _env_ section is used to declare general key/value settings. For security re
     editors: 3824117
     eics: myorg/editor-in-chief-team
     reviewers: 45363564
+    collaborators:
+      - user33
+      - user42
 ```
  The optional teams node includes entries to reference GitHub teams, used later to grant access to responders only to users belonging to specific teams. The teams referred here must be __visible__ teams of the organization owner of the repositories where the reviews will take place. Multiple entries can be added to the teams node. All entries follow this simple format:
 
  <dl>
   <dt>key: value</dt>
-  <dd>Where <em>key</em> is the name for this team in Buffy and <em>value</em> can be the integer id of the team in GitHub (preferred) or the reference in format <em>organization/name</em> (for example: <em>openjournals/editors</em>)</dd>
+  <dd>Where <em>key</em> is the name for this team in Buffy and <em>value</em> can be:
+    <dl>
+      <dd>- The integer <strong>id of the team</strong> in GitHub (preferred)</dd>
+      <dd>- The <strong>reference</strong> in format <em>organization/name</em> (for example: <em>openjournals/editors</em>)</dd>
+      <dd>- An array of user handles</dd>
+    </dl>
+  </dd>
 </dl>
 
 ## Responders

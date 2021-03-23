@@ -1,8 +1,7 @@
 module Authorizations
 
-  def authorized_team_ids
-    @authorized_team_ids ||= begin
-      team_ids = []
+  def authorized_teams
+    @authorized_teams ||= begin
       teams_ids_or_names = []
       case params[:only]
       when String
@@ -10,8 +9,26 @@ module Authorizations
       when Array
         params[:only].each { |team_name| teams_ids_or_names << @teams[team_name] }
       end
+      teams_ids_or_names
+    end
+  end
 
-      teams_ids_or_names.each do |team_id_or_name|
+  def authorized_users
+    @authorized_users ||= begin
+      user_handles = []
+      authorized_teams.each do |team|
+        if team.is_a?(Array)
+          user_handles += team
+        end
+      end
+      user_handles.uniq
+    end
+  end
+
+  def authorized_team_ids
+    @authorized_team_ids ||= begin
+      team_ids = []
+      authorized_teams.each do |team_id_or_name|
         case team_id_or_name
         when Integer
           team_ids << team_id_or_name
@@ -47,6 +64,10 @@ module Authorizations
         ""
       end
     end
+  end
+
+  def user_authorized?(user_login)
+    authorized_users.include?(user_login) || user_in_authorized_teams?(user_login)
   end
 
 end
