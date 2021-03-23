@@ -101,5 +101,19 @@ describe ExternalServiceWorker do
       @worker.perform(params, @locals)
     end
   end
+
+  describe "#parse_json_response" do
+    before { @worker = ExternalServiceWorker.new }
+
+    it "parses a JSON response" do
+      response = '{"number":42}'
+      expect(@worker.parse_json_response(response)).to eq({'number' => 42})
+    end
+
+    it "parses first element if response body is an array" do
+      response = "[\"{\\\"number\\\":42}\", \"whatever\", 1234567]"
+      expect(@worker.parse_json_response(response)).to eq({'number' => 42})
+    end
+  end
 end
 

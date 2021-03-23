@@ -28,7 +28,7 @@ class ExternalServiceWorker < BuffyWorker
 
     if response.status.between?(200, 299)
       if service['template_file']
-        parsed_response = JSON.parse(response.body)
+        parsed_response = parse_json_response(response.body)
         respond_external_template(service['template_file'], parsed_response)
       else
         respond(response.body)
@@ -36,5 +36,13 @@ class ExternalServiceWorker < BuffyWorker
     elsif response.status.between?(400, 599)
       respond("Error (#{response.status}). The #{service['name']} service is currently unavailable")
     end
+  end
+
+  def parse_json_response(body)
+    parsed = JSON.parse(body)
+    if parsed.is_a? Array
+      parsed = JSON.parse(parsed[0])
+    end
+    parsed
   end
 end
