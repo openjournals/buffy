@@ -15,11 +15,13 @@ A responder is a ruby class containing five elements:
 * **define_listening** method: a place to declare what events the responder is listening to
 * **process_message** method: the code to perform whatever the responder does
 * **description** method: to add a short description of the responder for documenting purposes
-* **example_invokation** method: to show users how to invoke the responder
+* **example_invocation** method: to show users how to invoke the responder
 
 ### The Responder Ruby class
 A responder object is a class inheriting from the Responder class, so you should require the Responder class located in `/lib` and create a child class.
 
+
+When initialized, a responder will have accessor methods for the name of the bot (`bot_name`) and for the parameters of the responder coming from the config file (`params`).
 
 ```ruby
 relative_require '../../lib/responder'
@@ -29,7 +31,6 @@ class ClockResponder < Responder
 end
 ```
 
-When initialized, a responder will have accessor methods for the name of the bot (`bot_name`) and for the parameters of the responder coming from the config file (`params`).
 
 ### Keyname
 
@@ -141,6 +142,7 @@ To interact back with the reviews repository there are several methods available
 * **update_body(mark, end_mark, text)**: will update the body of the issue between marks with the passed _text_
 * **add_assignee(user)**: will add the passed _user_ to the issue's assignees
 * **remove_assignee(user)**: will remove the passed _user_ from the issue's assignees
+* **replace_assignee(old_user, new_user)**: will replace the passed _old_user_ with _new_user_ in the issue's assignees
 * **process_labeling**: will add/remove labels as specified in the responder [config params](./labeling)
 
 If you need to access any matched data from the [_@event_regex_](#event-regex) you have them available via the `match_data` array.
@@ -158,7 +160,7 @@ class ClockResponder < Responder
   end
 
   def process_message
-    respond(Time.now.strftime("The time is %H:%M:%S, today is %d-%m-%Y"))
+    respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
   end
 
   def clock_command
@@ -167,5 +169,123 @@ class ClockResponder < Responder
 end
 ```
 
+### Description
+
+Use the `description` method to add a short description of what the responder does.
+
+Our example responder replies with the current time:
+```ruby
+relative_require '../../lib/responder'
+
+class ClockResponder < Responder
+  keyname: :clock
+
+  def define_listening
+    @event_action = "issue_comment.created"
+    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+  end
+
+  def process_message
+    respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
+  end
+
+  def clock_command
+    params[:command] || "what time is it\\?"
+  end
+
+  def description
+    "Get the current time"
+  end
+end
+```
+
+### Example invocation
+To help users understand how to use the responder, use the `example_invocation` to add an example of how the responder is triggered.
+
+In our example responder we'll use the command declared via config or the default one:
+
+```ruby
+relative_require '../../lib/responder'
+
+class ClockResponder < Responder
+  keyname: :clock
+
+  def define_listening
+    @event_action = "issue_comment.created"
+    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+  end
+
+  def process_message
+    respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
+  end
+
+  def clock_command
+    params[:command] || "what time is it\\?"
+  end
+
+  def description
+    "Get the current time"
+  end
+
+  def example_invocation
+    "@#{bot_name} #{params[:command] || 'what time is it?'}"
+  end
+end
+```
 
 
+## Tests
+
+Don't forget to add tests for any new Responder you create. Buffy uses the [RSpec](https://rspec.info/) test framework.
+
+
+For our sample responder, we would create
+ _spec/responders/myresponders/clock_responder_spec.rb_
+```ruby
+require_relative "../../spec_helper.rb"
+
+describe ClockResponder do
+
+  subject do
+    described_class
+  end
+
+  describe "listening" do
+    before { @responder = subject.new({env: {bot_github_user: "testbot"}}, {}) }
+
+    it "should listen to new comments" do
+      expect(@responder.event_action).to eq("issue_comment.created")
+    end
+
+    it "should define regex" do
+      expect(@responder.event_regex).to match("@testbot what time is it?")
+      expect(@responder.event_regex).to_not match("@testbot whatever")
+    end
+
+    it "should allow invocation with custom command" do
+      custom_responder = subject.new({env: {bot_github_user: "testbot"}},
+                                     {command: "tell me the time"})
+      expect(custom_responder.event_regex).to match("@testbot tell me the time")
+      expect(custom_responder.event_regex).to_not match("@botsci what time is it?")
+    end
+  end
+
+  describe "#process_message" do
+    before do
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
+      disable_github_calls_for(@responder)
+    end
+
+    it "should respond to github" do
+      timenow = Time.now
+      expected_response = timenow.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱")
+      expect(Time).to receive(:now).and_respond(timenow)
+      expect(@responder).to receive(:respond).with(expected_response)
+      @responder.process_message("@testbot what time is it?")
+    end
+  end
+end
+
+```
+
+You can find more examples of responder specs in the `/spec/responders` directory.
