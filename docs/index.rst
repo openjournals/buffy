@@ -23,3 +23,9 @@ Buffy is an Open Source project, `the code <https://github.com/openjournals/buff
    available_responders
    labeling
    using_templates
+
+.. toctree::
+   :caption: Developer guides
+   :maxdepth: 1
+
+   custom_responder
