@@ -6,7 +6,7 @@ class AddAndRemoveAssigneeResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} (add|remove) assignee: (\S+)\s*\z/i
+    @event_regex = /\A@#{bot_name} (add|remove) assignee: (\S+)\s*\z/i
   end
 
   def process_message(message)
@@ -42,7 +42,7 @@ class AddAndRemoveAssigneeResponder < Responder
   end
 
   def example_invocation
-    ["@#{@bot_name} add assignee: @username",
-     "@#{@bot_name} remove assignee: @username"]
+    ["@#{bot_name} add assignee: @username",
+     "@#{bot_name} remove assignee: @username"]
   end
 end

@@ -8,7 +8,7 @@ class ListOfValuesResponder < Responder
     required_params :name
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} (add|remove) (\S+) (to|from) #{name}\s*\z/i
+    @event_regex = /\A@#{bot_name} (add|remove) (\S+) (to|from) #{name}\s*\z/i
   end
 
   def process_message(message)
@@ -75,7 +75,7 @@ class ListOfValuesResponder < Responder
   end
 
   def example_invocation
-    ["@#{@bot_name} add #{params[:sample_value] || 'xxxxx'} to #{name}",
-     "@#{@bot_name} remove #{params[:sample_value] || 'xxxxx'} from #{name}"]
+    ["@#{bot_name} add #{params[:sample_value] || 'xxxxx'} to #{name}",
+     "@#{bot_name} remove #{params[:sample_value] || 'xxxxx'} from #{name}"]
   end
 end
