@@ -132,7 +132,40 @@ end
 
 
 ### Process message
+The `process_message` method will be called if an event reaches Buffy and it matches the action and the regex in the _define_listening_ method.
 
+This method is the place of all the custom Ruby code needed to perform whatever is the responder does.
+To interact back with the reviews repository there are several methods available:
+* **respond(message)**: will post a comment with the specified _message_ string
+* **respond_external_template(template_name, locals)**: will post a comment using [a template](./using_templates) and passing it the _locals_ variables
+* **update_body(mark, end_mark, text)**: will update the body of the issue between marks with the passed _text_
+* **add_assignee(user)**: will add the passed _user_ to the issue's assignees
+* **remove_assignee(user)**: will remove the passed _user_ from the issue's assignees
+* **process_labeling**: will add/remove labels as specified in the responder [config params](./labeling)
+
+If you need to access any matched data from the [_@event_regex_](#event-regex) you have them available via the `match_data` array.
+
+For our example we'll just reply a comment with the time:
+```ruby
+relative_require '../../lib/responder'
+
+class ClockResponder < Responder
+  keyname: :clock
+
+  def define_listening
+    @event_action = "issue_comment.created"
+    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+  end
+
+  def process_message
+    respond(Time.now.strftime("The time is %H:%M:%S, today is %d-%m-%Y"))
+  end
+
+  def clock_command
+    params[:command] || "what time is it\\?"
+  end
+end
+```
 
 
 
