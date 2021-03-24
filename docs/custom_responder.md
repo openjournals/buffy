@@ -29,7 +29,7 @@ class ClockResponder < Responder
 end
 ```
 
-When initialized, a responder will have available the name of the bot in the `@bot_name` instance variable and all the parameters for the responder from the config file in the `@params` instance variable.
+When initialized, a responder will have accessor methods for the name of the bot (`bot_name`) and for the parameters of the responder coming from the config file (`params`).
 
 ### Keyname
 
@@ -79,7 +79,7 @@ class ClockResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} what time is it\?\s*\z/i
+    @event_regex = /\A@#{bot_name} what time is it\?\s*\z/i
   end
 end
 ```
@@ -98,7 +98,7 @@ class ClockResponder < Responder
     required_params :command
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} #{command}\s*\z/i
+    @event_regex = /\A@#{bot_name} #{command}\s*\z/i
   end
 end
 ```
@@ -121,7 +121,7 @@ class ClockResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} #{clock_command}\s*\z/i
+    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
   end
 
   def clock_command
@@ -129,6 +129,10 @@ class ClockResponder < Responder
   end
 end
 ```
+
+
+### Process message
+
 
 
 
