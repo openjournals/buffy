@@ -248,13 +248,54 @@ module Myorganization
       "@#{bot_name} #{params[:command] || 'what time is it?'}"
     end
   end
+end
+```
 
-  def example_invocation
-    "@#{bot_name} #{params[:command] || 'what time is it?'}"
+## Sample custom responder
+
+The final version of our clock responder (in `app/responders/myorganization/clock_responder.rb`):
+```ruby
+require_relative '../../lib/responder'
+
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
+
+    def define_listening
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+    end
+
+    def process_message(message)
+      respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
+    end
+
+    def clock_command
+      params[:command] || "what time is it\\?"
+    end
+
+    def description
+      "Get the current time"
+    end
+
+    def example_invocation
+      "@#{bot_name} #{params[:command] || 'what time is it?'}"
+    end
   end
 end
 ```
 
+Adding its key to the configuration file in the responder settings:
+```yaml
+buffy:
+  responders:
+    clock:
+...
+```
+
+The responder should be available and ready to use:
+
+![](./images/responders/custom_example_1.png "Custom responder in action: clock responder")
 
 ## Tests
 
