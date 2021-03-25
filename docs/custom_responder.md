@@ -1,13 +1,9 @@
 Creating a custom responder
 ===========================
 
-Buffy will load and make available any responder that is located in the `app/responders` directory. The simplest way to organize your responders is to add them in a subfolder inside the `responders` dir.
-
+Buffy will load and make available any responder that is located in the `app/responders` directory. The simplest way to organize your responders is to add them in a subfolder inside the `responders` dir, defining a module for the custom responders.
 
 During this guide as an example, we'll create a simple responder to get the time.
-```text
-So, we add a clock.rb file to app/responders/myresponders dir.
-```
 
 ## Responder structure
 A responder is a ruby class containing five elements:
@@ -23,11 +19,18 @@ A responder object is a class inheriting from the Responder class, so you should
 
 When initialized, a responder will have accessor methods for the name of the bot (`bot_name`) and for the parameters of the responder coming from the config file (`params`).
 
+
+```text
+For our example we add a clock.rb file to app/responders/myorganization dir.
+It declares the responder class in the myorganization module.
+```
+
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-
+module Myorganization
+  class ClockResponder < Responder
+  end
 end
 ```
 
@@ -39,10 +42,12 @@ Using `keyname` you can define the handle for the responder to be used in the co
 For our example we'll just use _clock_:
 
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-  keyname: :clock
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
+  end
 end
 ```
 Now we can use the responder add to the [config.yml](./configuration) file:
@@ -73,14 +78,16 @@ Inside this method you have available the name of the bot in the `@botname` inst
 
 For our example, we will be listening to comments and we want the command to be "what time is it?":
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-  keyname: :clock
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
 
-  def define_listening
-    @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} what time is it\?\s*\z/i
+    def define_listening
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} what time is it\?\s*\z/i
+    end
   end
 end
 ```
@@ -90,16 +97,18 @@ You can also declare inside this method, which parameters are required in the co
 
 For example, we could make the command for invoking our responder declared in the config.yml file instead that in our regex, and make it required, that way the command for our responder can be easily configured:
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-  keyname: :clock
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
 
-  def define_listening
-    required_params :command
+    def define_listening
+      required_params :command
 
-    @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} #{command}\s*\z/i
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} #{command}\s*\z/i
+    end
   end
 end
 ```
@@ -115,18 +124,20 @@ now the command must be added to the config file or the responder will error and
 But we don't want to be too strict so, we'll allow the command to be changed but by default we'll have one. For that we'll use an auxiliary instance method:
 
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-  keyname: :clock
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
 
-  def define_listening
-    @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
-  end
+    def define_listening
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+    end
 
-  def clock_command
-    params[:command] || "what time is it\\?"
+    def clock_command
+      params[:command] || "what time is it\\?"
+    end
   end
 end
 ```
@@ -134,6 +145,7 @@ end
 
 ### Process message
 The `process_message` method will be called if an event reaches Buffy and it matches the action and the regex in the _define_listening_ method.
+It accepts a single argument: the message that triggered the call.
 
 This method is the place of all the custom Ruby code needed to perform whatever is the responder does.
 To interact back with the reviews repository there are several methods available:
@@ -149,22 +161,24 @@ If you need to access any matched data from the [_@event_regex_](#event-regex) y
 
 For our example we'll just reply a comment with the time:
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-  keyname: :clock
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
 
-  def define_listening
-    @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
-  end
+    def define_listening
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+    end
 
-  def process_message
-    respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
-  end
+    def process_message(message)
+      respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
+    end
 
-  def clock_command
-    params[:command] || "what time is it\\?"
+    def clock_command
+      params[:command] || "what time is it\\?"
+    end
   end
 end
 ```
@@ -175,26 +189,28 @@ Use the `description` method to add a short description of what the responder do
 
 Our example responder replies with the current time:
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-  keyname: :clock
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
 
-  def define_listening
-    @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
-  end
+    def define_listening
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+    end
 
-  def process_message
-    respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
-  end
+    def process_message(message)
+      respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
+    end
 
-  def clock_command
-    params[:command] || "what time is it\\?"
-  end
+    def clock_command
+      params[:command] || "what time is it\\?"
+    end
 
-  def description
-    "Get the current time"
+    def description
+      "Get the current time"
+    end
   end
 end
 ```
@@ -205,26 +221,32 @@ To help users understand how to use the responder, use the `example_invocation` 
 In our example responder we'll use the command declared via config or the default one:
 
 ```ruby
-relative_require '../../lib/responder'
+require_relative '../../lib/responder'
 
-class ClockResponder < Responder
-  keyname: :clock
+module Myorganization
+  class ClockResponder < Responder
+    keyname :clock
 
-  def define_listening
-    @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
-  end
+    def define_listening
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
+    end
 
-  def process_message
-    respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
-  end
+    def process_message(message)
+      respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
+    end
 
-  def clock_command
-    params[:command] || "what time is it\\?"
-  end
+    def clock_command
+      params[:command] || "what time is it\\?"
+    end
 
-  def description
-    "Get the current time"
+    def description
+      "Get the current time"
+    end
+
+    def example_invocation
+      "@#{bot_name} #{params[:command] || 'what time is it?'}"
+    end
   end
 
   def example_invocation
@@ -240,11 +262,11 @@ Don't forget to add tests for any new Responder you create. Buffy uses the [RSpe
 
 
 For our sample responder, we would create
- _spec/responders/myresponders/clock_responder_spec.rb_
+ _spec/responders/myorganization/clock_responder_spec.rb_
 ```ruby
 require_relative "../../spec_helper.rb"
 
-describe ClockResponder do
+describe Myorganization::ClockResponder do
 
   subject do
     described_class
