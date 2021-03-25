@@ -21,7 +21,7 @@ When initialized, a responder will have accessor methods for the name of the bot
 
 
 ```text
-For our example we add a clock.rb file to app/responders/myorganization dir.
+For our example we add a clock.rb file to the new app/responders/myorganization dir.
 It declares the responder class in the myorganization module.
 ```
 
@@ -50,7 +50,7 @@ module Myorganization
   end
 end
 ```
-Now we can use the responder add to the [config.yml](./configuration) file:
+Now we can use the responder adding it to the [config.yml](./configuration) file:
 ```yaml
 ...
   responders:
@@ -93,9 +93,9 @@ end
 ```
 
 #### Mandatory parameters
-You can also declare inside this method, which parameters are required in the configuration using `required_params`. This will create an reader method for every required parameter.
+You can also declare inside this method which parameters are required in the configuration using `required_params`. This will create a reader method for every required parameter.
 
-For example, we could make the command for invoking our responder declared in the config.yml file instead that in our regex, and make it required, that way the command for our responder can be easily configured:
+For example, we could make the command for invoking our responder mandatory and declared in the config.yml file instead that in our regex, that way the command for our responder can be changed and be easily configured:
 ```ruby
 require_relative '../../lib/responder'
 
@@ -165,20 +165,12 @@ require_relative '../../lib/responder'
 
 module Myorganization
   class ClockResponder < Responder
-    keyname :clock
-
-    def define_listening
-      @event_action = "issue_comment.created"
-      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
-    end
+    ...
 
     def process_message(message)
       respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
     end
 
-    def clock_command
-      params[:command] || "what time is it\\?"
-    end
   end
 end
 ```
@@ -193,20 +185,7 @@ require_relative '../../lib/responder'
 
 module Myorganization
   class ClockResponder < Responder
-    keyname :clock
-
-    def define_listening
-      @event_action = "issue_comment.created"
-      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
-    end
-
-    def process_message(message)
-      respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
-    end
-
-    def clock_command
-      params[:command] || "what time is it\\?"
-    end
+    ...
 
     def description
       "Get the current time"
@@ -225,24 +204,7 @@ require_relative '../../lib/responder'
 
 module Myorganization
   class ClockResponder < Responder
-    keyname :clock
-
-    def define_listening
-      @event_action = "issue_comment.created"
-      @event_regex = /\A@#{bot_name} #{clock_command}\s*\z/i
-    end
-
-    def process_message(message)
-      respond(Time.now.strftime("⏱ The time is %H:%M:%S %Z, today is %d-%m-%Y ⏱"))
-    end
-
-    def clock_command
-      params[:command] || "what time is it\\?"
-    end
-
-    def description
-      "Get the current time"
-    end
+    ...
 
     def example_invocation
       "@#{bot_name} #{params[:command] || 'what time is it?'}"
