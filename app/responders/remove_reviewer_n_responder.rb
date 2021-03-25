@@ -6,7 +6,7 @@ class RemoveReviewerNResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} remove reviewer (\S+)\s*\z/i
+    @event_regex = /\A@#{bot_name} remove reviewer (\S+)\s*\z/i
   end
 
   def process_message(message)
@@ -30,6 +30,6 @@ class RemoveReviewerNResponder < Responder
   end
 
   def example_invocation
-    "@#{@bot_name} remove reviewer 2"
+    "@#{bot_name} remove reviewer 2"
   end
 end

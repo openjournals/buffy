@@ -6,7 +6,7 @@ class AssignEditorResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} assign (\S+) as editor\s*\z/i
+    @event_regex = /\A@#{bot_name} assign (\S+) as editor\s*\z/i
   end
 
   def process_message(message)
@@ -31,7 +31,7 @@ class AssignEditorResponder < Responder
   end
 
   def example_invocation
-    "@#{@bot_name} assign @username as editor"
+    "@#{bot_name} assign @username as editor"
   end
 
   def add_as_collaborator?

@@ -6,7 +6,7 @@ class HelloResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A(Hello|Hi) @#{@bot_name}\s*\z/i
+    @event_regex = /\A(Hello|Hi) @#{bot_name}\s*\z/i
   end
 
   def process_message(message)
@@ -18,6 +18,6 @@ class HelloResponder < Responder
   end
 
   def example_invocation
-    "Hello @#{@bot_name}"
+    "Hello @#{bot_name}"
   end
 end

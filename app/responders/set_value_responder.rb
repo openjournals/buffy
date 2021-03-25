@@ -8,7 +8,7 @@ class SetValueResponder < Responder
     required_params :name
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} set (.*) as #{name}\s*\z/i
+    @event_regex = /\A@#{bot_name} set (.*) as #{name}\s*\z/i
   end
 
   def process_message(message)
@@ -27,7 +27,7 @@ class SetValueResponder < Responder
   end
 
   def example_invocation
-    "@#{@bot_name} set #{params[:sample_value] || 'xxxxx'} as #{name}"
+    "@#{bot_name} set #{params[:sample_value] || 'xxxxx'} as #{name}"
   end
 
 end

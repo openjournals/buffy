@@ -9,7 +9,7 @@ class LabelCommandResponder < Responder
     check_labels_present
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} #{command}\s*\z/i
+    @event_regex = /\A@#{bot_name} #{command}\s*\z/i
   end
 
   def process_message(message)
@@ -30,6 +30,6 @@ class LabelCommandResponder < Responder
   end
 
   def example_invocation
-    "@#{@bot_name} #{command}"
+    "@#{bot_name} #{command}"
   end
 end

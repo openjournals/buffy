@@ -8,7 +8,7 @@ class AddAndRemoveUserChecklistResponder < Responder
     required_params :template_file
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{@bot_name} (add|remove) checklist for (\S+)\s*\z/i
+    @event_regex = /\A@#{bot_name} (add|remove) checklist for (\S+)\s*\z/i
   end
 
   def process_message(message)
@@ -58,7 +58,7 @@ class AddAndRemoveUserChecklistResponder < Responder
   end
 
   def example_invocation
-    ["@#{@bot_name} add checklist for @username",
-     "@#{@bot_name} remove checklist for @username"]
+    ["@#{bot_name} add checklist for @username",
+     "@#{bot_name} remove checklist for @username"]
   end
 end
