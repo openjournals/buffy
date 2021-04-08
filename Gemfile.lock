@@ -109,6 +109,7 @@ PLATFORMS
 
 DEPENDENCIES
   bibtex-ruby
+  faraday
   github-linguist
   licensee
   octokit
@@ -122,9 +123,6 @@ DEPENDENCIES
   sinatra (= 2.1.0)
   sinatra-contrib (= 2.1.0)
   webmock
-
-RUBY VERSION
-   ruby 3.0.0p0
 
 BUNDLED WITH
    2.2.6
