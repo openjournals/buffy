@@ -114,6 +114,11 @@ describe ExternalServiceWorker do
       response = "[\"{\\\"number\\\":42}\", \"whatever\", 1234567]"
       expect(@worker.parse_json_response(response)).to eq({'number' => 42})
     end
+
+    it "returns first element as a string if response body is an array with no json in it" do
+      response = "[\"### Test Coverage Results\\n99%\"]"
+      expect(@worker.parse_json_response(response)).to eq({ response: "### Test Coverage Results\n99%"})
+    end
   end
 end
 

@@ -41,7 +41,11 @@ class ExternalServiceWorker < BuffyWorker
   def parse_json_response(body)
     parsed = JSON.parse(body)
     if parsed.is_a? Array
-      parsed = JSON.parse(parsed[0])
+      parsed = begin
+        JSON.parse(parsed[0])
+      rescue JSON::ParserError => err
+        { response: parsed[0] }
+      end
     end
     parsed
   end
