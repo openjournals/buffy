@@ -21,7 +21,7 @@ When initialized, a responder will have accessor methods for the name of the bot
 
 
 ```text
-For our example we add a clock.rb file to the new app/responders/myorganization dir.
+For our example we add a clock_responder.rb file to the new app/responders/myorganization dir.
 It declares the responder class in the myorganization module.
 ```
 
