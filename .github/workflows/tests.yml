@@ -4,9 +4,14 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.failure-allowed }}
     strategy:
       matrix:
         ruby-version: ['2.7.3', '3.0.1']
+        failure-allowed: [false]
+        include:
+            - ruby-version: 'head'
+              failure-allowed: true
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
