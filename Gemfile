@@ -18,3 +18,5 @@ group :test do
   gem 'rspec'
   gem 'webmock'
 end
+
+eval_gemfile './Gemfile_custom'

@@ -1,0 +1,3 @@
+# This is a Gemfile to add extra dependencies
+# needed for custom responders or workers.
+# Override and add customized gems in this file.
