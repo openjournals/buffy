@@ -151,12 +151,17 @@ The _env_ section is used to declare general key/value settings. For security re
   Example:
 
   ```yaml
+    # This responder should be invoked only if there's an editor assigned
     assign_reviewer:
       if:
         role_assigned: editor
+
+    # This responder will run only if issue title includes '[PRE-REVIEW]' and if
+    # there is a value for repo-url, ie: <!--repo-url-->whatever<!--end-repo-url-->
     start_review:
       if:
         title: "^\\[PRE-REVIEW\\]"
+        value: repo-url
   ```
   </dd>
 
