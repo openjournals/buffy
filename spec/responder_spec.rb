@@ -96,43 +96,45 @@ describe Responder do
 
     it "should be false if title condition is not met" do
       @responder.params = { if: {title: "PRE-REVIEW"} }
-      expect(@responder).to receive(:respond).with("I can't do that in this kind of issue")
       expect(@responder.meet_conditions?).to be_falsy
     end
 
     it "should be false if body condition is not met" do
       @responder.params = { if: {body: "ABCDEFG"} }
-      expect(@responder).to receive(:respond).with("I can't do that. Data in the body of the issue is incorrect")
       expect(@responder.meet_conditions?).to be_falsy
     end
 
     it "should be false if value condition is not met" do
       @responder.params = { if: {value: "author"} }
-      expect(@responder).to receive(:respond).with("That can't be done if there is no author")
-      expect(@responder.meet_conditions?).to be_falsy
-
-      @responder.params = { if: {value: "reviewers"} }
-      expect(@responder).to receive(:respond).with("That can't be done if there is no reviewers")
       expect(@responder.meet_conditions?).to be_falsy
     end
 
     it "should be false if role_assigned condition is not met" do
       @responder.params = { if: {role_assigned: "editor-2"} } #no username
-      expect(@responder).to receive(:respond).with("That can't be done if there is no editor-2 assigned")
       expect(@responder.meet_conditions?).to be_falsy
 
       @responder.params = { if: {role_assigned: "author"} } # empty
-      expect(@responder).to receive(:respond).with("That can't be done if there is no author assigned")
       expect(@responder.meet_conditions?).to be_falsy
 
       @responder.params = { if: {role_assigned: "reviewers"} } #no present
-      expect(@responder).to receive(:respond).with("That can't be done if there is no reviewers assigned")
       expect(@responder.meet_conditions?).to be_falsy
     end
 
     it "should be false if any condition is not met" do
-      @responder.params = { if: {title: "REVIEW", body: "^Test Review", value: "author"} }
-      expect(@responder).to receive(:respond)
+      @responder.params = { if: {title: "REVIEW", body: "^Test Review", value: "author", reject_msg: "Can't do that"} }
+      expect(@responder).to receive(:respond).with("Can't do that")
+      expect(@responder.meet_conditions?).to be_falsey
+    end
+
+    it "should not respond if there is no rejection message" do
+      @responder.params = { if: {title: "New Submission"} }
+      expect(@responder).to_not receive(:respond).with("Can't do that")
+      expect(@responder.meet_conditions?).to be_falsey
+    end
+
+    it "should respond the rejection message if condition is not met" do
+      @responder.params = { if: {title: "New Submission", reject_msg: "Wrong issue title"} }
+      expect(@responder).to receive(:respond).with("Wrong issue title")
       expect(@responder.meet_conditions?).to be_falsey
     end
 

@@ -146,15 +146,18 @@ The _env_ section is used to declare general key/value settings. For security re
 :body: *<String>* or *<Regular Expresion>* Responder will run only if the body of the issue matches this.
 :value: *<String>* Responder will run only if there is a value for this in the issue (marked with HTML comments).
 :role_assigned: *<String>* Responder will be run only if there is a username assigned for the specified value.
+:reject_msg: *<String>* Optional. The response to send as comment if the conditions are not met
 ```
 
   Example:
 
   ```yaml
     # This responder should be invoked only if there's an editor assigned
+    # otherwise will reply with a custom "no editor assigned yet" message
     assign_reviewer:
       if:
         role_assigned: editor
+        reject_msg: I can not do that because there is no editor assigned yet
 
     # This responder will run only if issue title includes '[PRE-REVIEW]' and if
     # there is a value for repo-url, ie: <!--repo-url-->whatever<!--end-repo-url-->
