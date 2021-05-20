@@ -144,7 +144,8 @@ The _env_ section is used to declare general key/value settings. For security re
 ```eval_rst
 :title: *<String>* or *<Regular Expresion>* Responder will run only if issue' title matches this.
 :body: *<String>* or *<Regular Expresion>* Responder will run only if the body of the issue matches this.
-:value: *<String>* Responder will run only if there is a value for this in the issue (marked with HTML comments).
+:value_exists: *<String>* Responder will run only if there is a not empty value for this in the issue (marked with HTML comments).
+:value_equals: *<Hash>* Responder will run only if the param values (marked with HTML comments) in the body of the issue are equal to the ones specified here.
 :role_assigned: *<String>* Responder will be run only if there is a username assigned for the specified value.
 :reject_msg: *<String>* Optional. The response to send as comment if the conditions are not met
 ```
@@ -164,7 +165,14 @@ The _env_ section is used to declare general key/value settings. For security re
     start_review:
       if:
         title: "^\\[PRE-REVIEW\\]"
-        value: repo-url
+        value_exists: repo-url
+
+    # This responder will run only if the value for submission_type in the body of
+    # the issue is 'astro', ie: <!--submission_type-->astro<!--end-submission_type-->
+    start_review:
+      if:
+        value_equals:
+          submission_type: astro
   ```
   </dd>
 
