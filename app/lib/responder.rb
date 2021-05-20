@@ -79,7 +79,7 @@ class Responder
     body_condition = params[:if][:body].nil? ? "" : params[:if][:body]
     value_condition = params[:if][:value_exists].nil? ? "" : params[:if][:value_exists]
     role_assigned_condition = params[:if][:role_assigned].nil? ? "" : params[:if][:role_assigned]
-    value_equals_condition = params[:if][:value_equals].nil? ? {} : params[:if][:value_equals]
+    value_matches_condition = params[:if][:value_matches].nil? ? {} : params[:if][:value_matches]
     rejection_response = params[:if][:reject_msg].nil? ? "" : params[:if][:reject_msg]
 
     unless title_condition.empty? || Regexp.new(title_condition).match?(@context.issue_title)
@@ -102,15 +102,15 @@ class Responder
       return false
     end
 
-    if value_equals_condition.is_a?(Hash)
-      value_equals_condition.each_pair do |k, v|
-        unless read_value_from_body(k) == v.strip
+    if value_matches_condition.is_a?(Hash)
+      value_matches_condition.each_pair do |k, v|
+        unless Regexp.new(v.to_s.strip).match?(read_value_from_body(k))
           respond(rejection_response) unless rejection_response.empty?
           return false
         end
       end
     else
-      raise "Configuration Error in #{self.class.name}: value_equals should be a hash of [field_name:expected_value] pairs"
+      raise "Configuration Error in #{self.class.name}: value_matches should be a hash of [field_name:expected_value] pairs"
     end
 
     return true

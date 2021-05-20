@@ -109,21 +109,24 @@ describe Responder do
       expect(@responder.meet_conditions?).to be_falsy
     end
 
-    it "should be false if value_equals condition is not met" do
-      @responder.params = { if: {value_equals: { submission_type: "math"} } }
+    it "should be false if value_matches condition is not met" do
+      @responder.params = { if: {value_matches: { submission_type: "math"} } }
+      expect(@responder.meet_conditions?).to be_falsy
+
+      @responder.params = { if: {value_matches: { submission_type: "^stro"} } }
       expect(@responder.meet_conditions?).to be_falsy
     end
 
-    it "should be false if any value_equals condition is not met" do
-      @responder.params = { if: {value_equals: { author: "L.B.", submission_type: "astro" } } }
+    it "should be false if any value_matches condition is not met" do
+      @responder.params = { if: {value_matches: { author: "L.B.", submission_type: "astro" } } }
       expect(@responder.meet_conditions?).to be_falsy
     end
 
-    it "should raise an error if value_equals is mksconfigured" do
-      @responder.params = { if: {value_equals: "submission_type"} }
+    it "should raise an error if value_matches is mksconfigured" do
+      @responder.params = { if: {value_matches: "submission_type"} }
       expect{
         @responder.meet_conditions?
-      }.to raise_error "Configuration Error in Responder: value_equals should be a hash of [field_name:expected_value] pairs"
+      }.to raise_error "Configuration Error in Responder: value_matches should be a hash of [field_name:expected_value] pairs"
     end
 
     it "should be false if role_assigned condition is not met" do
@@ -181,8 +184,12 @@ describe Responder do
       expect(@responder.meet_conditions?).to be_truthy
     end
 
-    it "should be true if value_equals condition is met" do
-      @responder.params = { if: {value_equals: { author: "", submission_type: "astro" } } }
+    it "should be true if value_matches condition is met" do
+      @responder.params = { if: {value_matches: { author: "", submission_type: "astro" } } }
+      expect(@responder).to_not receive(:respond)
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {value_matches: { submission_type: "^as" } } }
       expect(@responder).to_not receive(:respond)
       expect(@responder.meet_conditions?).to be_truthy
     end
