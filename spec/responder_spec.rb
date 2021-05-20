@@ -77,7 +77,6 @@ describe Responder do
                                                       "<!--editor-2-->L.B.<!--end-editor-2-->\n" +
                                                       "<!--author--><!--end-author-->\n")
       disable_github_calls_for(@responder)
-      @context = OpenStruct.new({ if: { title: "[REVIEW]", body:"<!--REVIEW-->", value: "editor" } })
     end
 
     it "should be true if there is not conditions (via :if setting)" do
