@@ -17,6 +17,7 @@ describe AddAndRemoveUserChecklistResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci add checklist for @arfon")
+      expect(@responder.event_regex).to match("@botsci add checklist for @arfon.")
       expect(@responder.event_regex).to match("@botsci remove checklist for @arfon   \r\n")
       expect(@responder.event_regex).to_not match("remove checklist for @arfon")
       expect(@responder.event_regex).to_not match("@botsci add checklist for @arfon and others")
@@ -57,7 +58,7 @@ describe AddAndRemoveUserChecklistResponder do
       end
 
       it "should not add user checklist if already present" do
-        msg = "@botsci add checklist for @xuanxu"
+        msg = "@botsci add checklist for @xuanxu."
         @responder.match_data = @responder.event_regex.match(msg)
 
         expect(@responder).to receive(:respond).with("There is already a checklist for @xuanxu")

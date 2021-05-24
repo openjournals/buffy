@@ -15,9 +15,11 @@ describe HelloResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("Hello @botsci")
+      expect(@responder.event_regex).to match("Hello @botsci!")
+      expect(@responder.event_regex).to match("Hello @botsci.")
       expect(@responder.event_regex).to match("hi @botsci")
       expect(@responder.event_regex).to_not match("```Hello @botsci")
-      expect(@responder.event_regex).to_not match("Hello @botsci!")
+      expect(@responder.event_regex).to_not match("Hey @botsci!")
     end
   end
 

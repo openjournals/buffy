@@ -16,6 +16,7 @@ describe RemoveReviewerNResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci remove reviewer 1")
       expect(@responder.event_regex).to match("@botsci remove reviewer 33B")
+      expect(@responder.event_regex).to match("@botsci remove reviewer chief.")
       expect(@responder.event_regex).to_not match("assign remove @xuanxu as reviewer 2")
       expect(@responder.event_regex).to_not match("@botsci remove reviewer")
     end
