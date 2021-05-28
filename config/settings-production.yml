@@ -5,6 +5,20 @@ buffy:
     gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
     editors: 3824115
+  services:
+    cq: &cq
+      name: code_quality
+      url: https://dummy-external-service.herokuapp.com/code-analysis
+      method: post
+      query_params:
+        secret: A1234567890Z
+      data_from_issue:
+        - target-repository
+      mapping:
+        target_url: target-repository
+      headers:
+        Authorization: OAUTH-token 123456
+        Time-Zone: Europe/Amsterdam
   responders:
     help:
     hello:
@@ -23,13 +37,6 @@ buffy:
           command: list editors
           description: List all current topic editors
           template_file: editors.md
-    assign_reviewer_n:
-      only: editors
-      if:
-        role_assigned: editor
-    remove_reviewer_n:
-      only: editors
-      no_reviewer_text: "TBD"
     list_of_values:
       - reviewers:
           only: editors
@@ -84,17 +91,7 @@ buffy:
           command: analyze code
           description: Reports on the quality of the code
           message: Inspecting code...
-          url: https://dummy-external-service.herokuapp.com/code-analysis
-          method: post
-          query_params:
-            secret: A1234567890Z
-          data_from_issue:
-            - target-repository
-          mapping:
-            target_url: target-repository
-          headers:
-            Authorization: OAUTH-token 123456
-            Time-Zone: Europe/Amsterdam
+          <<: *cq
       - cat_facts:
           command: tell me something about cats
           description: Random facts about cats
@@ -104,9 +101,13 @@ buffy:
               animal_type: cat
               amount: 1
           template_file: cats.md
+    welcome_external_service:
+      <<: *cq
     add_remove_checklist:
       only: editors
       template_file: reviewer_checklist.md
       data_from_issue:
         - target-repository
         - author-handle
+
+
