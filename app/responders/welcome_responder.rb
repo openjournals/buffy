@@ -17,7 +17,22 @@ class WelcomeResponder < Responder
 
     respond_external_template(params[:template_file], locals) if params[:template_file]
 
+    external_service(params[:external_service]) if params[:external_service]
+
     process_labeling
+  end
+
+  def external_service(service_params)
+    check_required_params(service_params)
+    ExternalServiceWorker.perform_async(service_params, locals)
+  end
+
+  def check_required_params(service_params)
+    [:name, :url].each do |param_name|
+      if service_params[param_name].nil? || service_params[param_name].strip.empty?
+        raise "Configuration Error in WelcomeResponder: No value for #{param_name}."
+      end
+    end
   end
 
   def description
