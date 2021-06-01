@@ -1,7 +1,19 @@
 Welcome
 =======
 
-This responder sends a message when a new issue is opened.
+This responder acts when a new issue is opened. It can reply with text messages or using a template.
+
+When rendering a template a map of values will be passed to it:
+- **issue_id**: The id of the issue
+- **repo**: the name of the repository
+- **sender**: the handle of the user creating the issue
+- **bot_name**: the name of the bot user responding
+
+If the template needs some other value included in the body of the issue, they can be declared using the `data_from_issue` param and those values will be passed to the template too, if can be extracted from the body. They can be used in the template using the syntax:
+```
+{{variable_name}}
+```
+
 Allows [labeling](../labeling).
 
 ## Listens to
@@ -12,10 +24,54 @@ New issue opened event.
 
 `welcome`
 
-## Params
-```eval_rst
-:reply: The message the bot will send. Default value is: **Hi!, I'm <@botname>, a friendly bot. Type '<@botname> help' to discover how I can help you**.
+## Requirements
 
+### When using a template to respond:
+
+In order to use a template, Buffy will look for the file declared in the `template_file` param in the target repo, in the location specified with the `template_path` setting (by default `.buffy/templates`). In short: the *template_file* should be located in the *template_path*.
+
+The values needed by the template that are listed in the `data_from_issue` param must be extractable: they have to be enclosed in HTML comments:
+
+```html
+<!--<name>--> Info to extract <!--end-<name>-->
+```
+So, for example, if you want to use the value of _version_ in the template, the body of the issue must include it inside HTML comments:
+```html
+<!--version--> v2.1 <!--end-version-->
+```
+Then it should be declared in the settings file, listed in the _data_from_issue_ param:
+```yaml
+  responders:
+    welcome:
+      template_file: welcome.md
+      data_from_issue:
+        - version
+```
+
+And can then be used in the template:
+```
+Thank you for your submission, we will review the {{version}} release of your software.
+```
+
+
+## Params
+
+For replying with plain text message(s):
+```eval_rst
+:message: *Optional* A text message to use as reply.
+:messages: *Optional <Array>* A list of text messages to respond with.
+
+```
+
+To reply with a template file:
+```eval_rst
+:template_file: *Required*. The name of the template file to use to build the response message.
+:data_from_issue: *<Array>* An optional list of values that will be extracted from the issue's body and used to fill the template.
+
+```
+
+General:
+```eval_rst
 :hidden: Is **true** by default.
 
 ```
@@ -27,31 +83,30 @@ New issue opened event.
 ...
   responders:
     welcome:
+      message: "Thanks for your submission!"
 ...
 ```
 
-**Custom message:**
+**Multiple messages and a template:**
 ```yaml
 ...
   responders:
     welcome:
-      reply: "Thanks for your submission!"
-...
-```
-
-**Multiple messages:**
-```yaml
-...
-  responders:
-    welcome:
-      - thank_user:
-          reply: "Thanks for consider our journal for your submission!"
-      - default_msg:
-      - info:
-          reply: "The review will start once two reviewers are assigned, please stay tuned."
+      messages:
+        - "You can list all the available commands typing `@botsci help`"
+        - "The review will start once two reviewers are assigned, please stay tuned."
+      template_file: welcome.md
+      data_from_issue:
+        - repository
+        - version
 ...
 ```
 ## In action
 
-![](../images/responders/welcome.png "Welcome responder in action")
+* **`The template file:`**
 
+![](../images/responders/welcome_1.png "Welcome responder in action, the template")
+
+* **`In use (template + 2 messages):`**
+
+![](../images/responders/welcome_2.png "Welcome responder in action")

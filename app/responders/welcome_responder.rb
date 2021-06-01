@@ -10,20 +10,22 @@ class WelcomeResponder < Responder
   end
 
   def process_message(message)
-    respond(reply)
+    respond(params[:message]) if params[:message]
+    if params[:messages].is_a?(Array)
+      params[:messages].each {|msg| respond(msg)}
+    end
+
+    respond_external_template(params[:template_file], locals) if params[:template_file]
+
     process_labeling
   end
 
   def description
-    "Send a message after an issue is opened"
+    "Replies after an issue is opened"
   end
 
   def example_invocation
     "Is invoked once, when an issue is created"
-  end
-
-  def reply
-    params[:reply] || "Hi!, I'm @#{bot_name}, a friendly bot.\n\nType ```@#{bot_name} help``` to discover how I can help you."
   end
 
   def hidden?
