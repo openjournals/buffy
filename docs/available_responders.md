@@ -29,7 +29,6 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/repo_checks
    responders/thanks
    responders/welcome
-   responders/welcome_template
    responders/close_issue_command
    responders/external_service
 ```
