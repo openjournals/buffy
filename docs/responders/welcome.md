@@ -65,14 +65,14 @@ You can configure a template file as a response after the external API call, thi
 
 For replying with plain text message(s):
 ```eval_rst
-:message: *Optional* A text message to use as reply.
-:messages: *Optional <Array>* A list of text messages to respond with.
+:message: A text message to use as reply.
+:messages: *<Array>* A list of text messages to respond with.
 
 ```
 
 To reply with a template file:
 ```eval_rst
-:template_file: *Optional*. The name of the template file to use to build the response message.
+:template_file: The name of the template file to use to build the response message.
 :data_from_issue: *<Array>* An optional list of values that will be extracted from the issue's body and used to fill the template.
 
 ```
