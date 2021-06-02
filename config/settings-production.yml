@@ -69,7 +69,7 @@ buffy:
           command: review failed
           add_labels:
             - recommend rejection
-    welcome_template:
+    welcome:
       template_file: welcome.md
       data_from_issue:
         - repository
