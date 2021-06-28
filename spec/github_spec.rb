@@ -292,6 +292,10 @@ describe "Github methods" do
     it "should downcase the username" do
       expect(subject.user_login("@BuFFy")).to eq("buffy")
     end
+
+    it "should strip the username" do
+      expect(subject.user_login(" Buffy  ")).to eq("buffy")
+    end
   end
 
   describe "#username?" do

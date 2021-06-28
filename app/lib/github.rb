@@ -130,7 +130,7 @@ module GitHub
 
   # Returns the user login (removes the @ from the username)
   def user_login(username)
-    username.sub(/^@/, "").downcase
+    username.strip.sub(/^@/, "").downcase
   end
 
   # Returns true if the string is a valid GitHub isername (starts with @)
