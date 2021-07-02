@@ -12,6 +12,7 @@ gem 'serrano'
 gem 'rexml'
 gem 'github-linguist'
 gem 'licensee'
+gem 'issue'
 
 group :test do
   gem 'rack-test'
