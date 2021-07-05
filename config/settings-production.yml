@@ -27,6 +27,7 @@ buffy:
       only: editors
       if:
         role_assigned: editor
+        reject_msg: "Can't assign reviewer because there is no editor assigned for this submission yet"
     remove_reviewer_n:
       only: editors
       no_reviewer_text: "TBD"
