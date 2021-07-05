@@ -1,18 +1,23 @@
 require 'sinatra/extension'
-require_relative '../lib/github_webhook_parser'
+require 'issue'
 
 module GitHubWebhookFilter
   extend Sinatra::Extension
 
   before '/dispatch' do
     if request.request_method == 'POST'
-      verify_signature
-      parse_webhook
+      webhook = Issue::Webhook.new(secret_token: settings.buffy[:env][:gh_secret_token],
+                                   discard_sender: settings.buffy[:env][:bot_github_user],
+                                   accept_events: ["issues", "issue_comment"])
+      payload, error = webhook.parse_request(request)
+
+      if webhook.errored?
+        halt error.status, error.message
+      else
+        @context = payload.context
+        @message = @context.comment_body || @context.issue_body
+      end
     end
   end
 
-  def self.registered(app)
-    app.class_eval { include GitHubWebhookParser }
-    super
-  end
 end
