@@ -119,12 +119,23 @@ The _env_ section is used to declare general key/value settings. For security re
 
 <dl>
   <dt>hidden</dt>
-  <dd>Defaults to <em>false</em>. If <em>true</em> this responder won't be listed in the help provided to users.</dd>
+  <dd>Defaults to <em>false</em>. If <em>true</em> this responder won't be listed in the help provided to users.
+
+  Usage:
+
+  ```yaml
+    ...
+    secret_responder:
+      hidden: true
+    ...
+
+  ```
+  </dd>
 
   <dt>only</dt>
   <dd>List of teams (referred by the name used in the <em>teams</em> node) that can have access to the responder. Used to limit access to the responder. If <em>only</em> is not present the responder is considered public and every user in the repository can invoke it.
 
-  Example:
+  Usage:
 
   ```yaml
     public_responder:
@@ -150,7 +161,7 @@ The _env_ section is used to declare general key/value settings. For security re
 :reject_msg: *<String>* Optional. The response to send as comment if the conditions are not met
 ```
 
-  Example:
+  Usage:
 
   ```yaml
     # This responder should be invoked only if there's an editor assigned
@@ -178,6 +189,34 @@ The _env_ section is used to declare general key/value settings. For security re
 
 </dl>
 
+A complete example:
+
+```yaml
+  # Two responders are configured here:
+  #
+  # The assign_reviewers responder will respond only when triggered from a user that is
+  # member of any of the editors or editors-in-chief teams. It will also respond only
+  # in issues with the text "[REVIEW]" in its title and that have a not empty value
+  # in its body marked with HTML comments: <!--editor-->EDITOR_VALUE<!--end-editor-->
+  # Once invoked, it will label the issue with the 'reviewers-assigned' label.
+  #
+  # The hello responder is configured as hidden, so when calling the help responder the
+  # description and usage example of the hello responder won't be listed in the response.
+  ...
+  responders:
+    assign_reviewers:
+      only:
+        - editors
+        - editors-in-chief
+      if:
+        title: "^\\[REVIEW\\]"
+        role_assigned: editor
+      add_labels:
+        - reviewers-assigned
+    hello:
+      hidden: true
+  ...
+```
 Several responders also allow [adding or removing labels](./labeling).
 
 ### Multiple instances of the same responder
