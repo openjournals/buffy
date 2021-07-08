@@ -17,6 +17,12 @@ module Actions
     update_issue({ body: @issue_body })
   end
 
+  # Add text at the beginning of the body of the issue
+  def prepend_to_body(text)
+    @issue_body = text + issue_body
+    update_issue({ body: @issue_body })
+  end
+
   # Remove a block of text from the body of the issue optionally including start/end marks
   def delete_from_body(start_mark, end_mark, delete_marks=false)
     if delete_marks

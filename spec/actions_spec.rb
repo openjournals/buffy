@@ -60,6 +60,48 @@ describe "Actions" do
     end
   end
 
+  describe "#prepend_to_body" do
+    before do
+      @initial_body = "Hi <before> there! <after> this is the end"
+      @context = OpenStruct.new(issue_body: @initial_body)
+      @expected_new_body = "Now this is the start\nHi <before> there! <after> this is the end"
+
+      allow(subject).to receive(:context).and_return(@context)
+      expect(subject).to receive(:update_issue).once.with({body: @expected_new_body})
+    end
+
+    it "should call update_issue on new body" do
+      subject.prepend_to_body("Now this is the start\n")
+    end
+
+    it "should update @body_issue" do
+      expect(subject.issue_body).to eq(@initial_body)
+      subject.prepend_to_body("Now this is the start\n")
+      expect(subject.issue_body).to eq(@expected_new_body)
+    end
+  end
+
+  describe "#issue_body_has?" do
+    before do
+      @body = "Hi <!--value33--> there! <!--end-value33--> <!--no-value--><!--end-no-value--> Bye"
+      @context = OpenStruct.new(issue_body: @body)
+
+      allow(subject).to receive(:context).and_return(@context)
+    end
+
+    it "is true if value is marked with HTML comments in the body" do
+      expect(subject.issue_body_has?("value33")).to be_truthy
+    end
+
+    it "is true if value is empty but present" do
+      expect(subject.issue_body_has?("no-value")).to be_truthy
+    end
+
+    it "is false if value is not present in the body of the issue" do
+      expect(subject.issue_body_has?("other-value")).to be_falsy
+    end
+  end
+
   describe "#delete_from_body" do
     before do
       @initial_body = "Intro <before> Here!\n <after> Final"
