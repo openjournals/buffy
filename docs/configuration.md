@@ -194,10 +194,10 @@ A complete example:
 ```yaml
   # Two responders are configured here:
   #
-  # The assign_reviewers responder will respond only when triggered from a user that is
+  # The assign_reviewers responder will respond only when triggered by a user that is
   # member of any of the editors or editors-in-chief teams. It will also respond only
   # in issues with the text "[REVIEW]" in its title and that have a not empty value
-  # in its body marked with HTML comments: <!--editor-->EDITOR_VALUE<!--end-editor-->
+  # in its body marked with HTML comments: <!--editor-->@EDITOR_HANDLE<!--end-editor-->
   # Once invoked, it will label the issue with the 'reviewers-assigned' label.
   #
   # The hello responder is configured as hidden, so when calling the help responder the
