@@ -80,6 +80,23 @@ module Actions
     read_value_from_body(value_name)
   end
 
+  # Update value in issue's body, or add it if it doesn't exist
+  def update_or_add_value(value_name, text, append: true, hide: false)
+    start_mark = "<!--#{value_name}-->"
+    end_mark = "<!--end-#{value_name}-->"
+
+    if issue_body_has?(value_name)
+      update_body(start_mark, end_mark, text)
+    else
+      value_heading = (hide ? "" : "**#{value_name.capitalize.gsub(/[_-]/, " ")}:** ")
+      if append
+        append_to_body "\n#{value_heading}#{start_mark}#{text}#{end_mark}"
+      else
+        prepend_to_body "#{value_heading}#{start_mark}#{text}#{end_mark}\n"
+      end
+    end
+  end
+
   # Update value in issue's body between HTML comments
   def update_value(value_name, text)
     start_mark = "<!--#{value_name}-->"

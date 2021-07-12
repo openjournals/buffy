@@ -81,6 +81,39 @@ describe "Actions" do
     end
   end
 
+  describe "#update_or_add_value" do
+    before do
+      @initial_body = "Hi <!--x--><!--end-x--> this is the body"
+      @context = OpenStruct.new(issue_body: @initial_body)
+
+      allow(subject).to receive(:context).and_return(@context)
+    end
+
+    it "should update value if placeholder exists" do
+      expected_new_body = "Hi <!--x-->test<!--end-x--> this is the body"
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.update_or_add_value("x", "test")
+    end
+
+    it "should append value" do
+      expected_new_body = @initial_body + "\n**Y:** <!--y-->test<!--end-y-->"
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.update_or_add_value("y", "test")
+    end
+
+    it "should prepend value" do
+      expected_new_body = "**Y:** <!--y-->test<!--end-y-->\n" + @initial_body
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.update_or_add_value("y", "test", append: false)
+    end
+
+    it "should hide value (no heading)" do
+      expected_new_body = @initial_body + "\n<!--y-->test<!--end-y-->"
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.update_or_add_value("y", "test", hide: true)
+    end
+  end
+
   describe "#issue_body_has?" do
     before do
       @body = "Hi <!--value33--> there! <!--end-value33--> <!--no-value--><!--end-no-value--> Bye"
