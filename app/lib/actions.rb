@@ -81,14 +81,21 @@ module Actions
   end
 
   # Update value in issue's body, or add it if it doesn't exist
-  def update_or_add_value(value_name, text, append: true, hide: false)
+  def update_or_add_value(value_name, text, append: true, hide: false, heading: nil)
     start_mark = "<!--#{value_name}-->"
     end_mark = "<!--end-#{value_name}-->"
 
     if issue_body_has?(value_name)
       update_body(start_mark, end_mark, text)
     else
-      value_heading = (hide ? "" : "**#{value_name.capitalize.gsub(/[_-]/, " ")}:** ")
+      if hide
+        value_heading = ""
+      elsif heading.nil?
+        value_heading = "**#{value_name.capitalize.gsub(/[_-]/, " ")}:** "
+      else
+        value_heading = "**#{heading}:** "
+      end
+
       if append
         append_to_body "\n#{value_heading}#{start_mark}#{text}#{end_mark}"
       else

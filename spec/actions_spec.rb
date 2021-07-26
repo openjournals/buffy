@@ -112,6 +112,12 @@ describe "Actions" do
       expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
       subject.update_or_add_value("y", "test", hide: true)
     end
+
+    it "should use custom heading" do
+      expected_new_body = @initial_body + "\n**Y Axis:** <!--y-->test<!--end-y-->"
+      expect(subject).to receive(:update_issue).once.with({body: expected_new_body})
+      subject.update_or_add_value("y", "test", heading: "Y Axis")
+    end
   end
 
   describe "#issue_body_has?" do
