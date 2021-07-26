@@ -106,9 +106,13 @@ module Actions
 
   # Update value in issue's body between HTML comments
   def update_value(value_name, text)
-    start_mark = "<!--#{value_name}-->"
-    end_mark = "<!--end-#{value_name}-->"
-    update_body(start_mark, end_mark, text)
+    found = issue_body_has?(value_name)
+    if found
+      start_mark = "<!--#{value_name}-->"
+      end_mark = "<!--end-#{value_name}-->"
+      update_body(start_mark, end_mark, text)
+    end
+    found
   end
 
   # Update list in issue's body between HTML comments

@@ -141,6 +141,44 @@ describe "Actions" do
     end
   end
 
+  describe "#update_value" do
+    before do
+      @body = "Hi <!--value33-->33<!--end-value33-->"
+      @context = OpenStruct.new(issue_body: @body)
+
+      allow(subject).to receive(:context).and_return(@context)
+    end
+
+    it "updates value in body" do
+      expect(subject).to receive(:update_body).once.with("<!--value33-->", "<!--end-value33-->", "42")
+      expect(subject.update_value("value33", "42")).to eq(true)
+    end
+
+    it "is false if no value placeholder found in body" do
+      expect(subject).to_not receive(:update_body)
+      expect(subject.update_value("value42", "42")).to eq(false)
+    end
+  end
+
+  describe "#update_list" do
+    before do
+      @body = "Hi <!--letters-list-->abc<!--end-letters-list-->"
+      @context = OpenStruct.new(issue_body: @body)
+
+      allow(subject).to receive(:context).and_return(@context)
+    end
+
+    it "updates value in body" do
+      expect(subject).to receive(:update_body).once.with("<!--letters-list-->", "<!--end-letters-list-->", "xyz")
+      expect(subject.update_list("letters", "xyz")).to eq(true)
+    end
+
+    it "is false if no value placeholder found in body" do
+      expect(subject).to_not receive(:update_body)
+      expect(subject.update_list("numbers", "4321")).to eq(false)
+    end
+  end
+
   describe "#delete_from_body" do
     before do
       @initial_body = "Intro <before> Here!\n <after> Final"
