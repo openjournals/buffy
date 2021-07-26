@@ -52,6 +52,58 @@ describe SetValueResponder do
     end
   end
 
+  describe "with config option: if_missing" do
+    before do
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "version" })
+      disable_github_calls_for(@responder)
+
+      @msg = "@botsci set v0.0.33-beta as version"
+      @responder.match_data = @responder.event_regex.match(@msg)
+
+      issue_body = "... text ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
+    end
+
+    it "should append" do
+      @responder.params[:if_missing] = "append"
+
+      expected_new_body = "... text ...\n**Version:** <!--version-->v0.0.33-beta<!--end-version-->"
+      expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+      expect(@responder).to receive(:respond).with("Done! version is now v0.0.33-beta")
+      @responder.process_message(@msg)
+    end
+
+    it "should prepend" do
+      @responder.params[:if_missing] = "prepend"
+
+      expected_new_body = "**Version:** <!--version-->v0.0.33-beta<!--end-version-->\n... text ..."
+      expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+      expect(@responder).to receive(:respond).with("Done! version is now v0.0.33-beta")
+      @responder.process_message(@msg)
+    end
+
+    it "should error" do
+      @responder.params[:if_missing] = "error"
+
+      expect(@responder).to_not receive(:update_issue)
+      expect(@responder).to receive(:respond).with("Error: `version` not found in the issue's body")
+      @responder.process_message(@msg)
+    end
+
+    it "should use custom heading" do
+      @responder.params[:if_missing] = "append"
+      @responder.params[:heading] = "Released version"
+
+      expected_new_body = "... text ...\n**Released version:** <!--version-->v0.0.33-beta<!--end-version-->"
+      expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+      expect(@responder).to receive(:respond).with("Done! version is now v0.0.33-beta")
+      @responder.process_message(@msg)
+    end
+  end
+
   describe "misconfiguration" do
     it "should raise error if name is missing from config" do
       expect {

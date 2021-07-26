@@ -16,10 +16,23 @@ class SetValueResponder < Responder
     end_mark = "<!--end-#{name}-->"
 
     new_value = @match_data[1]
+    reply = "Done! #{name} is now #{new_value}"
 
-    update_body(mark, end_mark, new_value)
-    respond("Done! #{name} is now #{new_value}")
-    process_labeling
+    case params[:if_missing].to_s.downcase
+    when "append"
+      update_or_add_value(name, new_value, append: true, heading: params[:heading])
+    when "prepend"
+      update_or_add_value(name, new_value, append: false, heading: params[:heading])
+    when "error"
+      unless update_value(name, new_value)
+        reply = "Error: `#{name}` not found in the issue's body"
+        errored = true
+      end
+    else
+      update_body(mark, end_mark, new_value)
+    end
+    respond(reply)
+    process_labeling unless errored
   end
 
   def description
