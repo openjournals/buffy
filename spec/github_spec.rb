@@ -198,7 +198,7 @@ describe "Github methods" do
       end
 
       it "should create the team and return true" do
-        expect(subject.add_new_team("openjournals/superusers")).to eq(true)
+        expect(subject.add_new_team("openjournals/superusers")).to be_truthy
       end
     end
 
@@ -209,13 +209,61 @@ describe "Github methods" do
       end
 
       it "should return false" do
-        expect(subject.add_new_team("openjournals/superusers")).to eq(false)
+        expect(subject.add_new_team("openjournals/superusers")).to be_falsy
       end
 
       it "should log a warning" do
         expect(subject.logger).to receive(:warn).with("Error trying to create team openjournals/superusers: Octokit::Forbidden")
         subject.add_new_team("openjournals/superusers")
       end
+    end
+  end
+
+  describe "#invite_user_to_team" do
+    it "should be false if user can't be found" do
+      expect(Octokit).to receive(:user).with("nouser").and_raise(Octokit::NotFound)
+      expect(subject.invite_user_to_team("nouser", "my-teams")).to be_falsy
+    end
+
+    it "should be false if team does not exist" do
+      expect(Octokit).to receive(:user).and_return(double(id: 33))
+      expect(subject).to receive(:team_id).and_return(nil)
+      expect(subject).to receive(:add_new_team).and_return(nil)
+
+      expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
+    end
+
+    it "should be false if can't create team" do
+      expect(Octokit).to receive(:user).and_return(double(id: 33))
+      expect(subject).to receive(:team_id).and_return(nil)
+      allow_any_instance_of(Octokit::Client).to receive(:create_team).and_return(false)
+
+      expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
+    end
+
+    it "should try to create team if it does not exist" do
+      expect(Octokit).to receive(:user).and_return(double(id: 33))
+      expect(subject).to receive(:team_id).and_return(nil)
+      expect(subject).to receive(:add_new_team).with("openjournals/superusers").and_return(double(id: 3333))
+      expect(Faraday).to receive(:post).and_return(double(status: 200))
+
+      subject.invite_user_to_team("user42", "openjournals/superusers")
+    end
+
+    it "should be false if invitation can not be created" do
+      expect(Octokit).to receive(:user).and_return(double(id: 33))
+      expect(subject).to receive(:team_id).with("openjournals/superusers").and_return(1234)
+      expect(Faraday).to receive(:post).and_return(double(status: 403))
+
+      expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
+    end
+
+    it "should be true when invitation is created" do
+      expect(Octokit).to receive(:user).and_return(double(id: 33))
+      expect(subject).to receive(:team_id).with("openjournals/superusers").and_return(1234)
+      expect(Faraday).to receive(:post).and_return(double(status: 201))
+
+      expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_truthy
     end
   end
 

@@ -1,4 +1,5 @@
 require 'octokit'
+require 'faraday'
 
 # This module includes all the methods involving calls to the GitHub API
 # It reuses a memoized Octokit::Client instance
@@ -104,12 +105,12 @@ module GitHub
   def add_new_team(org_team_name)
     org_name, team_name = org_team_name.split('/')
     begin
-      github_client.create_team(org_name, { name: team_name })
+      new_team = github_client.create_team(org_name, { name: team_name })
     rescue Octokit::ClientError => gh_err
       logger.warn("Error trying to create team #{org_team_name}: #{gh_err.message}")
       return false
     end
-    return true
+    return new_team
   end
 
   # Uses the GitHub API to obtain the id of an organization's team
@@ -122,6 +123,30 @@ module GitHub
     rescue Octokit::Forbidden
       raise "Configuration Error: No API access to organization: #{org_name}"
     end
+  end
+
+  def invite_user_to_team(user_handle, org_team_name)
+    invitee_id = begin
+      Octokit.user(user_handle).id
+    rescue Octokit::NotFound
+      nil
+    end
+    return false if invitee_id.nil?
+
+    invited_team_id = team_id(org_team_name)
+    if invited_team_id.nil?
+      invited_team_id = add_new_team(org_team_name)
+      invited_team_id = invited_team_id.id if invited_team_id
+    end
+    return false unless invited_team_id
+
+    org_name, team_name = org_team_name.split('/')
+    url = "https://api.github.com/orgs/#{org_name}/invitations"
+    headers = {"Authorization" => "token #{github_client.access_token}", "Content-Type" => "application/json", "Accept" => "application/vnd.github.v3+json"}
+    parameters = {invitee_id: invitee_id, team_ids: [invited_team_id]}
+
+    response = Faraday.post(url, parameters.to_json, headers)
+    response.status.between?(200, 299)
   end
 
   # Returns true if the user in a team member of any of the authorized teams
