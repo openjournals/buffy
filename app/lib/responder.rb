@@ -4,6 +4,7 @@ require_relative 'defaults'
 require_relative 'github'
 require_relative 'templating'
 require_relative 'workers'
+require_relative 'logging'
 
 class Responder
   include Actions
@@ -11,6 +12,7 @@ class Responder
   include Defaults
   include GitHub
   include Templating
+  include Logging
 
   attr_accessor :event_regex
   attr_accessor :event_action

@@ -1,7 +1,8 @@
-require 'logger'
+require_relative 'logging'
 Dir["#{File.expand_path '../../responders', __FILE__}/**/*.rb"].sort.each { |f| require f }
 
 class ResponderRegistry
+  include Logging
 
   attr_accessor :responders
   attr_accessor :config
@@ -75,9 +76,5 @@ class ResponderRegistry
 
   def log_error(responder, error)
     logger.warn("Error calling #{responder.class}: #{error.message}")
-  end
-
-  def logger
-    @logger ||= Logger.new(STDOUT)
   end
 end
