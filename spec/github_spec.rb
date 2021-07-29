@@ -189,6 +189,36 @@ describe "Github methods" do
     end
   end
 
+  describe "#add_new_team" do
+    context "with valid permissions" do
+      before do
+        allow_any_instance_of(Octokit::Client).to receive(:create_team).
+                                                  with("openjournals", {name: "superusers"}).
+                                                  and_return({status: "201"})
+      end
+
+      it "should create the team and return true" do
+        expect(subject.add_new_team("openjournals/superusers")).to eq(true)
+      end
+    end
+
+    context "with invalid permissions" do
+      before do
+        allow_any_instance_of(Octokit::Client).to receive(:create_team).and_raise(Octokit::Forbidden)
+        allow(subject.logger).to receive(:warn)
+      end
+
+      it "should return false" do
+        expect(subject.add_new_team("openjournals/superusers")).to eq(false)
+      end
+
+      it "should log a warning" do
+        expect(subject.logger).to receive(:warn).with("Error trying to create team openjournals/superusers: Octokit::Forbidden")
+        subject.add_new_team("openjournals/superusers")
+      end
+    end
+  end
+
   describe "#team_id" do
     context "with valid API access" do
       before do

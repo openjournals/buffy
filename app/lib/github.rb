@@ -98,6 +98,20 @@ module GitHub
     github_client.repository_invitations(context.repo).any? { |i| i.invitee.login.downcase == username }
   end
 
+  # Uses the GitHub API to create a new organization's team.
+  # This require the auth user to be owner in the organization
+  # Returns true if the response status is 201, false otherwise.
+  def add_new_team(org_team_name)
+    org_name, team_name = org_team_name.split('/')
+    begin
+      github_client.create_team(org_name, { name: team_name })
+    rescue Octokit::ClientError => gh_err
+      logger.warn("Error trying to create team #{org_team_name}: #{gh_err.message}")
+      return false
+    end
+    return true
+  end
+
   # Uses the GitHub API to obtain the id of an organization's team
   def team_id(org_team_name)
     org_name, team_name = org_team_name.split('/')
