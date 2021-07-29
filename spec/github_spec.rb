@@ -226,11 +226,11 @@ describe "Github methods" do
     end
 
     it "should be false if team does not exist" do
-      expect(Octokit).to receive(:user).and_return(double(id: 33))
+      expect(Octokit).to receive(:user).with("user42").and_return(double(id: 33))
       expect(subject).to receive(:team_id).and_return(nil)
       expect(subject).to receive(:add_new_team).and_return(nil)
 
-      expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
+      expect(subject.invite_user_to_team("@user42", "openjournals/superusers")).to be_falsy
     end
 
     it "should be false if can't create team" do

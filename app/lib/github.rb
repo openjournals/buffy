@@ -125,9 +125,10 @@ module GitHub
     end
   end
 
-  def invite_user_to_team(user_handle, org_team_name)
+  def invite_user_to_team(username, org_team_name)
+    username = user_login(username)
     invitee_id = begin
-      Octokit.user(user_handle).id
+      Octokit.user(username).id
     rescue Octokit::NotFound
       nil
     end
