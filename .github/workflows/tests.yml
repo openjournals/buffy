@@ -10,8 +10,6 @@ jobs:
         ruby-version: ['2.7.4', '3.0.2']
         failure-allowed: [false]
         include:
-        - ruby-version: 'head'
-          failure-allowed: true
         - ruby-version: 'truffleruby'
           failure-allowed: true
     steps:
