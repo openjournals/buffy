@@ -8,7 +8,19 @@ module GitHub
 
   # Authenticated Octokit
   def github_client
-    @github_client ||= Octokit::Client.new(access_token: @env[:gh_access_token], auto_paginate: true)
+    @github_client ||= Octokit::Client.new(access_token: github_access_token, auto_paginate: true)
+  end
+
+  # GitHub access token
+  def github_access_token
+    @github_access_token ||= env[:gh_access_token]
+  end
+
+  # GitHub API headers
+  def github_headers
+    @github_headers ||= { "Authorization" => "token #{github_access_token}",
+                          "Content-Type" => "application/json",
+                          "Accept" => "application/vnd.github.v3+json" }
   end
 
   # returns the URL for a given template in the repo
@@ -125,6 +137,7 @@ module GitHub
     end
   end
 
+  # Send an invitation to a user to join an organization's team using the GitHub API
   def invite_user_to_team(username, org_team_name)
     username = user_login(username)
     invitee_id = begin
@@ -143,11 +156,21 @@ module GitHub
 
     org_name, team_name = org_team_name.split('/')
     url = "https://api.github.com/orgs/#{org_name}/invitations"
-    headers = {"Authorization" => "token #{github_client.access_token}", "Content-Type" => "application/json", "Accept" => "application/vnd.github.v3+json"}
-    parameters = {invitee_id: invitee_id, team_ids: [invited_team_id]}
+    parameters = { invitee_id: invitee_id, team_ids: [invited_team_id] }
 
-    response = Faraday.post(url, parameters.to_json, headers)
+    response = Faraday.post(url, parameters.to_json, github_headers)
     response.status.between?(200, 299)
+  end
+
+  # Use the GitHub API to trigger a workflow run (GitHub Action)
+  def trigger_workflow(repo, workflow, inputs={}, ref="main")
+    return false if repo.nil? || workflow.nil?
+
+    url = "https://api.github.com/repos/#{repo}/actions/workflows/#{workflow}/dispatches"
+    parameters = { inputs: inputs, ref: ref }
+    response = Faraday.post(url, parameters.to_json, github_headers)
+
+    response.status.to_i == 204
   end
 
   # Returns true if the user in a team member of any of the authorized teams
