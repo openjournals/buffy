@@ -300,21 +300,21 @@ describe "Github methods" do
 
     it "should call Actions API with default params" do
       expected_url = "https://api.github.com/repos/openjournals/buffy/actions/workflows/test-action.yml/dispatches"
+      expected_params = { inputs: {}, ref: "main" }.to_json
+      expected_headers = subject.github_headers
+
+      expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(double(status: 204))
+      expect(subject.trigger_workflow("openjournals/buffy", "test-action.yml")).to be_truthy
+    end
+
+    it "should call Actions API with custom params" do
+      expected_url = "https://api.github.com/repos/openjournals/buffy/actions/workflows/test-action.yml/dispatches"
       test_inputs = { repo: "astropy/stars", branch: "article", "paper-path": "docs/paper.md" }
       expected_params = { inputs: test_inputs, ref: "v1.0" }
       expected_headers = subject.github_headers
 
       expect(Faraday).to receive(:post).with(expected_url, expected_params.to_json, expected_headers).and_return(double(status: 204))
       expect(subject.trigger_workflow("openjournals/buffy", "test-action.yml", test_inputs, "v1.0")).to be_truthy
-    end
-
-    it "should call Actions API with custom params" do
-      expected_url = "https://api.github.com/repos/openjournals/buffy/actions/workflows/test-action.yml/dispatches"
-      expected_params = { inputs: {}, ref: "main" }.to_json
-      expected_headers = subject.github_headers
-
-      expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(double(status: 204))
-      expect(subject.trigger_workflow("openjournals/buffy", "test-action.yml")).to be_truthy
     end
   end
 
