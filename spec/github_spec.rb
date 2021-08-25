@@ -20,6 +20,26 @@ describe "Github methods" do
     end
   end
 
+  describe "#github_access_token" do
+    it "should memoize the access_token" do
+      expect(subject).to receive(:env).once.and_return({gh_access_token: "ABC123"})
+      subject.github_access_token
+      expect(subject.github_access_token).to eq("ABC123")
+    end
+  end
+
+  describe "#github_headers" do
+    it "should memoize the GitHub API headers" do
+      expected_headers = { "Authorization" => "token ABC123",
+                          "Content-Type" => "application/json",
+                          "Accept" => "application/vnd.github.v3+json" }
+
+      expect(subject).to receive(:github_access_token).once.and_return("ABC123")
+      subject.github_headers
+      expect(subject.github_headers).to eq(expected_headers)
+    end
+  end
+
   describe "#issue" do
     it "should call proper issue using the Octokit client" do
       expect_any_instance_of(Octokit::Client).to receive(:issue).once.with("openjournals/buffy", 5).and_return("issue")
@@ -264,6 +284,37 @@ describe "Github methods" do
       expect(Faraday).to receive(:post).and_return(double(status: 201))
 
       expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_truthy
+    end
+  end
+
+  describe "#trigger_workflow" do
+    it "should be false if missing repo or workflow" do
+      expect(subject.trigger_workflow(nil, "action.yml")).to be_falsy
+      expect(subject.trigger_workflow("openjournals/buffy", nil)).to be_falsy
+    end
+
+    it "should be false if API call is not successful" do
+      expect(Faraday).to receive(:post).and_return(double(status: 401))
+      expect(subject.trigger_workflow("openjournals/buffy", "action.yml")).to be_falsy
+    end
+
+    it "should call Actions API with default params" do
+      expected_url = "https://api.github.com/repos/openjournals/buffy/actions/workflows/test-action.yml/dispatches"
+      expected_params = { inputs: {}, ref: "main" }.to_json
+      expected_headers = subject.github_headers
+
+      expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(double(status: 204))
+      expect(subject.trigger_workflow("openjournals/buffy", "test-action.yml")).to be_truthy
+    end
+
+    it "should call Actions API with custom params" do
+      expected_url = "https://api.github.com/repos/openjournals/buffy/actions/workflows/test-action.yml/dispatches"
+      test_inputs = { repo: "astropy/stars", branch: "article", "paper-path": "docs/paper.md" }
+      expected_params = { inputs: test_inputs, ref: "v1.0" }
+      expected_headers = subject.github_headers
+
+      expect(Faraday).to receive(:post).with(expected_url, expected_params.to_json, expected_headers).and_return(double(status: 204))
+      expect(subject.trigger_workflow("openjournals/buffy", "test-action.yml", test_inputs, "v1.0")).to be_truthy
     end
   end
 

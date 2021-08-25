@@ -31,6 +31,7 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/welcome
    responders/close_issue_command
    responders/external_service
+   responders/github_action
 ```
 
 ```eval_rst
