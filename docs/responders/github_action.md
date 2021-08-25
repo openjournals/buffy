@@ -30,7 +30,8 @@ Some parameters are required for the responder to work: the `command` to invoke 
 :message: An optional message to reply.
 :ref: Optional. The ref for the GitHub action to use. Defaults to *main*.
 :description: The description of the action this command runs. It will show in the help command if the responder is not hidden.
-:inputs: *<Map>* An optional list of params to pass as inputs to the GitHub Action.
+:inputs: *<Map>* An optional list of params/values to pass as inputs to the GitHub Action.
+:data_from_issue: *<Array>* An optional list of fields from the body of the issue to pass as inputs to the GitHub Action.
 :mapping: *<Map>* An optional mapping of variable names to add to the inputs.
 
 ```
@@ -45,7 +46,7 @@ Some parameters are required for the responder to work: the `command` to invoke 
     command: compile pdf
     description: Generates a PDF based on the paper.md file in the repository
     workflow_repo: openjournals/reviews
-    workflow_name: compile-pdf
+    workflow_name: compile-pdf.yml
     inputs:
       file: paper.md
     data-from-issue:
@@ -53,7 +54,7 @@ Some parameters are required for the responder to work: the `command` to invoke 
       - target_repository
     mapping:
       repository: target_repository
-      branch: branch
+      number: issue_id
 ...
 ```
-Once the responder is invoked it triggers the _compile-pdf_ action on the _openjournals/reviews_ repository passing to it the _file_, _repository_ and _branch_ inputs.
+Once the responder is invoked it triggers the _compile-pdf.yml_ workflow on the _openjournals/reviews_ repository passing to it the _file_, _repository_, _branch_ and _number_ inputs.

@@ -13,12 +13,18 @@ class GithubActionResponder < Responder
 
   def process_message(message)
     inputs = params[:inputs] || {}
+    inputs_from_issue = params[:data_from_issue] || []
     mapping = params[:mapping] || {}
     ref = params[:ref] || "main"
     mapped_parameters = {}
 
+    inputs_from_issue.each do |input_from_issue|
+      mapped_parameters[input_from_issue] = locals[input_from_issue].to_s
+    end
+
     mapping.each_pair do |k, v|
-      mapped_parameters[k] = locals.delete(v).to_s
+      mapped_parameters[k] = locals[v].to_s
+      mapped_parameters.delete(v)
     end
 
     parameters = {}.merge(inputs, mapped_parameters)

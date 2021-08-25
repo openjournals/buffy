@@ -30,6 +30,7 @@ describe GithubActionResponder do
       @responder = subject.new(settings, params)
       @responder.context = OpenStruct.new(issue_id: 33,
                                           issue_author: "opener",
+                                          issue_body: "<!--abc-->XYZ<!--end-abc--><!--p-->33<!--end-p-->",
                                           repo: "openjournals/testing",
                                           sender: "xuanxu")
       disable_github_calls_for(@responder)
@@ -58,12 +59,13 @@ describe GithubActionResponder do
 
     it "should run workflow with custom inputs and params" do
       @responder.params = @responder.params.merge({ ref: "v1.2.3",
-                                                    mapping: { input3: :sender },
+                                                    data_from_issue: ["abc", "p"],
+                                                    mapping: { input3: :sender, input4: "p" },
                                                     inputs: { input1: "A", input2: "B" }})
 
       expected_repo = "openjournals/joss-reviews"
       expected_name = "compiler"
-      expected_inputs = { input1: "A", input2: "B", input3: "xuanxu" }
+      expected_inputs = { "abc" => "XYZ", input1: "A", input2: "B", input3: "xuanxu", input4: "33"}
       expected_ref = "v1.2.3"
       expect(@responder).to receive(:trigger_workflow).with(expected_repo, expected_name, expected_inputs, expected_ref)
       @responder.process_message("")
