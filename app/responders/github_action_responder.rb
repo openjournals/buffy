@@ -18,7 +18,7 @@ class GithubActionResponder < Responder
     mapped_parameters = {}
 
     mapping.each_pair do |k, v|
-      mapped_parameters[k] = locals.delete(v)
+      mapped_parameters[k] = locals.delete(v).to_s
     end
 
     parameters = {}.merge(inputs, mapped_parameters)
