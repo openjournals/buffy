@@ -151,19 +151,20 @@ class Responder
   # Create a hash with the basic config info
   # and adds any data from the body issue requested via :data_from_issue param
   def locals
-    from_context = { issue_id: context.issue_id,
+    from_context = Sinatra::IndifferentHash[
+                     issue_id: context.issue_id,
                      issue_author: context.issue_author,
                      repo: context.repo,
                      sender: context.sender,
-                     bot_name: bot_name }
-    from_body = {}
+                     bot_name: bot_name ]
+    from_body = Sinatra::IndifferentHash.new
     if params[:data_from_issue].is_a? Array
       params[:data_from_issue].each do |varname|
         from_body[varname] = read_from_body("<!--#{varname}-->", "<!--end-#{varname}-->")
       end
     end
 
-    from_context.merge from_body
+    from_body.merge from_context
   end
 
   # Add/remove labels as configured in the responder' settings

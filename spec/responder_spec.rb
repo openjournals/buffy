@@ -268,14 +268,22 @@ describe Responder do
     end
 
     it "should include basic config info" do
-      expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33" }
+      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33"]
       expect(@responder.locals).to eq(expected_locals)
     end
 
     it "should add info from the issue body if requested" do
       @responder.params = {data_from_issue: ["reviewer"]}
-      expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
+      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu"]
       expect(@responder.locals).to eq(expected_locals)
+    end
+
+    it "context data should not be overwritten by issue body data" do
+      @responder.context["issue_body"] += "<!--issue_id-->42<!--end-issue_id--><!--x-->Y<!--end-x-->"
+      @responder.params = {data_from_issue: ["x", "issue_id"]}
+      expect(@responder.read_value_from_body("issue_id")).to eq("42")
+      expect(@responder.locals[:x]).to eq("Y")
+      expect(@responder.locals[:issue_id]).to eq(5)
     end
   end
 
