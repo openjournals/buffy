@@ -287,6 +287,26 @@ describe Responder do
     end
   end
 
+  describe "get_data_from_issue" do
+    before do
+      @responder = described_class.new({ env: {bot_github_user: 'botsci'} }, {})
+      @responder.context = OpenStruct.new(issue_body: "Test Software Review\n\n" +
+                                                      "<!--first-->1111<!--end-first-->" +
+                                                      "<!--second-->2222<!--end-second-->" +
+                                                      "<!--third-->3333<!--end-third-->")
+    end
+
+    it "should be empty if no values listed" do
+      expected = Sinatra::IndifferentHash.new
+      expect(@responder.get_data_from_issue(nil)).to eq(expected)
+    end
+
+    it "should extract listed values from issue body" do
+      expected = Sinatra::IndifferentHash[first: "1111", third: "3333"]
+      expect(@responder.get_data_from_issue(["first", "third"])).to eq(expected)
+    end
+  end
+
   describe "#hidden?" do
     it "should be true if params[:hidden] is true" do
       responder = described_class.new({}, { hidden: true })

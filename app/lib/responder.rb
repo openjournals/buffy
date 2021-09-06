@@ -157,14 +157,20 @@ class Responder
                      repo: context.repo,
                      sender: context.sender,
                      bot_name: bot_name ]
-    from_body = Sinatra::IndifferentHash.new
-    if params[:data_from_issue].is_a? Array
-      params[:data_from_issue].each do |varname|
-        from_body[varname] = read_from_body("<!--#{varname}-->", "<!--end-#{varname}-->")
-      end
-    end
+    from_body = get_data_from_issue(params[:data_from_issue])
 
     from_body.merge from_context
+  end
+
+  # Create a hash with the data from the body issue listed in the source array
+  def get_data_from_issue(values_list)
+    body_issue_data = Sinatra::IndifferentHash.new
+    if values_list.is_a? Array
+      values_list.each do |varname|
+        body_issue_data[varname] = read_value_from_body(varname)
+      end
+    end
+    body_issue_data
   end
 
   # Add/remove labels as configured in the responder' settings
