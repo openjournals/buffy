@@ -84,40 +84,41 @@ describe WelcomeResponder do
   describe "#process_message with external service" do
     before do
       settings = { env: {bot_github_user: "botsci"} }
-      params = { name: 'test-service', url: 'http://testing.openjournals.org' }
+      params = { name: "test-service", url: "http://testing.openjournals.org", data_from_issue: ["extra-data"] }
       @responder = subject.new(settings, {external_service: params})
       @responder.context = OpenStruct.new(issue_id: 33,
                                           issue_author: "opener",
                                           repo: "openjournals/testing",
-                                          sender: "xuanxu")
+                                          sender: "xuanxu",
+                                          issue_body: "Test Review\n\n<!--extra-data-->ABC123<!--end-extra-data-->")
       disable_github_calls_for(@responder)
     end
 
     it "should add an ExternalServiceWorker to the jobs queue" do
-      expect { @responder.process_message('') }.to change(ExternalServiceWorker.jobs, :size).by(1)
+      expect { @responder.process_message("") }.to change(ExternalServiceWorker.jobs, :size).by(1)
     end
 
     it "should pass right info to the worker" do
-      expected_params = { name: 'test-service', url: 'http://testing.openjournals.org' }
-      expected_locals = { bot_name: 'botsci', issue_author: "opener", issue_id: 33, repo: 'openjournals/testing', sender: 'xuanxu' }
+      expected_params = { name: "test-service", url: "http://testing.openjournals.org", data_from_issue: ["extra-data"] }
+      expected_locals = { "extra-data": "ABC123", bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
-      @responder.process_message('')
+      @responder.process_message("")
     end
 
     describe "misconfiguration" do
     it "should raise error if there is no name for the service" do
-      @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { url: 'URL' }})
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { url: "URL" }})
 
       expect {
-        @responder.process_message('')
+        @responder.process_message("")
       }.to raise_error "Configuration Error in WelcomeResponder: No value for name."
     end
 
     it "should raise error if there is no url for the service" do
-      @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { name: 'test' }})
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { name: "test" }})
 
       expect {
-        @responder.process_message('')
+        @responder.process_message("")
       }.to raise_error "Configuration Error in WelcomeResponder: No value for url."
     end
   end

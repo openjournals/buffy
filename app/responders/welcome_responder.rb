@@ -24,7 +24,9 @@ class WelcomeResponder < Responder
 
   def external_service(service_params)
     check_required_params(service_params)
-    ExternalServiceWorker.perform_async(service_params, locals)
+    locals_with_issue_data = get_data_from_issue(service_params[:data_from_issue]).merge(locals)
+
+    ExternalServiceWorker.perform_async(service_params, locals_with_issue_data)
   end
 
   def check_required_params(service_params)
