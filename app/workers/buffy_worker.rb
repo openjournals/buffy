@@ -10,6 +10,7 @@ require_relative '../lib/templating'
 require_relative '../lib/utilities'
 require_relative '../lib/paper_file'
 require_relative '../lib/doi_checker'
+require_relative '../lib/logging'
 
 class BuffyWorker
   include Sidekiq::Worker
@@ -18,6 +19,7 @@ class BuffyWorker
   include Actions
   include Templating
   include Utilities
+  include Logging
 
   sidekiq_options retry: false
 
