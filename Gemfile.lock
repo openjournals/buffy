@@ -39,7 +39,7 @@ GEM
       mini_mime (~> 1.0)
       rugged (>= 0.25.1)
     hashdiff (1.0.1)
-    issue (0.2.0)
+    issue (0.3.0)
       openssl
       rack
     latex-decode (0.3.2)
