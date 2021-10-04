@@ -110,6 +110,13 @@ describe "Github methods" do
     end
   end
 
+  describe "#update_comment" do
+    it "should update issue comment with received content" do
+      expect_any_instance_of(Octokit::Client).to receive(:update_comment).once.with("openjournals/buffy", 12345, "New reviewer checklist here")
+      subject.update_comment(12345, "New reviewer checklist here")
+    end
+  end
+
   describe "#update_issue" do
     it "should update github issue with received options" do
       expect_any_instance_of(Octokit::Client).to receive(:update_issue).once.with("openjournals/buffy", 5, { body: "new body"})
