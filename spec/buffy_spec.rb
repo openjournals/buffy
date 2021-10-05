@@ -88,12 +88,14 @@ describe Buffy do
         end
 
         it "should be correct on issue_comment events" do
-          comment_issue_data = @issue_data.merge({ comment: { body: "Body of the comment!",
+          comment_issue_data = @issue_data.merge({ comment: { id: 123456,
+                                                              body: "Body of the comment!",
                                                               created_at: "3/3/2033",
                                                               html_url: "https://buf.fy" } })
           comment_payload = comment_issue_data.to_json
           comment_context = @expected_context_data.merge({ event: "issue_comment",
                                                            event_action: "issue_comment.test-action",
+                                                           comment_id: 123456,
                                                            comment_body: "Body of the comment!",
                                                            comment_created_at: "3/3/2033",
                                                            comment_url: "https://buf.fy",
