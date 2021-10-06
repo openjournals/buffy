@@ -9,6 +9,7 @@ module ResponderParams
       CloseIssueCommandResponder => { command: "close_command_#{n}" },
       ExternalServiceResponder => { name: "external_service_#{n}", command: "bot call service #{n}", url: "https://github.com/openjournals"},
       AddAndRemoveUserChecklistResponder => { template_file: "checklist.md" },
+      ReviewerChecklistCommentResponder => { template_file: "checklist.md" },
       GithubActionResponder => { workflow_repo: "openjournals/joss-reviews", workflow_name: "compiler", command: "generate pdf" },
     }
 
