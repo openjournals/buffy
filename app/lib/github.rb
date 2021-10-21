@@ -118,6 +118,7 @@ module GitHub
 
   # Uses the GitHub API to get a user's information
   def get_user(username)
+    return nil if username.to_s.strip.empty?
     username = user_login(username)
     begin
       github_client.user(username)

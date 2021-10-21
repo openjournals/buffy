@@ -233,6 +233,12 @@ describe "Github methods" do
       expect(subject.logger).to receive(:warn).with("Error calling GitHub API! Bad credentials: TOKEN is invalid")
       subject.get_user("whatever")
     end
+
+    it "should be nil if empty username" do
+      expect(subject.get_user(nil)).to be_nil
+      expect(subject.get_user("")).to be_nil
+      expect(subject.get_user("     ")).to be_nil
+    end
   end
 
   describe "#add_new_team" do
