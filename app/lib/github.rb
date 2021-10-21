@@ -116,6 +116,19 @@ module GitHub
     github_client.repository_invitations(context.repo).any? { |i| i.invitee.login.downcase == username }
   end
 
+  # Uses the GitHub API to get a user's information
+  def get_user(username)
+    username = user_login(username)
+    begin
+      github_client.user(username)
+    rescue Octokit::Unauthorized
+      logger.warn("Error calling GitHub API! Bad credentials: TOKEN is invalid")
+      nil
+    rescue Octokit::NotFound
+      nil
+    end
+  end
+
   # Uses the GitHub API to create a new organization's team.
   # This require the auth user to be owner in the organization
   # Returns true if the response status is 201, false otherwise.
@@ -145,15 +158,8 @@ module GitHub
   # Send an invitation to a user to join an organization's team using the GitHub API
   def invite_user_to_team(username, org_team_name)
     username = user_login(username)
-    invitee_id = begin
-      github_client.user(username).id
-    rescue Octokit::Unauthorized
-      logger.warn("Error calling GitHub API! Bad credentials: TOKEN is invalid")
-      nil
-    rescue Octokit::NotFound
-      nil
-    end
-    return false if invitee_id.nil?
+    invitee = get_user(username)
+    return false if (invitee.nil? || invitee.id.nil?)
 
     invited_team_id = team_id(org_team_name)
     if invited_team_id.nil?
@@ -164,7 +170,7 @@ module GitHub
 
     org_name, team_name = org_team_name.split('/')
     url = "https://api.github.com/orgs/#{org_name}/invitations"
-    parameters = { invitee_id: invitee_id, team_ids: [invited_team_id] }
+    parameters = { invitee_id: invitee.id, team_ids: [invited_team_id] }
 
     response = Faraday.post(url, parameters.to_json, github_headers)
     response.status.between?(200, 299)

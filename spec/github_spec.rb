@@ -216,6 +216,25 @@ describe "Github methods" do
     end
   end
 
+  describe "#get_user" do
+    it "should call GItHub API to get user information" do
+      expect_any_instance_of(Octokit::Client).to receive(:user).once.with("tester").and_return("API response")
+      expect(subject.get_user("tester")).to eq("API response")
+    end
+
+    it "should be nil if user can't be found" do
+      expect_any_instance_of(Octokit::Client).to receive(:user).with("nouser").and_raise(Octokit::NotFound)
+      expect(subject.logger).to_not receive(:warn)
+      subject.get_user("nouser")
+    end
+
+    it "should be nil if token is invalid" do
+      expect_any_instance_of(Octokit::Client).to receive(:user).with("whatever").and_raise(Octokit::Unauthorized)
+      expect(subject.logger).to receive(:warn).with("Error calling GitHub API! Bad credentials: TOKEN is invalid")
+      subject.get_user("whatever")
+    end
+  end
+
   describe "#add_new_team" do
     context "with valid permissions" do
       before do
@@ -248,15 +267,8 @@ describe "Github methods" do
 
   describe "#invite_user_to_team" do
     it "should be false if user can't be found" do
-      expect_any_instance_of(Octokit::Client).to receive(:user).with("nouser").and_raise(Octokit::NotFound)
-      expect(subject.logger).to_not receive(:warn)
+      expect(subject).to receive(:get_user).with("nouser").and_return(nil)
       expect(subject.invite_user_to_team("nouser", "my-teams")).to be_falsy
-    end
-
-    it "should be false if token is invalid" do
-      expect_any_instance_of(Octokit::Client).to receive(:user).with("whatever").and_raise(Octokit::Unauthorized)
-      expect(subject.logger).to receive(:warn).with("Error calling GitHub API! Bad credentials: TOKEN is invalid")
-      expect(subject.invite_user_to_team("whatever", "my-teams")).to be_falsy
     end
 
     it "should be false if team does not exist" do
