@@ -34,7 +34,7 @@ describe InitialValuesResponder do
 
     it "should add value to body if is not present" do
       @responder.params = { values: ["archive"] }
-      expected_new_body = "**Archive:** <!--archive--><!--end-archive-->\n\nLatest Version: <!--version-->Pending<!--end-version--> ..."
+      expected_new_body = "**Archive:** <!--archive--><!--end-archive-->\nLatest Version: <!--version-->Pending<!--end-version--> ..."
       expect(@responder).to receive(:update_issue).with(body: expected_new_body)
       @responder.process_message("")
     end
@@ -51,37 +51,37 @@ describe InitialValuesResponder do
 
     it "should allow custom heading" do
       @responder.params = { values: [{author: [{heading: "Author username:"}]}] }
-      expected_new_body = "Author username: <!--author--><!--end-author-->\n\nVersion: <!--version--><!--end-version--> ..."
+      expected_new_body = "Author username: <!--author--><!--end-author-->\nVersion: <!--version--><!--end-version--> ..."
       expect(@responder).to receive(:update_issue).with(body: expected_new_body)
       @responder.process_message("")
     end
 
     it "should allow custom value" do
       @responder.params = { values: [{author: [{value: "USERNAME"}]}] }
-      expected_new_body = "**Author:** <!--author-->USERNAME<!--end-author-->\n\nVersion: <!--version--><!--end-version--> ..."
+      expected_new_body = "**Author:** <!--author-->USERNAME<!--end-author-->\nVersion: <!--version--><!--end-version--> ..."
       expect(@responder).to receive(:update_issue).with(body: expected_new_body)
       @responder.process_message("")
     end
 
     it "should allow appending" do
       @responder.params = { values: [{author: [{action: "append"}]}] }
-      expected_new_body = "Version: <!--version--><!--end-version--> ...\n\n**Author:** <!--author--><!--end-author-->"
+      expected_new_body = "Version: <!--version--><!--end-version--> ...\n**Author:** <!--author--><!--end-author-->"
       expect(@responder).to receive(:update_issue).with(body: expected_new_body)
       @responder.process_message("")
     end
 
     it "should allow full customization" do
       @responder.params = { values: [{author: [{heading: "Author username:", value: "USERNAME", action: "append"}]}] }
-      expected_new_body = "Version: <!--version--><!--end-version--> ...\n\nAuthor username: <!--author-->USERNAME<!--end-author-->"
+      expected_new_body = "Version: <!--version--><!--end-version--> ...\nAuthor username: <!--author-->USERNAME<!--end-author-->"
       expect(@responder).to receive(:update_issue).with(body: expected_new_body)
       @responder.process_message("")
     end
 
     it "should allow individual customizations" do
       @responder.params = { values: [{author: [{heading: "", value: "USERNAME", action: "append"}]}, {archive: nil}] }
-      expected_new_body = "**Archive:** <!--archive--><!--end-archive-->\n\n" +
+      expected_new_body = "**Archive:** <!--archive--><!--end-archive-->\n" +
                           "Version: <!--version--><!--end-version--> ..." +
-                          "\n\n<!--author-->USERNAME<!--end-author-->"
+                          "\n<!--author-->USERNAME<!--end-author-->"
       expect(@responder).to receive(:update_issue).with(body: expected_new_body)
       @responder.process_message("")
     end

@@ -43,7 +43,7 @@ class InitialValuesResponder < Responder
     append_block = append_texts.empty? ? nil : append_texts.join("\n")
 
     if prepend_block || append_block
-      new_body [prepend_block, issue_body, append_block].compact.join("\n\n")
+      new_body [prepend_block, issue_body, append_block].compact.join("\n")
     end
 
     unless empty.empty?
