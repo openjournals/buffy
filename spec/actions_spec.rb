@@ -81,6 +81,27 @@ describe "Actions" do
     end
   end
 
+  describe "#new_body" do
+    before do
+      @initial_body = "Hi <before> there! <after> this is the end"
+      @context = OpenStruct.new(issue_body: @initial_body)
+      @expected_new_body = "This is the new body"
+
+      allow(subject).to receive(:context).and_return(@context)
+      expect(subject).to receive(:update_issue).once.with({body: @expected_new_body})
+    end
+
+    it "should call update_issue on new body" do
+      subject.new_body("This is the new body")
+    end
+
+    it "should update @body_issue" do
+      expect(subject.issue_body).to eq(@initial_body)
+      subject.new_body("This is the new body")
+      expect(subject.issue_body).to eq(@expected_new_body)
+    end
+  end
+
   describe "#update_or_add_value" do
     before do
       @initial_body = "Hi <!--x--><!--end-x--> this is the body"
