@@ -140,11 +140,21 @@ class Responder
   def required_params(*param_names)
     param_names.each do |param_name|
       param_name = param_name.to_sym
-      if params[param_name].nil? || params[param_name].strip.empty?
+      if empty_param?(param_name)
         raise "Configuration Error in #{self.class.name}: No value for #{param_name}."
       else
         self.class.define_method(param_name.to_s) { params[param_name].strip }
       end
+    end
+  end
+
+  # True if param's value is empty
+  def empty_param?(x)
+    return true if params[x].nil?
+    if params[x].is_a?(String)
+      params[x].strip.empty?
+    else
+      params[x].empty?
     end
   end
 
