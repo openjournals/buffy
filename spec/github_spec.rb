@@ -410,6 +410,15 @@ describe "Github methods" do
     end
   end
 
+  describe "#issue_url" do
+    it "should return the url of the repo's current issue page" do
+      expected_url = "https://github.com/openjournals/buffy/issues/5"
+      expect(subject.context.repo).to eq("openjournals/buffy")
+      expect(subject.context.issue_id).to eq(5)
+      expect(subject.issue_url).to eq(expected_url)
+    end
+  end
+
   describe "#invitations_url" do
     it "should return the url of the repo's invitations page" do
       expected_url = "https://github.com/openjournals/buffy/invitations"

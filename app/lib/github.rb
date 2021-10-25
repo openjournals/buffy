@@ -206,6 +206,11 @@ module GitHub
     end
   end
 
+  # The url of current issue in the current repo
+  def issue_url
+    "https://github.com/#{context.repo}/issues/#{context.issue_id}"
+  end
+
   # The url of the invitations page for the current repo
   def invitations_url
     "https://github.com/#{context.repo}/invitations"
