@@ -59,6 +59,11 @@ module GitHub
     github_client.labels_for_issue(context.repo, context.issue_id).map { |l| l[:name] }
   end
 
+  # Get info on an issue's comment
+  def issue_comment(comment_id)
+    github_client.issue_comment(context.repo, comment_id)
+  end
+
   # Update a Github comment
   def update_comment(comment_id, content)
     github_client.update_comment(context.repo, comment_id, content)
