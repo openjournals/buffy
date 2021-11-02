@@ -18,7 +18,7 @@ This will be the user responding to commands in the reviews repo.
   ![GitHub's signup page](./images/signup.png "GitHub's signup page")
 
 
-**2.** Go to `Settings >> Developer settings >> Personal access tokens` and create a new token with at least this scopes: `public_repo`, `repo:invite`, `read:org` and `read:user`. Save that token, it will be your `BUFFY_GH_ACCESS_TOKEN`.
+**2.** Go to `Settings >> Developer settings >> Personal access tokens` and create a new token with at least these scopes: `public_repo`, `repo:invite`, `read:org` and `read:user`. Save that token, it will be your `BUFFY_GH_ACCESS_TOKEN`.
 
   ![Settings >> Developer settings >> Personal access tokens](./images/access_token.png "Settings >> Developer settings >> Personal access tokens")
 
