@@ -252,7 +252,7 @@ describe "Github methods" do
     context "with valid permissions" do
       before do
         allow_any_instance_of(Octokit::Client).to receive(:create_team).
-                                                  with("openjournals", {name: "superusers"}).
+                                                  with("openjournals", {name: "superusers", privacy: "closed"}).
                                                   and_return({status: "201"})
       end
 

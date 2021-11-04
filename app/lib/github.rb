@@ -141,7 +141,7 @@ module GitHub
   def add_new_team(org_team_name)
     org_name, team_name = org_team_name.split('/')
     begin
-      new_team = github_client.create_team(org_name, { name: team_name })
+      new_team = github_client.create_team(org_name, { name: team_name, privacy: "closed" })
     rescue Octokit::ClientError => gh_err
       logger.warn("Error trying to create team #{org_team_name}: #{gh_err.message}")
       return false
