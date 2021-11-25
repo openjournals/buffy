@@ -1,5 +1,9 @@
 source 'https://rubygems.org'
 
+if ENV["CUSTOM_RUBY_VERSION"]
+  ruby ENV["CUSTOM_RUBY_VERSION"]
+end
+
 gem 'octokit'
 gem 'sinatra', '2.1.0'
 gem 'sinatra-contrib', '2.1.0'
