@@ -55,6 +55,9 @@ We will use here [Heroku](https://www.heroku.com) as an example service to deplo
         BUFFY_GH_SECRET_TOKEN: <a_random_string>
         RACK_ENV: production
 
+**2b.** You can set the Ruby version to install using the CUSTOM_RUBY_VERSION env var. Unless you need any other specific version, please add also a Config Var named CUSTOM_RUBY_VERSION with the value of the latest version listed in the [Buffy tested Ruby versions](https://github.com/openjournals/buffy/blob/main/.github/workflows/tests.yml#L10).
+
+
 **3.** You can set Heroku to automatically redeploy when new commits are added. You can also add heroku as a git remote and deploy manually using
 
         $ git push heroku main
