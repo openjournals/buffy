@@ -99,3 +99,15 @@ buffy:
       data_from_issue:
         - target-repository
         - author-handle
+    github_action:
+      - draft_paper:
+          command: compile pdf
+          workflow_repo: openjournals/joss-papers-testing
+          workflow_name: draft-paper.yml
+          description: Generates the pdf paper
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
