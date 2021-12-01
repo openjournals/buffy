@@ -105,6 +105,7 @@ buffy:
           workflow_repo: openjournals/joss-papers-testing
           workflow_name: draft-paper.yml
           description: Generates the pdf paper
+          message: "Attempting PDF compilation. Reticulating splines etc..."
           data_from_issue:
             - branch
             - target-repository
