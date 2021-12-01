@@ -15,7 +15,7 @@ class GithubActionResponder < Responder
     inputs = params[:inputs] || {}
     inputs_from_issue = params[:data_from_issue] || []
     mapping = params[:mapping] || {}
-    ref = params[:ref] || "main"
+    ref = params[:workflow_ref] || "main"
     mapped_parameters = {}
 
     inputs_from_issue.each do |input_from_issue|

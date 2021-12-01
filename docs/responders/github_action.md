@@ -27,8 +27,8 @@ Some parameters are required for the responder to work: the `command` to invoke 
 :command: *Required*. The command this responder will listen to.
 :workflow_repo: *Required*. The repo to run the action on, in *org/name* format.
 :workflow_name: *Required*. Name of the workflow to run.
-:message: An optional message to reply.
-:ref: Optional. The ref for the GitHub action to use. Defaults to *main*.
+:workflow_ref: Optional. The git ref for the GitHub action to use. Defaults to *main*.
+:message: An optional message to reply with once the workflow is triggered.
 :description: The description of the action this command runs. It will show in the help command if the responder is not hidden.
 :inputs: *<Map>* An optional list of params/values to pass as inputs to the GitHub Action.
 :data_from_issue: *<Array>* An optional list of fields from the body of the issue to pass as inputs to the GitHub Action.

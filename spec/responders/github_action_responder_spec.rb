@@ -58,7 +58,7 @@ describe GithubActionResponder do
     end
 
     it "should run workflow with custom inputs and params" do
-      @responder.params = @responder.params.merge({ ref: "v1.2.3",
+      @responder.params = @responder.params.merge({ workflow_ref: "v1.2.3",
                                                     data_from_issue: ["abc", "p"],
                                                     mapping: { input3: :sender, input4: "p" },
                                                     inputs: { input1: "A", input2: "B" }})
