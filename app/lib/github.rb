@@ -189,8 +189,14 @@ module GitHub
     url = "https://api.github.com/repos/#{repo}/actions/workflows/#{workflow}/dispatches"
     parameters = { inputs: inputs, ref: ref }
     response = Faraday.post(url, parameters.to_json, github_headers)
+    response_ok = response.status.to_i == 204
 
-    response.status.to_i == 204
+    unless response_ok
+      logger.warn("Error triggering workflow #{workflow} at #{repo}: ")
+      logger.warn("   Response #{response.status}: #{response.body}")
+    end
+
+    response_ok
   end
 
   # Returns true if the user in a team member of any of the authorized teams

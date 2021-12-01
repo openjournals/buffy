@@ -333,7 +333,7 @@ describe "Github methods" do
     end
 
     it "should be false if API call is not successful" do
-      expect(Faraday).to receive(:post).and_return(double(status: 401))
+      expect(Faraday).to receive(:post).and_return(double(status: 401, body: "User Unauthorized"))
       expect(subject.trigger_workflow("openjournals/buffy", "action.yml")).to be_falsy
     end
 
