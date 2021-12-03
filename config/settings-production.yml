@@ -41,3 +41,10 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
+    basic_command:
+      - query_scope:
+          only: editors
+          command: query scope
+          add_labels:
+            - query-scope
+          message: "Submission flagged for editorial review."
