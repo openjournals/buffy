@@ -9,3 +9,10 @@ buffy:
     help:
     help:
       help_command: commands
+    list_of_values:
+      - reviewers:
+          only: editors
+          if:
+            role_assigned: editor
+          sample_value: "@username"
+          add_as_assignee: true
