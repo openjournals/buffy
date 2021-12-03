@@ -20,3 +20,10 @@ buffy:
       only: editors
     remove_editor:
       only: editors
+    set_value:
+      - version:
+          only: editors
+          sample_value: "v1.0.0"
+      - archive:
+          only: editors
+          sample_value: "10.21105/zenodo.12345"
