@@ -16,3 +16,7 @@ buffy:
             role_assigned: editor
           sample_value: "@username"
           add_as_assignee: true
+    assign_editor:
+      only: editors
+    remove_editor:
+      only: editors
