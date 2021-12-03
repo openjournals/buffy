@@ -20,6 +20,8 @@ buffy:
       only: editors
     remove_editor:
       only: editors
+    check_references:
+    repo_checks:
     set_value:
       - version:
           only: editors
