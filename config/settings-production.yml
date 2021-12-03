@@ -27,3 +27,17 @@ buffy:
       - archive:
           only: editors
           sample_value: "10.21105/zenodo.12345"
+    github_action:
+      - draft_paper:
+          command: generate pdf
+          workflow_repo: openjournals/joss-papers-testing
+          workflow_name: draft-paper.yml
+          workflow_ref: master
+          description: Generates the pdf paper
+          message: "Attempting PDF compilation. Reticulating splines etc..."
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
