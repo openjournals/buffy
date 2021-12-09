@@ -161,6 +161,21 @@ module GitHub
     end
   end
 
+  # Uses the GitHub API to get a list of users in a team
+  def team_members(team_id_or_name)
+    case team_id_or_name
+    when Integer
+      team = team_id_or_name
+    when String
+      team = team_id(team_id_or_name)
+    else
+      team = nil
+    end
+
+    return [] if team.nil?
+    github_client.team_members(team).collect { |e| e.login }.compact.sort
+  end
+
   # Send an invitation to a user to join an organization's team using the GitHub API
   def invite_user_to_team(username, org_team_name)
     username = user_login(username)

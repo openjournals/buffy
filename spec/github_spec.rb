@@ -392,6 +392,26 @@ describe "Github methods" do
     end
   end
 
+  describe "#team_members" do
+    before do
+      members = [double(login: "user1"), double(login: "user2")]
+      allow_any_instance_of(Octokit::Client).to receive(:team_members).with(1111).and_return(members)
+      allow(subject).to receive(:team_id).with("org/team_test").and_return(1111)
+    end
+
+    it "should accept a team id" do
+      expect(subject.team_members(1111)).to eq(["user1", "user2"])
+    end
+
+    it "should accept a team name" do
+      expect(subject.team_members("org/team_test")).to eq(["user1", "user2"])
+    end
+
+    it "should return empty list if the team doesn't exists" do
+      expect(subject.team_members(nil)).to eq([])
+    end
+  end
+
   describe "#user_in_authorized_teams?" do
     it "should return true if user is member of any authorized team" do
       expect_any_instance_of(Octokit::Client).to receive(:team_member?).once.with(11, "sender").and_return(true)
