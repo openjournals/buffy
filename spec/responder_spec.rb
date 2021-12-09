@@ -402,28 +402,29 @@ describe Responder do
     it "should be true when param's value is an empty string" do
       subject.params = { first_name: "", last_name: "       " }
 
-      expect(subject.empty_param?("first_name")).to be_truthy
-      expect(subject.empty_param?("last_name")).to be_truthy
+      expect(subject.empty_param?(:first_name)).to be_truthy
+      expect(subject.empty_param?(:last_name)).to be_truthy
     end
 
     it "should be true when param's value is an empty array" do
       subject.params = { values: [] }
 
-      expect(subject.empty_param?("values")).to be_truthy
+      expect(subject.empty_param?(:values)).to be_truthy
     end
 
     it "should be true when param's value is an empty hash" do
       subject.params = { values: {} }
 
-      expect(subject.empty_param?("values")).to be_truthy
+      expect(subject.empty_param?(:values)).to be_truthy
     end
 
     it "should be false when param's value is present" do
-      subject.params = { labels: ["archived", "accepted"], name: "Buffy", required: {version: "1.0"} }
+      subject.params = { labels: ["archived", "accepted"], name: "Buffy", required: {version: "1.0"}, id: 33}
 
-      expect(subject.empty_param?("labels")).to be_truthy
-      expect(subject.empty_param?("name")).to be_truthy
-      expect(subject.empty_param?("required")).to be_truthy
+      expect(subject.empty_param?(:labels)).to be_falsy
+      expect(subject.empty_param?(:name)).to be_falsy
+      expect(subject.empty_param?(:required)).to be_falsy
+      expect(subject.empty_param?(:id)).to be_falsy
     end
   end
 

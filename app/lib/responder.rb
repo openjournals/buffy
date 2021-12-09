@@ -151,10 +151,10 @@ class Responder
   # True if param's value is empty
   def empty_param?(x)
     return true if params[x].nil?
-    if params[x].is_a?(String)
-      params[x].strip.empty?
-    else
+    if params[x].is_a?(Hash) || params[x].is_a?(Array)
       params[x].empty?
+    else
+      params[x].to_s.strip.empty?
     end
   end
 
