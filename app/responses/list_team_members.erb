@@ -1,0 +1,8 @@
+<%= heading %>
+
+```
+<% team_members.each do |team_member| -%>
+@<%= team_member %>
+<% end -%>
+<%= "The list is empty" if team_members.empty? -%>
+```

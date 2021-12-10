@@ -19,10 +19,6 @@ buffy:
             - "Our CoC: https://github.com/openjournals/joss/blob/master/CODE_OF_CONDUCT.md"
             - "It's adapted from the Contributor Covenant: http://contributor-covenant.org"
             - "Reports of abusive or harassing behavior may be reported to reports@theoj.org"
-      - editor_list:
-          command: list editors
-          description: List all current topic editors
-          template_file: editors.md
     assign_reviewer_n:
       only: editors
       if:
@@ -45,6 +41,10 @@ buffy:
       only: editors
     add_remove_assignee:
       only: editors
+    list_team_members:
+      command: list editors
+      team_id: 3824115
+      heading: Current journal editors
     check_references:
     repo_checks:
     set_value:

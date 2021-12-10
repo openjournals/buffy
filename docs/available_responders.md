@@ -22,6 +22,7 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/invite
    responders/set_value
    responders/list_of_values
+   responders/list_team_members
    responders/add_remove_assignee
    responders/reviewer_checklist_comment
    responders/add_remove_checklist
