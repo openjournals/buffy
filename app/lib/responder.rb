@@ -143,7 +143,7 @@ class Responder
       if empty_param?(param_name)
         raise "Configuration Error in #{self.class.name}: No value for #{param_name}."
       else
-        self.class.define_method(param_name.to_s) { params[param_name].strip }
+        self.class.define_method(param_name.to_s) { params[param_name] }
       end
     end
   end

@@ -11,7 +11,8 @@ module ResponderParams
       AddAndRemoveUserChecklistResponder => { template_file: "checklist.md" },
       ReviewerChecklistCommentResponder => { template_file: "checklist.md" },
       GithubActionResponder => { workflow_repo: "openjournals/joss-reviews", workflow_name: "compiler", command: "generate pdf" },
-      InitialValuesResponder => { values: ["version", "target-repository"]}
+      InitialValuesResponder => { values: ["version", "target-repository"]},
+      ListTeamMembersResponder => { command: "list editors", team_id: 3824115 },
     }
 
     params_by_responder[responder_class] || {}
