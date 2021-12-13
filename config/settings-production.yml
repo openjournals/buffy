@@ -15,6 +15,10 @@ buffy:
             role_assigned: editor
           sample_value: "@username"
           add_as_assignee: true
+    list_team_members:
+      team_id: 2009411
+      heading: List of Test-JOSS editors
+      description: "Get a list of all editors's GitHub handles"
     assign_editor:
       only: editors
     remove_editor:
