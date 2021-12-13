@@ -7,7 +7,6 @@ buffy:
     editors: 2009411
   responders:
     help:
-    help:
       help_command: commands
     list_of_values:
       - reviewers:
