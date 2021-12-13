@@ -16,6 +16,7 @@ buffy:
           sample_value: "@username"
           add_as_assignee: true
     list_team_members:
+      command: list editors
       team_id: aliadalabs/editors
       heading: List of Test-JOSS editors
       description: "Get a list of all editors's GitHub handles"
