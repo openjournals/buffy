@@ -12,7 +12,7 @@ class ListTeamMembersResponder < Responder
   end
 
   def process_message(message)
-    team_members = team_members(params[:team_id])
+    team_members = api_team_members(params[:team_id])
     heading = params[:heading].to_s
     respond_template :list_team_members, { heading: heading, team_members: team_members }
   end

@@ -31,7 +31,7 @@ describe ListTeamMembersResponder do
 
     it "should respond with a erb template to github" do
       team_members = ["user1", "user2"]
-      expect(@responder).to receive(:team_members).once.with(12345).and_return(@team_members)
+      expect(@responder).to receive(:api_team_members).once.with(12345).and_return(@team_members)
 
       expected_locals = { heading: "", team_members: @team_members }
       expect(@responder).to receive(:respond_template).once.with(:list_team_members, expected_locals)
@@ -40,7 +40,7 @@ describe ListTeamMembersResponder do
 
     it "should allow to customize heading" do
       @responder.params[:heading] = "Current editors"
-      expect(@responder).to receive(:team_members).once.with(12345).and_return(@team_members)
+      expect(@responder).to receive(:api_team_members).once.with(12345).and_return(@team_members)
 
       expected_locals = { heading: "Current editors", team_members: @team_members }
       expect(@responder).to receive(:respond_template).once.with(:list_team_members, expected_locals)

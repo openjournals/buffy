@@ -150,7 +150,7 @@ module GitHub
   end
 
   # Uses the GitHub API to obtain the id of an organization's team
-  def team_id(org_team_name)
+  def api_team_id(org_team_name)
     org_name, team_name = org_team_name.split('/')
     raise "Configuration Error: Invalid team name: #{org_team_name}" if org_name.nil? || team_name.nil?
     begin
@@ -162,12 +162,12 @@ module GitHub
   end
 
   # Uses the GitHub API to get a list of users in a team
-  def team_members(team_id_or_name)
+  def api_team_members(team_id_or_name)
     case team_id_or_name
     when Integer
       team = team_id_or_name
     when String
-      team = team_id(team_id_or_name)
+      team = api_team_id(team_id_or_name)
     else
       team = nil
     end
@@ -182,7 +182,7 @@ module GitHub
     invitee = get_user(username)
     return false if (invitee.nil? || invitee.id.nil?)
 
-    invited_team_id = team_id(org_team_name)
+    invited_team_id = api_team_id(org_team_name)
     if invited_team_id.nil?
       invited_team_id = add_new_team(org_team_name)
       invited_team_id = invited_team_id.id if invited_team_id
@@ -219,8 +219,8 @@ module GitHub
   def user_in_authorized_teams?(user_login)
     @user_authorized ||= begin
       authorized = []
-      authorized_team_ids.each do |team_id|
-        authorized << github_client.team_member?(team_id, user_login)
+      authorized_team_ids.each do |t_id|
+        authorized << github_client.team_member?(t_id, user_login)
         break if authorized.compact.any?
       end
       authorized.compact.any?

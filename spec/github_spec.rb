@@ -286,7 +286,7 @@ describe "Github methods" do
 
     it "should be false if team does not exist" do
       expect_any_instance_of(Octokit::Client).to receive(:user).with("user42").and_return(double(id: 33))
-      expect(subject).to receive(:team_id).and_return(nil)
+      expect(subject).to receive(:api_team_id).and_return(nil)
       expect(subject).to receive(:add_new_team).and_return(nil)
 
       expect(subject.invite_user_to_team("@user42", "openjournals/superusers")).to be_falsy
@@ -294,7 +294,7 @@ describe "Github methods" do
 
     it "should be false if can't create team" do
       expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
-      expect(subject).to receive(:team_id).and_return(nil)
+      expect(subject).to receive(:api_team_id).and_return(nil)
       allow_any_instance_of(Octokit::Client).to receive(:create_team).and_return(false)
 
       expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
@@ -302,7 +302,7 @@ describe "Github methods" do
 
     it "should try to create team if it does not exist" do
       expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
-      expect(subject).to receive(:team_id).and_return(nil)
+      expect(subject).to receive(:api_team_id).and_return(nil)
       expect(subject).to receive(:add_new_team).with("openjournals/superusers").and_return(double(id: 3333))
       expect(Faraday).to receive(:post).and_return(double(status: 200))
 
@@ -311,7 +311,7 @@ describe "Github methods" do
 
     it "should be false if invitation can not be created" do
       expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
-      expect(subject).to receive(:team_id).with("openjournals/superusers").and_return(1234)
+      expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
       expect(Faraday).to receive(:post).and_return(double(status: 403))
 
       expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
@@ -319,7 +319,7 @@ describe "Github methods" do
 
     it "should be true when invitation is created" do
       expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
-      expect(subject).to receive(:team_id).with("openjournals/superusers").and_return(1234)
+      expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
       expect(Faraday).to receive(:post).and_return(double(status: 201))
 
       expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_truthy
@@ -357,7 +357,7 @@ describe "Github methods" do
     end
   end
 
-  describe "#team_id" do
+  describe "#api_team_id" do
     context "with valid API access" do
       before do
         teams = [{name: "Editors", id: 372411, description: ""}, {name: "Bots!", id: 111001, slug: "bots"}]
@@ -365,21 +365,21 @@ describe "Github methods" do
       end
 
       it "should return team's id if the team exists" do
-        expect(subject.team_id("openjournals/editors")).to eq(372411)
+        expect(subject.api_team_id("openjournals/editors")).to eq(372411)
       end
 
       it "should find team by slug" do
-        expect(subject.team_id("openjournals/bots")).to eq(111001)
+        expect(subject.api_team_id("openjournals/bots")).to eq(111001)
       end
 
       it "should return nil if the team doesn't exists" do
-        expect(subject.team_id("openjournals/nonexistent")).to be_nil
+        expect(subject.api_team_id("openjournals/nonexistent")).to be_nil
       end
     end
 
     it "should raise a configuration error for teams with wrong name" do
       expect {
-        subject.team_id("wrong-name")
+        subject.api_team_id("wrong-name")
       }.to raise_error "Configuration Error: Invalid team name: wrong-name"
     end
 
@@ -387,28 +387,28 @@ describe "Github methods" do
       expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("buffy").and_raise(Octokit::Forbidden)
 
       expect {
-        subject.team_id("buffy/whatever")
+        subject.api_team_id("buffy/whatever")
       }.to raise_error "Configuration Error: No API access to organization: buffy"
     end
   end
 
-  describe "#team_members" do
+  describe "#api_team_members" do
     before do
       members = [double(login: "user1"), double(login: "user2")]
       allow_any_instance_of(Octokit::Client).to receive(:team_members).with(1111).and_return(members)
-      allow(subject).to receive(:team_id).with("org/team_test").and_return(1111)
+      allow(subject).to receive(:api_team_id).with("org/team_test").and_return(1111)
     end
 
     it "should accept a team id" do
-      expect(subject.team_members(1111)).to eq(["user1", "user2"])
+      expect(subject.api_team_members(1111)).to eq(["user1", "user2"])
     end
 
     it "should accept a team name" do
-      expect(subject.team_members("org/team_test")).to eq(["user1", "user2"])
+      expect(subject.api_team_members("org/team_test")).to eq(["user1", "user2"])
     end
 
     it "should return empty list if the team doesn't exists" do
-      expect(subject.team_members(nil)).to eq([])
+      expect(subject.api_team_members(nil)).to eq([])
     end
   end
 

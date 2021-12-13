@@ -33,7 +33,7 @@ module Authorizations
         when Integer
           team_ids << team_id_or_name
         when String
-          found_team_id = team_id(team_id_or_name)
+          found_team_id = api_team_id(team_id_or_name)
           team_ids << found_team_id unless found_team_id.nil?
         end
       end
