@@ -4,7 +4,7 @@ buffy:
     gh_access_token: <%= ENV['BUFFY_GH_ACCESS_TOKEN'] %>
     gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
-    editors: openjournals/dev
+    editors: aliadalabs/editors
   responders:
     help:
       help_command: commands
@@ -16,7 +16,7 @@ buffy:
           sample_value: "@username"
           add_as_assignee: true
     list_team_members:
-      team_id: openjournals/dev
+      team_id: aliadalabs/editors
       heading: List of Test-JOSS editors
       description: "Get a list of all editors's GitHub handles"
     assign_editor:
