@@ -448,7 +448,8 @@ describe "Github methods" do
 
   describe ".get_team_ids" do
     it "should convert all team entries to ids" do
-      config = { teams: { editors: 11, eics: "openjournals/eics", nonexistent: "openjournals/nope" } }
+      config = { teams: { editors: 11, eics: "openjournals/eics", nonexistent: "openjournals/nope" }, env: {gh_access_token: "ABC123"}}
+      expect(Octokit::Client).to receive(:new).with(access_token: "ABC123", auto_paginate: true).and_return(Octokit::Client.new)
       expect_any_instance_of(Octokit::Client).to receive(:organization_teams).twice.and_return([{name: "eics", id: 42}])
 
       expected_response = { editors: 11, eics: 42, nonexistent: nil }
@@ -456,7 +457,8 @@ describe "Github methods" do
     end
 
     it "should find teams by slug" do
-      config = { teams: { the_bots: "openjournals/bots" } }
+      config = { teams: { the_bots: "openjournals/bots" }, env: {gh_access_token: "ABC123"}}
+      expect(Octokit::Client).to receive(:new).with(access_token: "ABC123", auto_paginate: true).and_return(Octokit::Client.new)
       expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.and_return([{name: "Rob0tz", id: 111001, slug: "bots"}])
 
       expected_response = { the_bots: 111001 }
@@ -472,7 +474,8 @@ describe "Github methods" do
     end
 
     it "should raise a configuration error if there's not access to the organization" do
-      config = { teams: { the_bots: "openjournals/bots" } }
+      config = { teams: { the_bots: "openjournals/bots" }, env: {gh_access_token: "ABC123"}}
+      expect(Octokit::Client).to receive(:new).with(access_token: "ABC123", auto_paginate: true).and_return(Octokit::Client.new)
       expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("openjournals").and_raise(Octokit::Forbidden)
 
       expect {

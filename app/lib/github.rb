@@ -257,7 +257,7 @@ module GitHub
         if id_or_slug.is_a? String
           org_slug, team_slug = id_or_slug.split('/')
           raise "Configuration Error: Invalid team name: #{id_or_slug}" if org_slug.nil? || team_slug.nil?
-          gh ||= Octokit::Client.new(access_token: config[:gh_access_token], auto_paginate: true)
+          gh ||= Octokit::Client.new(access_token: config[:env][:gh_access_token], auto_paginate: true)
           teams_hash[team_name] = begin
             team = gh.organization_teams(org_slug).select { |t| t[:slug] == team_slug || t[:name].downcase == team_slug.downcase }.first
             team.nil? ? nil : team[:id]

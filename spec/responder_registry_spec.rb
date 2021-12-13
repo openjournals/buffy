@@ -52,6 +52,7 @@ describe ResponderRegistry do
   describe "loading responders" do
     it "should retrieve all teams ids once" do
       @config[:teams] = { editors: 11, eics: "openjournals/eics" }
+      @config[:env] = { gh_access_token: "ABC123" }
       expect_any_instance_of(Octokit::Client).to receive(:organization_teams).once.with("openjournals").and_return([{name: "eics", id: 42}])
       expected_teams = { editors: 11, eics: 42 }
 
