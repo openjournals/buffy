@@ -30,7 +30,6 @@ end
 RSpec.configure do |config|
   config.before(:each) do
     Sidekiq::Worker.clear_all
-    stub_request(:any, /api.github.com/).to_rack(FakeGitHub)
   end
 
   config.mock_with :rspec do |mocks|
