@@ -26,6 +26,11 @@ buffy:
       only: editors
     check_references:
     repo_checks:
+    reviewer_checklist_comment:
+      template_file: reviewer_checklist.md
+      data_from_issue:
+        - target-repository
+        - author-handle
     set_value:
       - version:
           only: editors
