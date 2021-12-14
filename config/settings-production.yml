@@ -54,3 +54,7 @@ buffy:
           add_labels:
             - query-scope
           message: "Submission flagged for editorial review."
+      - list_reviewers:
+          command: list reviewers
+          message: "Here's the current list of reviewers: https://bit.ly/joss-reviewers"
+
