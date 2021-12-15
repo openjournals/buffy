@@ -22,6 +22,15 @@ buffy:
       description: "Get a list of all editors's GitHub handles"
     assign_editor:
       only: editors
+      external_call:
+        url: "https://test.joss.theoj.org/papers/api_assign_editor"
+        method: post
+        query_params:
+          secret: <%= ENV['JOSS_TEST_SECRET'] %>
+        mapping:
+          id: issue_id
+          editor: editor
+        silent: true
     remove_editor:
       only: editors
     check_references:
