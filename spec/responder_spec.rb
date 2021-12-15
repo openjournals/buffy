@@ -514,7 +514,7 @@ describe Responder do
     end
 
     it "should add an ExternalServiceWorker to the jobs queue" do
-      expect { @responder.process_external_service({ url: "https://openjournals.org" }, {}) }.to change(ExternalServiceWorker.jobs, :size).by(1)
+      expect { @responder.process_external_service({ url: "https://theoj.org" }, {}) }.to change(ExternalServiceWorker.jobs, :size).by(1)
     end
 
     it "should pass right info to the worker" do
