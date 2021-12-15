@@ -60,6 +60,22 @@ describe ExternalServiceWorker do
       @worker.perform(service_params, @locals)
     end
 
+    it "should not respond message if silent=true" do
+      service_params = @service_params.merge({ 'silent' => true })
+      expect(Faraday).to receive(:post).and_return(response_200)
+      expect(@worker).to_not receive(:respond)
+
+      @worker.perform(service_params, @locals)
+    end
+
+    it "should not respond errors if silent=true" do
+      service_params = @service_params.merge({ 'silent' => true })
+      expect(Faraday).to receive(:post).and_return(response_400)
+      expect(@worker).to_not receive(:respond)
+
+      @worker.perform(service_params, @locals)
+    end
+
   end
 
   describe "service request" do

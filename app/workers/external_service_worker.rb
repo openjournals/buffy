@@ -26,6 +26,8 @@ class ExternalServiceWorker < BuffyWorker
       response = Faraday.post(url, parameters.to_json, post_headers)
     end
 
+    return true if service['silent'] == true
+
     if response.status.between?(200, 299)
       if service['template_file']
         parsed_response = parse_json_response(response.body)
