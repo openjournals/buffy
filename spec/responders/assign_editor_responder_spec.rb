@@ -84,6 +84,20 @@ describe AssignEditorResponder do
       @responder.process_message(@msg)
     end
 
+    it "should not process external call if not configured" do
+      expect(@responder).to_not receive(:process_external_service)
+      @responder.process_message(@msg)
+    end
+
+    it "should process external call" do
+      external_call = { url: "https://theoj.org" ,method: "post", query_params: { secret: "A1234567890Z" }, silent: true}
+      @responder.params[:external_call] = external_call
+      expected_locals = @responder.locals.merge({ editor: "@arfon" })
+      expect(@responder).to receive(:process_external_service).with(external_call, expected_locals)
+
+      @responder.process_message(@msg)
+    end
+
     it "should understand 'assign me'" do
       msg = "@botsci assign me as editor"
       @responder.context.sender = "xuanxu"

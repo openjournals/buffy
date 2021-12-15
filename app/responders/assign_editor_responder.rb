@@ -23,6 +23,8 @@ class AssignEditorResponder < Responder
     add_collaborator(new_editor) if add_as_collaborator?
     replace_assignee(old_editor, new_editor) if add_as_assignee?
     respond("Assigned! #{new_editor} is now the editor")
+
+    process_external_service(params[:external_call], locals.merge({editor: new_editor})) if params[:external_call]
     process_labeling
   end
 
