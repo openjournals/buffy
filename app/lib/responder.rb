@@ -183,6 +183,13 @@ class Responder
     body_issue_data
   end
 
+  # Create background workers to perform external calls
+  def process_external_service(service_config, service_data)
+    unless service_config.nil? || service_config.empty?
+      ExternalServiceWorker.perform_async(service_config, service_data)
+    end
+  end
+
   # Add/remove labels as configured in the responder' settings
   def process_labeling
     process_adding_labels

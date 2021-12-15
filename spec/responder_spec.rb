@@ -501,6 +501,30 @@ describe Responder do
     end
   end
 
+  describe "#process_external_service" do
+    before do
+      @responder = described_class.new({ bot_github_user: "botsci" }, {})
+      disable_github_calls_for(@responder)
+    end
+
+    it "should do nothing if no external service config present" do
+      expect { @responder.process_external_service({}, {}) }.to_not change(ExternalServiceWorker.jobs, :size)
+      expect { @responder.process_external_service("", {}) }.to_not change(ExternalServiceWorker.jobs, :size)
+      expect { @responder.process_external_service(nil, {}) }.to_not change(ExternalServiceWorker.jobs, :size)
+    end
+
+    it "should add an ExternalServiceWorker to the jobs queue" do
+      expect { @responder.process_external_service({ url: "https://openjournals.org" }, {}) }.to change(ExternalServiceWorker.jobs, :size).by(1)
+    end
+
+    it "should pass right info to the worker" do
+      expected_params = { name: "test-service", command: "run tests", url: "http://testing.openjournals.org" }
+      expected_locals = { bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
+      expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
+      @responder.process_external_service(expected_params, expected_locals)
+    end
+  end
+
   describe "#target_repo_value" do
     before do
       @responder = Responder.new({}, {})
