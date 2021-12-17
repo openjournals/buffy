@@ -154,7 +154,7 @@ describe Buffy do
         expect(last_response.body).not_to eq("Event discarded")
       end
 
-      it "should discard event if created by buffy" do
+      it "should discard issue_comment events if created by buffy" do
         with_secret_token "test_secret_token" do
           payload = {sender: { login: "botsci" } }.to_json
           post "/dispatch", payload, headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for(payload), "HTTP_X_GITHUB_EVENT" => "issue_comment"})
@@ -162,6 +162,16 @@ describe Buffy do
 
         expect(last_response.status).to eq(200)
         expect(last_response.body).to eq("Event origin discarded")
+      end
+
+      it "should not discard issue events if created by buffy" do
+        with_secret_token "test_secret_token" do
+          payload = {sender: { login: "botsci" } }.to_json
+          post "/dispatch", payload, headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for(payload), "HTTP_X_GITHUB_EVENT" => "issues"})
+        end
+
+        expect(last_response.status).to eq(200)
+        expect(last_response.body).to eq("Message processed")
       end
 
       it "should discard other events" do
