@@ -72,4 +72,8 @@ buffy:
       - list_reviewers:
           command: list reviewers
           template_file: reviewers_list.md
+    welcome:
+      if:
+        title: "^\\[PRE REVIEW\\]:"
+      template_file: pre-review_welcome.md
 
