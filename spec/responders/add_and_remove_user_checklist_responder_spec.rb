@@ -43,7 +43,7 @@ describe AddAndRemoveUserChecklistResponder do
         msg = "@botsci add checklist for @arfon"
         @responder.match_data = @responder.event_regex.match(msg)
 
-        expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33" }
+        expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", match_data_1: "add", match_data_2: "@arfon" }
         expected_checklist = "\n<!--checklist-for-@arfon-->" +
                              "\n## Review checklist for @arfon" +
                              "\n[] A" +
@@ -54,7 +54,7 @@ describe AddAndRemoveUserChecklistResponder do
         expect(@responder).to receive(:respond).with("Checklist added for @arfon")
         expect(@responder).to receive(:process_labeling)
         expect(@responder).to_not receive(:process_reverse_labeling)
-        @responder.process_message(@msg)
+        @responder.process_message(msg)
       end
 
       it "should not add user checklist if already present" do
@@ -63,7 +63,7 @@ describe AddAndRemoveUserChecklistResponder do
 
         expect(@responder).to receive(:respond).with("There is already a checklist for @xuanxu")
         expect(@responder).to_not receive(:process_labeling)
-        @responder.process_message(@msg)
+        @responder.process_message(msg)
       end
     end
 
@@ -77,7 +77,7 @@ describe AddAndRemoveUserChecklistResponder do
         expect(@responder).to receive(:delete_from_body).with(expected_mark, expected_end_mark, true)
         expect(@responder).to receive(:respond).with("Checklist for @xuanxu removed")
         expect(@responder).to receive(:process_reverse_labeling)
-        @responder.process_message(@msg)
+        @responder.process_message(msg)
       end
 
       it "should not remove user checklist if not present" do
@@ -85,7 +85,7 @@ describe AddAndRemoveUserChecklistResponder do
         @responder.match_data = @responder.event_regex.match(msg)
         expect(@responder).to receive(:respond).with("There is not a checklist for @arfon")
         expect(@responder).to_not receive(:process_labeling)
-        @responder.process_message(@msg)
+        @responder.process_message(msg)
       end
     end
   end

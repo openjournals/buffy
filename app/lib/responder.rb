@@ -161,6 +161,7 @@ class Responder
   # Create a hash with the basic config info
   # and adds any data from the body issue requested via :data_from_issue param
   def locals
+    from_command = get_data_from_command_regex
     from_context = Sinatra::IndifferentHash[
                      issue_id: context.issue_id,
                      issue_author: context.issue_author,
@@ -169,7 +170,7 @@ class Responder
                      bot_name: bot_name ]
     from_body = get_data_from_issue(params[:data_from_issue])
 
-    from_body.merge from_context
+    from_command.merge(from_body, from_context)
   end
 
   # Create a hash with the data from the body issue listed in the source array
@@ -181,6 +182,14 @@ class Responder
       end
     end
     body_issue_data
+  end
+
+  def get_data_from_command_regex
+    command_regex_data = Sinatra::IndifferentHash.new
+    if @match_data && @match_data.size > 1
+      (1..@match_data.size-1).each { |i| command_regex_data["match_data_#{i}"] = @match_data[i] }
+    end
+    command_regex_data
   end
 
   # Create background workers to perform external calls

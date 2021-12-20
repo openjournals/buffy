@@ -278,6 +278,14 @@ describe Responder do
       expect(@responder.locals).to eq(expected_locals)
     end
 
+    it "should add info from the event_regex if present" do
+      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", match_data_1: "@xuanxu"]
+      @responder.event_regex = /\A@bot assign (.*) as editor\z/i
+      @responder.match_data = @responder.event_regex.match("@bot assign @xuanxu as editor")
+
+      expect(@responder.locals).to eq(expected_locals)
+    end
+
     it "context data should not be overwritten by issue body data" do
       @responder.context["issue_body"] += "<!--issue_id-->42<!--end-issue_id--><!--x-->Y<!--end-x-->"
       @responder.params = {data_from_issue: ["x", "issue_id"]}
@@ -304,6 +312,26 @@ describe Responder do
     it "should extract listed values from issue body" do
       expected = Sinatra::IndifferentHash[first: "1111", third: "3333"]
       expect(@responder.get_data_from_issue(["first", "third"])).to eq(expected)
+    end
+  end
+
+  describe "get_data_from_command_regex" do
+    before do
+      @responder = described_class.new({ env: {bot_github_user: 'botsci'} }, {})
+    end
+
+    it "should be empty if no values captured in the event_regex" do
+      @responder.event_regex = /\A@bot generate pdf\.?\s*\z/i
+      @responder.responds_to?("@bot generate pdf")
+      expected = Sinatra::IndifferentHash.new
+      expect(@responder.get_data_from_command_regex).to eq(expected)
+    end
+
+    it "should extract captured values from event_regex" do
+      @responder.event_regex = /\A@bot assign (.*) as (.*)\.?\s*\z/i
+      @responder.responds_to?("@bot assign @astrophysics-editor as editor")
+      expected = Sinatra::IndifferentHash[match_data_1: "@astrophysics-editor", match_data_2: "editor"]
+      expect(@responder.get_data_from_command_regex).to eq(expected)
     end
   end
 
