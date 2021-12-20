@@ -41,8 +41,8 @@ The response from the external service should be in JSON format. It will be pars
 :message: An optional message to reply when the command is received, before the external service is called.
 :template_file: The optional template file to use to build the response message.
 :headers: *<Array>* An optional list of *key: value* pairs to be passed as headers in the external service request.
-:data_from_issue: *<Array>* An optional list of values that will be extracted from the issue's body and used to fill the template.
 :query_params: *<Array>* An optional list of params to add to the query of the external call. Common place to add API_KEYS or other authentication info.
+:data_from_issue: *<Array>* An optional list of values that will be extracted from the issue's info or issue's body and sent as query params to the service call. Available info includes: issue_id, issue_author, repo, sender, bot_name, and any variable included in the body of the issue.
 :mapping: *<Array>* An optional mapping of variable names in the query of the external service call.
 :silent: *<Boolean>* Optional parameter, if **true** the responder won't reply after the external service is called. Default is **false**.
 
