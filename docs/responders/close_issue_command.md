@@ -23,7 +23,6 @@ For example, if you configure the command to be _reject_, it would respond to:
 
 ```eval_rst
 :command: The command this responder will listen to.
-:labels:  *Optional <Array>* A list of text labels to add to the issue.
 :description:  *Optional* String to show when the help command is invoked (if the responder is not hidden).
 ```
 

@@ -31,6 +31,7 @@ class GithubActionResponder < Responder
 
     if trigger_workflow(workflow_repo, workflow_name, parameters, ref)
       respond(params[:message]) if params[:message]
+      process_labeling
     end
   end
 

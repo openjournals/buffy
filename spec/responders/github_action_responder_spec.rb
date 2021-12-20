@@ -48,6 +48,26 @@ describe GithubActionResponder do
       @responder.process_message("")
     end
 
+    it "should process labels" do
+      expect(@responder).to receive(:process_labeling)
+      @responder.process_message("")
+    end
+
+    it "should label issue with defined labels" do
+      @responder.params[:add_labels] = ["recommend-accept"]
+      expect(@responder).to receive(:label_issue).with(["recommend-accept"])
+      @responder.process_message("")
+    end
+
+    it "should not label/unlabel the issue if not labels are defined" do
+      @responder.params[:add_labels] = nil
+      expect(@responder).to receive(:process_labeling)
+      expect(@responder).to_not receive(:label_issue)
+      expect(@responder).to_not receive(:unlabel_issue)
+
+      @responder.process_message("")
+    end
+
     it "should run workflow" do
       expected_repo = "openjournals/joss-reviews"
       expected_name = "compiler"
