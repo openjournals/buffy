@@ -12,13 +12,18 @@ class ExternalServiceWorker < BuffyWorker
 
     query_parameters = service['query_params'] || {}
     service_mapping = service['mapping'] || {}
+    inputs_from_issue = service['data_from_issue'] || {}
     mapped_parameters = {}
+
+    inputs_from_issue.each do |input_from_issue|
+      mapped_parameters[input_from_issue] = locals[input_from_issue].to_s
+    end
 
     service_mapping.each_pair do |k, v|
       mapped_parameters[k] = locals.delete(v)
     end
 
-    parameters = {}.merge(query_parameters, mapped_parameters, locals)
+    parameters = {}.merge(query_parameters, mapped_parameters)
 
     if http_method.downcase == 'get'
       response = Faraday.get(url, parameters, headers)

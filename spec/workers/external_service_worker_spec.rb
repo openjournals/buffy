@@ -26,7 +26,7 @@ describe ExternalServiceWorker do
     it "should use POST by default" do
       expected_url = @service_params['url']
       expected_headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json'}
-      expected_params = @locals.to_json
+      expected_params = {}.to_json
 
       expect(Faraday).to_not receive(:get)
       expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(response_200)
@@ -35,7 +35,7 @@ describe ExternalServiceWorker do
 
     it "should use GET method if set via settings" do
       expected_url = @service_params['url']
-      expected_params = @locals
+      expected_params = {}
       expected_headers = {}
 
       expect(Faraday).to_not receive(:post)
@@ -97,20 +97,21 @@ describe ExternalServiceWorker do
       disable_github_calls_for @worker
     end
 
-    it "should include query parameters, mapped parameters and locals" do
+    it "should include query parameters, data_from_issue, mapped parameters and locals" do
       query_params = { 'extra_param' => 'testing', 'api_user_id' => 51 }
+      data_from_issue = ['repo']
       mapping = { 'id' => 'issue_id', 'user' => 'bot_name' }
 
-      mapped_params = { 'id' => 11, 'user' => 'botsci' }
+      mapped_params = { 'repo' => 'openjournals/tests', 'id' => 11, 'user' => 'botsci' }
       locals = { 'repo' => 'openjournals/tests', 'sender' => 'editor1' }
 
       expected_url = @service['url']
-      expected_params = query_params.merge(mapped_params, locals).to_json
+      expected_params = query_params.merge(mapped_params).to_json
       expected_headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json'}
 
       expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(@null_response)
 
-      params = @service.merge({ 'query_params' => query_params, 'mapping' => mapping })
+      params = @service.merge({ 'query_params' => query_params, 'mapping' => mapping, 'data_from_issue' => data_from_issue })
       @worker.perform(params, @locals)
     end
 
@@ -118,7 +119,7 @@ describe ExternalServiceWorker do
       params = @service.merge({ 'headers' => { 'X-Auth' => "secret-token" } })
 
       expected_url = @service['url']
-      expected_params = @locals.to_json
+      expected_params = {}.to_json
       expected_headers = {'Content-Type' => 'application/json', 'Accept' => 'application/json', 'X-Auth' => "secret-token"}
 
       expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(@null_response)
