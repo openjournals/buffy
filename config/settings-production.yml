@@ -5,6 +5,7 @@ buffy:
     gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
     editors: aliadalabs/editors
+    eics: aliadalabs/editors
   responders:
     help:
       help_command: commands
@@ -48,6 +49,33 @@ buffy:
       - archive:
           only: editors
           sample_value: "10.21105/zenodo.12345"
+    external_service:
+      - reject:
+          only: eics
+          command: reject
+          url: "https://test.joss.theoj.org/papers/api_reject"
+          query_params:
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
+          mapping:
+            id: issue_id
+          add_labels:
+            - rejected
+          success_msg: "Paper rejected."
+          error_msg: "There was a problem rejecting the paper."
+          close: true
+      - withdraw:
+          only: eics
+          command: withdraw
+          url: "https://test.joss.theoj.org/papers/api_withdraw"
+          query_params:
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
+          mapping:
+            id: issue_id
+          add_labels:
+            - withdrawn
+          success_msg: "Paper withdrawn."
+          error_msg: "There was a problem withdrawing the paper."
+          close: true
     github_action:
       - draft_paper:
           command: generate pdf
