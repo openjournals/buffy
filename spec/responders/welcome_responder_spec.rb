@@ -21,6 +21,7 @@ describe WelcomeResponder do
   describe "#process_message" do
     before do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
+      @responder.context = OpenStruct.new(issue_body: "...\n<!--target-repository-->URL<!--end-target-repository-->")
       disable_github_calls_for(@responder)
     end
 
@@ -28,6 +29,14 @@ describe WelcomeResponder do
       expect(@responder).to receive(:process_labeling)
       expect(@responder).to_not receive(:process_reverse_labeling)
       @responder.process_message("")
+    end
+
+    it "should by default do nothing" do
+      expect(@responder).to_not receive(:respond)
+      expect(@responder).to_not receive(:respond_external_template)
+      expect(RepoChecksWorker).to_not receive(:perform_async)
+      expect(DOIWorker).to_not receive(:perform_async)
+      expect(ExternalServiceWorker).to_not receive(:perform_async)
     end
   end
 
@@ -81,6 +90,61 @@ describe WelcomeResponder do
     end
   end
 
+  describe "#process_message with repo_checks option" do
+    before do
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { repo_checks: ""})
+      @responder.context = OpenStruct.new(issue_body: "...\n<!--target-repository-->URL<!--end-target-repository-->")
+      disable_github_calls_for(@responder)
+    end
+
+    it "should not create RepoChecksWorker if no target repository" do
+      @responder.context.issue_body = ""
+      expect(RepoChecksWorker).to_not receive(:perform_async)
+      @responder.process_message("")
+    end
+
+    it "should create RepoChecksWorker" do
+      expect(RepoChecksWorker).to receive(:perform_async)
+      @responder.process_message("")
+    end
+
+    it "should pass correct config" do
+      expect(RepoChecksWorker).to receive(:perform_async).with(@responder.locals, "URL", "", nil)
+      @responder.process_message("")
+
+      @responder.params[:repo_checks] = { checks: ["languages", "license"] }
+      expect(RepoChecksWorker).to receive(:perform_async).with(@responder.locals, "URL", "", ["languages", "license"])
+      @responder.process_message("")
+    end
+  end
+
+  describe "#process_message with check_references option" do
+    before do
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { check_references: ""})
+      @responder.context = OpenStruct.new(issue_body: "...\n<!--target-repository-->URL<!--end-target-repository-->" +
+                                                      "...\n<!--branch-->branch-name<!--end-branch-->")
+      disable_github_calls_for(@responder)
+    end
+
+    it "should not create DOIWorker if no target repository" do
+      @responder.context.issue_body = ""
+      expect(DOIWorker).to_not receive(:perform_async)
+      @responder.process_message("")
+    end
+
+    it "should create DOIWorker" do
+      expect(DOIWorker).to receive(:perform_async)
+      @responder.process_message("")
+    end
+
+    it "should pass correct config" do
+      @responder.params[:repo_checks] = { checks: ["languages", "license"] }
+
+      expect(DOIWorker).to receive(:perform_async).with(@responder.locals, "URL", "branch-name")
+      @responder.process_message("")
+    end
+  end
+
   describe "#process_message with external service" do
     before do
       settings = { env: {bot_github_user: "botsci"} }
@@ -104,8 +168,9 @@ describe WelcomeResponder do
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
       @responder.process_message("")
     end
+  end
 
-    describe "misconfiguration" do
+  describe "misconfiguration" do
     it "should raise error if there is no name for the service" do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { url: "URL" }})
 
@@ -122,7 +187,4 @@ describe WelcomeResponder do
       }.to raise_error "Configuration Error in WelcomeResponder: No value for url."
     end
   end
-  end
-
-
 end

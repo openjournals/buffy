@@ -96,7 +96,11 @@ Calling an external service:
 
 General:
 ```eval_rst
+:check_references: Optional. If present the validity of the DOIs from the paper’s references file will be checked.
+:repo_checks: Optional. If present the responder will perform (asynchronously) several checks on the target repository. You can configure which checks to perform using nested params. Available options are those of the `repository_checks responder`_
 :hidden: Is **true** by default.
+
+.. _`repository_checks responder`: ./repo_checks.html#params
 
 ```
 
