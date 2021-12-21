@@ -59,8 +59,9 @@ _Configuring the response_
 
 ```eval_rst
 :template_file: The optional template file to use to build the response message if the response from the external service is successful.
+:success_msg: Optional message to respond with if the service call is successful.
 :error_msg: Optional message to respond with if the service call fails with a 400/500 response.
-:silent: *<Boolean>* Optional parameter, if **true** the responder won't reply anything after the external service is called (*template_file* and *error_msg* will be ignored if present). Default is **false**.
+:silent: *<Boolean>* Optional parameter, if **true** the responder won't reply after the external service is called (*template_file*, *success_msg* and *error_msg* will overwrite this if present). Default is **false**.
 :add_labels: *<Array>* Optional parameter. Labels to add to the issue if the external service call is successful.
 :remove_labels: *<Array>* Optional parameter. Labels to remove from the issue if the external service call is successful.
 :close: *<Boolean>* Optional parameter, if **true** the responder will close the issue if the external service call is successful. Default is **false**.

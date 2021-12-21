@@ -44,10 +44,27 @@ describe ExternalServiceWorker do
     end
 
     describe "when response status is 2XX" do
-      it "should respond body" do
+      it "should respond body as default message" do
         expect(Faraday).to receive(:post).and_return(response_200)
         expect(@worker).to receive(:respond).with("Tests suite OK, build passed")
         @worker.perform(@service_params, @locals)
+      end
+
+      it "should respond using a custom message" do
+        service_params = @service_params.merge({ 'success_msg' => 'Done!' })
+
+        expect(Faraday).to receive(:post).and_return(response_200)
+        expect(@worker).to receive(:respond).with("Done!")
+        @worker.perform(service_params, @locals)
+      end
+
+      it "should respond if silent=true but there is custom message" do
+        service_params = @service_params.merge({ 'success_msg' => 'Done!' })
+        service_params = service_params.merge({ 'silent' => true })
+
+        expect(Faraday).to receive(:post).and_return(response_200)
+        expect(@worker).to receive(:respond).with("Done!")
+        @worker.perform(service_params, @locals)
       end
 
       it "should respond using a template" do
@@ -60,17 +77,19 @@ describe ExternalServiceWorker do
         @worker.perform(service_params, @locals)
       end
 
-      it "should not respond template if silent=true" do
+      it "should respond if silent=true but template is present" do
         service_params = @service_params.merge({ 'template_file' => 'test_service_reply.md' })
         service_params = service_params.merge({ 'silent' => true })
-        expect(URI).to_not receive(:parse)
-        expect(Faraday).to receive(:post).and_return(response_200)
-        expect(@worker).to_not receive(:respond)
+
+        expect(URI).to receive(:parse).at_least(:once).and_return(URI("buf.fy"))
+        expect_any_instance_of(URI::Generic).to receive(:read).once.and_return("Tests {{result}}")
+        expect(Faraday).to receive(:post).and_return(response_200_template)
+        expect(@worker).to receive(:respond).with("Tests passed")
 
         @worker.perform(service_params, @locals)
       end
 
-      it "should not respond message if silent=true" do
+      it "should not respond default message if silent=true" do
         service_params = @service_params.merge({ 'silent' => true })
         expect(Faraday).to receive(:post).and_return(response_200)
         expect(@worker).to_not receive(:respond)
@@ -117,6 +136,20 @@ describe ExternalServiceWorker do
         expect(@worker).to receive(:respond).with("Something failed!")
         @worker.perform(service_params, @locals)
       end
+
+      it "should respond custom error message if present even if silent=true" do
+        service_params = @service_params.merge({ 'error_msg' => 'Something failed!' })
+        service_params = service_params.merge({ 'silent' => true })
+
+        expect(Faraday).to receive(:post).and_return(response_400)
+        expect(@worker).to receive(:respond).with("Something failed!")
+        @worker.perform(service_params, @locals)
+
+        expect(Faraday).to receive(:post).and_return(OpenStruct.new(status: 500))
+        expect(@worker).to receive(:respond).with("Something failed!")
+        @worker.perform(service_params, @locals)
+      end
+
       it "should respond default error message " do
         expect(Faraday).to receive(:post).and_return(response_400)
         expect(@worker).to receive(:respond).with("Error (400). The tests service is currently unavailable")
@@ -127,7 +160,7 @@ describe ExternalServiceWorker do
         @worker.perform(@service_params, @locals)
       end
 
-      it "should not respond errors if silent=true" do
+      it "should not respond default error message if silent=true" do
         service_params = @service_params.merge({ 'silent' => true })
         expect(Faraday).to receive(:post).and_return(response_400)
         expect(@worker).to_not receive(:respond)

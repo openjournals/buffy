@@ -34,11 +34,14 @@ class ExternalServiceWorker < BuffyWorker
     end
 
     if response.status.between?(200, 299)
-      if service['silent'] == true
-      elsif service['template_file']
+      respond(service['success_msg']) if service['success_msg']
+
+      if service['template_file']
         parsed_response = parse_json_response(response.body)
         respond_external_template(service['template_file'], parsed_response)
-      else
+      end
+
+      unless service['success_msg'] || service['template_file'] || service['silent'] == true
         respond(response.body)
       end
 
@@ -50,14 +53,14 @@ class ExternalServiceWorker < BuffyWorker
         labels_to_remove = service['remove_labels'].uniq.compact
         labels_to_remove.each{|label| unlabel_issue(label)} unless labels_to_remove.empty?
       end
-      close_issue if service['close'] == true
 
+      close_issue if service['close'] == true
     elsif response.status.between?(400, 599)
-      if service['silent'] == true
-      elsif service['error_msg']
+      if service['error_msg']
         respond(service['error_msg'])
       else
-        respond("Error (#{response.status}). The #{service['name'].to_s} service is currently unavailable")
+        error_msg = "Error (#{response.status}). The #{service['name'].to_s} service is currently unavailable"
+        respond(error_msg) unless service['silent'] == true
       end
     end
 
