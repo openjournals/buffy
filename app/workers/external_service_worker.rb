@@ -6,6 +6,7 @@ class ExternalServiceWorker < BuffyWorker
     http_method = service['method'] || 'post'
     url = service['url']
     headers = service['headers'] || {}
+    actions_on_success = service['on_success'] || {}
     template = nil
 
     return true if url.to_s.strip.empty?
@@ -32,18 +33,34 @@ class ExternalServiceWorker < BuffyWorker
       response = Faraday.post(url, parameters.to_json, post_headers)
     end
 
-    return true if service['silent'] == true
-
     if response.status.between?(200, 299)
-      if service['template_file']
+      if service['silent'] == true
+      elsif service['template_file']
         parsed_response = parse_json_response(response.body)
         respond_external_template(service['template_file'], parsed_response)
       else
         respond(response.body)
       end
+
+      if service['add_labels'] && service['add_labels'].is_a?(Array)
+        labels_to_add = service['add_labels'].uniq.compact
+        label_issue(labels_to_add) unless labels_to_add.empty?
+      end
+      if service['remove_labels'] && service['remove_labels'].is_a?(Array)
+        labels_to_remove = service['remove_labels'].uniq.compact
+        labels_to_remove.each{|label| unlabel_issue(label)} unless labels_to_remove.empty?
+      end
+      close_issue if service['close'] == true
+
     elsif response.status.between?(400, 599)
-      respond("Error (#{response.status}). The #{service['name']} service is currently unavailable")
+      if service['silent'] == true
+      elsif service['error_msg']
+        respond(service['error_msg'])
+      else
+        respond("Error (#{response.status}). The #{service['name']} service is currently unavailable")
+      end
     end
+
   end
 
   def parse_json_response(body)

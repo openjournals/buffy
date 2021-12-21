@@ -43,46 +43,108 @@ describe ExternalServiceWorker do
       @worker.perform(@service_params.merge({'method' => 'get'}), @locals)
     end
 
-    it "should respond error message if a 400 or 500 response is received" do
-      expect(Faraday).to receive(:post).and_return(response_400)
-      expect(@worker).to receive(:respond).with("Error (400). The tests service is currently unavailable")
-      @worker.perform(@service_params, @locals)
+    describe "when response status is 2XX" do
+      it "should respond body" do
+        expect(Faraday).to receive(:post).and_return(response_200)
+        expect(@worker).to receive(:respond).with("Tests suite OK, build passed")
+        @worker.perform(@service_params, @locals)
+      end
 
-      expect(Faraday).to receive(:post).and_return(OpenStruct.new(status: 500))
-      expect(@worker).to receive(:respond).with("Error (500). The tests service is currently unavailable")
-      @worker.perform(@service_params, @locals)
+      it "should respond using a template" do
+        service_params = @service_params.merge({ 'template_file' => 'test_service_reply.md' })
+        expect(URI).to receive(:parse).at_least(:once).and_return(URI("buf.fy"))
+        expect_any_instance_of(URI::Generic).to receive(:read).once.and_return("Tests {{result}}")
+
+        expect(Faraday).to receive(:post).and_return(response_200_template)
+        expect(@worker).to receive(:respond).with("Tests passed")
+        @worker.perform(service_params, @locals)
+      end
+
+      it "should not respond template if silent=true" do
+        service_params = @service_params.merge({ 'template_file' => 'test_service_reply.md' })
+        service_params = service_params.merge({ 'silent' => true })
+        expect(URI).to_not receive(:parse)
+        expect(Faraday).to receive(:post).and_return(response_200)
+        expect(@worker).to_not receive(:respond)
+
+        @worker.perform(service_params, @locals)
+      end
+
+      it "should not respond message if silent=true" do
+        service_params = @service_params.merge({ 'silent' => true })
+        expect(Faraday).to receive(:post).and_return(response_200)
+        expect(@worker).to_not receive(:respond)
+
+        @worker.perform(service_params, @locals)
+      end
+
+      it "by default should not close or label issue" do
+        expect(@worker).to_not receive(:close_issue)
+        expect(@worker).to_not receive(:label_issue)
+        expect(@worker).to_not receive(:unlabel_issue)
+
+        expect(Faraday).to receive(:post).and_return(response_200)
+        @worker.perform(@service_params, @locals)
+      end
+
+      it "should close issue" do
+        service_params = @service_params.merge({ 'close' => true })
+        expect(@worker).to receive(:close_issue)
+
+        expect(Faraday).to receive(:post).and_return(response_200)
+        @worker.perform(service_params, @locals)
+      end
+
+      it "should manage labeling" do
+        service_params = @service_params.merge({ 'add_labels' => ['a', 'b'], 'remove_labels' => ['1', '2'] })
+        expect(@worker).to receive(:label_issue).with(['a', 'b'])
+        expect(@worker).to receive(:unlabel_issue).with('1')
+        expect(@worker).to receive(:unlabel_issue).with('2')
+
+        expect(Faraday).to receive(:post).and_return(response_200)
+        @worker.perform(service_params, @locals)
+      end
     end
 
-    it "should respond body when a 200 response is received" do
-      expect(Faraday).to receive(:post).and_return(response_200)
-      expect(@worker).to receive(:respond).with("Tests suite OK, build passed")
-      @worker.perform(@service_params, @locals)
-    end
+    describe "when response status is 400 or 500" do
+      it "should respond custom error message " do
+        service_params = @service_params.merge({ 'error_msg' => 'Something failed!' })
+        expect(Faraday).to receive(:post).and_return(response_400)
+        expect(@worker).to receive(:respond).with("Something failed!")
+        @worker.perform(service_params, @locals)
 
-    it "should respond using a template if present when a 200 response is received" do
-      service_params = @service_params.merge({ 'template_file' => 'test_service_reply.md' })
-      expect(URI).to receive(:parse).at_least(:once).and_return(URI("buf.fy"))
-      expect_any_instance_of(URI::Generic).to receive(:read).once.and_return("Tests {{result}}")
+        expect(Faraday).to receive(:post).and_return(OpenStruct.new(status: 500))
+        expect(@worker).to receive(:respond).with("Something failed!")
+        @worker.perform(service_params, @locals)
+      end
+      it "should respond default error message " do
+        expect(Faraday).to receive(:post).and_return(response_400)
+        expect(@worker).to receive(:respond).with("Error (400). The tests service is currently unavailable")
+        @worker.perform(@service_params, @locals)
 
-      expect(Faraday).to receive(:post).and_return(response_200_template)
-      expect(@worker).to receive(:respond).with("Tests passed")
-      @worker.perform(service_params, @locals)
-    end
+        expect(Faraday).to receive(:post).and_return(OpenStruct.new(status: 500))
+        expect(@worker).to receive(:respond).with("Error (500). The tests service is currently unavailable")
+        @worker.perform(@service_params, @locals)
+      end
 
-    it "should not respond message if silent=true" do
-      service_params = @service_params.merge({ 'silent' => true })
-      expect(Faraday).to receive(:post).and_return(response_200)
-      expect(@worker).to_not receive(:respond)
+      it "should not respond errors if silent=true" do
+        service_params = @service_params.merge({ 'silent' => true })
+        expect(Faraday).to receive(:post).and_return(response_400)
+        expect(@worker).to_not receive(:respond)
 
-      @worker.perform(service_params, @locals)
-    end
+        @worker.perform(service_params, @locals)
+      end
 
-    it "should not respond errors if silent=true" do
-      service_params = @service_params.merge({ 'silent' => true })
-      expect(Faraday).to receive(:post).and_return(response_400)
-      expect(@worker).to_not receive(:respond)
+      it "should never close or label issue" do
+        service_params = @service_params.merge({ 'close' => true, 'add_labels' => ['a'], 'remove_labels' => ['b'] })
+        expect(Faraday).to receive(:post).and_return(response_400)
 
-      @worker.perform(service_params, @locals)
+        expect(@worker).to_not receive(:close_issue)
+        expect(@worker).to_not receive(:label_issue)
+        expect(@worker).to_not receive(:unlabel_issue)
+
+        @worker.perform(service_params, @locals)
+      end
     end
 
   end
