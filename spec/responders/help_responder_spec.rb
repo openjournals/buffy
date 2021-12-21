@@ -34,12 +34,12 @@ describe HelpResponder do
                     teams: { editors: 2009411 },
                     responders: { "hello" => nil,
                                   "help" => nil,
-                                  "assign_reviewer_n" => { only: "editors" }}}
+                                  "assign_editor" => { only: "editors" }}}
       @responder = subject.new(@settings, {})
 
       @hello = HelloResponder.new(@settings,{})
       @help = HelpResponder.new(@settings,{})
-      @assign_reviewer_n = AssignReviewerNResponder.new(@settings,{})
+      @assign_editor = AssignEditorResponder.new(@settings,{})
 
       @context = OpenStruct.new(sender: "sender", event: "issue_comments", event_action: "issue_comment.created")
       @responder.context = @context
@@ -50,7 +50,7 @@ describe HelpResponder do
     it "should respond the help erb template to github" do
       allow_any_instance_of(Responder).to receive(:authorized?).and_return(true)
 
-      responders = [@hello, @help, @assign_reviewer_n]
+      responders = [@hello, @help, @assign_editor]
       expected_descriptions = responders.map {|r| [r.description, r.example_invocation]}
       expected_locals = { sender: "sender", descriptions_and_examples: expected_descriptions}
 
@@ -74,7 +74,7 @@ describe HelpResponder do
     end
 
     it "should list only allowed responders" do
-      allow_any_instance_of(AssignReviewerNResponder).to receive(:authorized?).and_return(false)
+      allow_any_instance_of(AssignEditorResponder).to receive(:authorized?).and_return(false)
 
       responders = [@hello, @help]
       expected_descriptions = responders.map {|r| [r.description, r.example_invocation]}
@@ -91,7 +91,7 @@ describe HelpResponder do
       responder.context = @context
       disable_github_calls_for(responder)
 
-      responders = [@help, @assign_reviewer_n]
+      responders = [@help, @assign_editor]
       expected_descriptions = responders.map {|r| [r.description, r.example_invocation]}
       expected_locals = { sender: "sender", descriptions_and_examples: expected_descriptions}
 
@@ -105,7 +105,7 @@ describe HelpResponder do
       no_comment_responder = Responder.new(@settings, {})
       no_comment_responder.event_action = "issues"
 
-      responders = [@help, no_comment_responder, @assign_reviewer_n]
+      responders = [@help, no_comment_responder, @assign_editor]
 
       expect_any_instance_of(ResponderRegistry).to receive(:load_responders!).and_return(true)
       expect_any_instance_of(ResponderRegistry).to receive(:responders).and_return(responders)

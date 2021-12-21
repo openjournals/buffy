@@ -4,7 +4,7 @@ describe ResponderRegistry do
 
   before do
     @config = { responders: { "hello" => { hidden: true },
-                              "assign_reviewer_n" => { only: "editors" },
+                              "assign_editor" => { only: "editors" },
                               "set_value" => [
                                 { version: { only: "editors" }},
                                 { archival: { name: "archive", sample_value: "doi42" }},
@@ -22,7 +22,7 @@ describe ResponderRegistry do
 
     it "should load single responders" do
       registry = described_class.new(@config)
-      single_responder = registry.responders.select { |r| r.kind_of?(AssignReviewerNResponder) }
+      single_responder = registry.responders.select { |r| r.kind_of?(AssignEditorResponder) }
 
       expect(single_responder.size).to eq(1)
       expect(single_responder[0].params).to eq({ only: "editors" })
