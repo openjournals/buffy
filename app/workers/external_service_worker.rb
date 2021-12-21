@@ -57,7 +57,7 @@ class ExternalServiceWorker < BuffyWorker
       elsif service['error_msg']
         respond(service['error_msg'])
       else
-        respond("Error (#{response.status}). The #{service['name']} service is currently unavailable")
+        respond("Error (#{response.status}). The #{service['name'].to_s} service is currently unavailable")
       end
     end
 

@@ -27,6 +27,9 @@ For example, if you configure the command to be _list editors_, it would respond
 :messages: *Optional <Array>* A list of text messages to respond with.
 :template_file: *Optional* A template file to use to build the response message.
 :data_from_issue: *<Array>* An optional list of values that will be extracted from the issue's body and used to fill the template.
+:external_call: *Optional* Configuration for a external service call. All available subparams are described in the `external_service docs`_.
+
+.. _`external_service docs`: ./external_service.html#params
 ```
 
 ## Examples

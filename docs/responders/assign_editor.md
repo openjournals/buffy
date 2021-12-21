@@ -27,6 +27,10 @@ The body of the issue should have the editor placeholder marked with HTML commen
 :add_as_assignee: *<Boolean>* If true, the editor user will be added as assignee to the issue. Default value is **true**.
 
 :add_as_collaborator: *<Boolean>* If true, the editor user will be added as collaborator to the repo. Default value is **false**.
+
+:external_call: *Optional* Configuration for a external service call. All available subparams are described in the `external_service docs`_.
+
+.. _`external_service docs`: ./external_service.html#params
 ```
 
 ## Examples
