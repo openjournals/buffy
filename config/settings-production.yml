@@ -53,6 +53,7 @@ buffy:
       - reject:
           only: eics
           command: reject
+          description: "Reject paper"
           url: "https://test.joss.theoj.org/papers/api_reject"
           query_params:
             secret: <%= ENV['JOSS_TEST_SECRET'] %>
@@ -66,6 +67,7 @@ buffy:
       - withdraw:
           only: eics
           command: withdraw
+          description: "Withdraw paper"
           url: "https://test.joss.theoj.org/papers/api_withdraw"
           query_params:
             secret: <%= ENV['JOSS_TEST_SECRET'] %>
@@ -76,6 +78,18 @@ buffy:
           success_msg: "Paper withdrawn."
           error_msg: "There was a problem withdrawing the paper."
           close: true
+      - invite_editor:
+          only: eics
+          command: "invite @(.*) as editor"
+          description: "Invite an editor to edit a submission (sending them an email)"
+          url: "https://test.joss.theoj.org/papers/api_editor_invite"
+          query_params:
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
+          mapping:
+            id: issue_id
+            editor: match_data_1
+          success_msg: Invitation to edit this submission sent!
+          error_msg: "There was a problem inviting the user to edit this submission."
     github_action:
       - draft_paper:
           command: generate pdf
