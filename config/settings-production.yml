@@ -118,4 +118,5 @@ buffy:
       if:
         title: "^\\[PRE REVIEW\\]:"
       template_file: pre-review_welcome.md
-
+      check_references:
+      repo_checks:
