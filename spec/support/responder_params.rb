@@ -13,6 +13,7 @@ module ResponderParams
       GithubActionResponder => { workflow_repo: "openjournals/joss-reviews", workflow_name: "compiler", command: "generate pdf" },
       InitialValuesResponder => { values: ["version", "target-repository"]},
       ListTeamMembersResponder => { command: "list editors", team_id: 3824115 },
+      ExternalStartReviewResponder => { external_call: { url: "https://github.com/openjournals" }},
     }
 
     params_by_responder[responder_class] || {}
