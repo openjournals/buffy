@@ -115,11 +115,18 @@ buffy:
           command: list reviewers
           template_file: reviewers_list.md
     welcome:
-      if:
-        title: "^\\[PRE REVIEW\\]:"
-      template_file: pre-review_welcome.md
-      check_references:
-      repo_checks:
+      - pre_review_issue:
+          if:
+            title: "^\\[PRE REVIEW\\]:"
+          template_file: pre-review_welcome.md
+          check_references:
+          repo_checks:
+      - review_issue:
+          if:
+            title: "^\\[REVIEW\\]:"
+          template_file: review_welcome.md
+          check_references:
+          repo_checks:
     external_start_review:
       only: editors
       external_call:
