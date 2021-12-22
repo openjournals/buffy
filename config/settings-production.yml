@@ -120,3 +120,16 @@ buffy:
       template_file: pre-review_welcome.md
       check_references:
       repo_checks:
+    external_start_review:
+      only: editors
+      external_call:
+        url: "https://test.joss.theoj.org/papers/api_start_review"
+        query_params:
+          secret: <%= ENV['JOSS_TEST_SECRET'] %>
+        mapping:
+          id: issue_id
+          editor: editor_login
+          reviewers: reviewers_logins
+        silent: true
+        template_file: "review_started.md"
+        close: true
