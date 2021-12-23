@@ -74,6 +74,29 @@ class ResponderRegistry
     available_responders
   end
 
+  # Get an instance of one of the responders in the configuration
+  def self.get_responder(config={}, responder_key=nil, responder_name=nil)
+    return nil if config.empty?
+    return nil if responder_key.nil?
+    return nil unless config[:responders].keys.include?(responder_key)
+
+    key = nil
+    responder_params = config[:responders][responder_key] || {}
+
+    if responder_name && responder_params.is_a?(Array)
+      if responder_instance = responder_params.select {|r| r.keys.first.to_s == responder_name.to_s}.first
+        key = responder_key
+        params = responder_instance[responder_name] || {}
+        params = Sinatra::IndifferentHash[name: responder_name.to_s].merge(params)
+      end
+    elsif responder_name.nil? && responder_params.is_a?(Hash)
+      key = responder_key
+      params = responder_params
+    end
+
+    return key.nil? ? nil : ResponderRegistry.available_responders[key].new(config, params)
+  end
+
   def log_error(responder, error)
     logger.warn("Error calling #{responder.class}: #{error.message}")
   end
