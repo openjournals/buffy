@@ -132,11 +132,14 @@ buffy:
           repo_checks:
     external_start_review:
       only: editors
+      data_from_issue:
+        - branch
       external_call:
         url: "https://test.joss.theoj.org/papers/api_start_review"
         query_params:
           secret: <%= ENV['JOSS_TEST_SECRET'] %>
         mapping:
+          branch: branch
           id: issue_id
           editor: editor_login
           reviewers: reviewers_logins
