@@ -122,14 +122,14 @@ buffy:
           if:
             title: "^\\[PRE REVIEW\\]:"
           template_file: pre-review_welcome.md
-          check_references:
-          repo_checks:
+          check_references: true
+          repo_checks: true
       - review_issue:
           if:
             title: "^\\[REVIEW\\]:"
           template_file: review_welcome.md
-          check_references:
-          repo_checks:
+          check_references: true
+          repo_checks: true
     external_start_review:
       only: editors
       data_from_issue:
