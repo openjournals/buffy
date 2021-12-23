@@ -18,16 +18,19 @@ buffy:
     help:
     hello:
       hidden: true
-    assign_reviewer_n:
-      only: editors
-    remove_reviewer_n:
-      only: editors
-      no_reviewer_text: "TBD"
     assign_editor:
       only: editors
     remove_editor:
       only: editors
       no_editor_text: "TBD"
+    list_of_values:
+      - reviewers:
+          only: editors
+          if:
+            role_assigned: editor
+            reject_msg: "Can't assign reviewer because there is no editor assigned for this submission yet"
+          sample_value: "@username"
+          add_as_assignee: true
     invite:
       only: eics
     set_value:

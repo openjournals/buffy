@@ -11,11 +11,6 @@ buffy:
       hidden: true
     thanks:
       hidden: true
-    assign_reviewer_n:
-      only: editors
-    remove_reviewer_n:
-      only: editors
-      no_reviewer_text: "TBD"
     assign_editor:
       only: editors
     remove_editor:
