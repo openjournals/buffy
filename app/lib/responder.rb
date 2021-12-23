@@ -195,7 +195,8 @@ class Responder
   # Create background workers to perform external calls
   def process_external_service(service_config, service_data)
     unless service_config.nil? || service_config.empty?
-      ExternalServiceWorker.perform_async(service_config, service_data)
+      service_locals = get_data_from_issue(service_config[:data_from_issue]).merge(service_data)
+      ExternalServiceWorker.perform_async(service_config, service_locals)
     end
   end
 
