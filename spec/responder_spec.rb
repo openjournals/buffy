@@ -531,7 +531,7 @@ describe Responder do
 
   describe "#process_external_service" do
     before do
-      @responder = described_class.new({ bot_github_user: "botsci" }, {})
+      @responder = described_class.new({env: { bot_github_user: "botsci" }}, {})
       disable_github_calls_for(@responder)
     end
 
@@ -550,6 +550,39 @@ describe Responder do
       expected_locals = { bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
       @responder.process_external_service(expected_params, expected_locals)
+    end
+  end
+
+  describe "#process_other_responder" do
+    before do
+      settings = { bot_github_user: "botsci",
+                   responders: { github_action:
+                                [{ draft_paper: {
+                                     command: "generate pdf",
+                                     workflow_repo: "openjournals/joss-papers-testing",
+                                     workflow_name: "draft-paper.yml",
+                                     workflow_ref: "master",
+                                     description: "Generates the pdf paper",
+                                     message: "Attempting PDF compilation. Reticulating splines etc...",
+                                     data_from_issue: ["branch", "issue_id"]}
+                                }]}}
+
+      @responder = described_class.new(settings, {})
+      @responder.context = OpenStruct.new(sender: "tester", issue_id: 33, issue_body: "", repo: "openjournals/buffy")
+      disable_github_calls_for(@responder)
+    end
+
+    it "should do nothing if no responder found" do
+      expect_any_instance_of(GithubActionResponder).to_not receive(:process_message)
+
+      @responder.process_other_responder({responder_key: :github_action})
+    end
+
+    it "should call process_message in found responder" do
+      allow_any_instance_of(GithubActionResponder).to receive(:process_message).with("test").and_return("OK")
+
+      result = @responder.process_other_responder({responder_key: :github_action, responder_name: :draft_paper, message: "test"})
+      expect(result).to eq("OK")
     end
   end
 

@@ -200,6 +200,18 @@ class Responder
     end
   end
 
+  # Call a different responder bypassing authorization
+  def process_other_responder(other_responder={})
+    matching_responder = ResponderRegistry.get_responder(@settings, other_responder[:responder_key], other_responder[:responder_name])
+
+    if matching_responder
+      matching_responder.context = context
+      msg = other_responder[:message] || ""
+      matching_responder.match_data = matching_responder.event_regex.match(msg) unless msg.empty?
+      matching_responder.process_message(msg)
+    end
+  end
+
   # Add/remove labels as configured in the responder' settings
   def process_labeling
     process_adding_labels
