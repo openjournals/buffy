@@ -94,7 +94,7 @@ class ResponderRegistry
       params = responder_params
     end
 
-    return key.nil? ? nil : ResponderRegistry.available_responders[key].new(config, params)
+    return key.nil? ? nil : ResponderRegistry.available_responders[key.to_s].new(config, params)
   end
 
   def log_error(responder, error)
