@@ -26,11 +26,12 @@ Some parameters are required for the responder to work: the `command` to invoke 
 ## Params
 ```eval_rst
 :command: *Required*. The command this responder will listen to.
+:description: The description of the action this command runs. It will show in the help command if the responder is not hidden.
+:example_invocation:  *Optional* String to show as an example of the command being used when the help command is invoked.
 :workflow_repo: *Required*. The repo to run the action on, in *org/name* format.
 :workflow_name: *Required*. Name of the workflow to run.
 :workflow_ref: Optional. The git ref for the GitHub action to use. Defaults to *main*.
 :message: An optional message to reply with once the workflow is triggered.
-:description: The description of the action this command runs. It will show in the help command if the responder is not hidden.
 :inputs: *<Map>* An optional list of params/values to pass as inputs to the GitHub Action.
 :data_from_issue: *<Array>* An optional list of fields from the body of the issue to pass as inputs to the GitHub Action.
 :mapping: *<Map>* An optional mapping of variable names to add to the inputs.

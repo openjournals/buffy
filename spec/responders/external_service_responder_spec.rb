@@ -79,4 +79,13 @@ describe ExternalServiceResponder do
     end
   end
 
+  it "#example_invocation can be customized" do
+    responder = subject.new({ env: { bot_github_user: "botsci" }},
+                            { name: "tests",
+                              url: "URL",
+                              command: "run tests for (.*)",
+                              example_invocation: "@botsci run tests in <repo-name>" })
+    expect(responder.example_invocation).to eq("@botsci run tests in <repo-name>")
+  end
+
 end

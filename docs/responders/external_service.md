@@ -39,6 +39,7 @@ _General_
 :name: *Required*. The name for this service.
 :command: *Required*. The command this responder will listen to.
 :description: The description of the service. It will show in the help command if the responder is not hidden.
+:example_invocation:  Optional string to show as an example of the command being used when the help command is invoked.
 :message: An optional message to reply when the command is received, before the external service is called.
 
 ```

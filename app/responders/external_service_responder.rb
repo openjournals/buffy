@@ -21,6 +21,6 @@ class ExternalServiceResponder < Responder
   end
 
   def example_invocation
-    "@#{bot_name} #{command}"
+    params[:example_invocation] || "@#{bot_name} #{command}"
   end
 end

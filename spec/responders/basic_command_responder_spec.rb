@@ -98,6 +98,11 @@ describe BasicCommandResponder do
       responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "list checkpoints" })
       expect(responder.example_invocation).to eq("@botsci list checkpoints")
     end
+
+    it "#example_invocation can be customized" do
+      responder = subject.new({env: {bot_github_user: "botsci"}}, { command: "list checkpoints for (.*)", example_invocation: "@botsci list checkpoints for @username" })
+      expect(responder.example_invocation).to eq("@botsci list checkpoints for @username")
+    end
   end
 
 end

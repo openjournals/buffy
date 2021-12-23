@@ -112,4 +112,13 @@ describe GithubActionResponder do
     end
   end
 
+  it "#example_invocation can be customized" do
+    responder = subject.new({ env: { bot_github_user: "botsci" } },
+                            { workflow_name: "compile",
+                              workflow_repo: "org/repo",
+                              command: "compile file (.*)",
+                              example_invocation: "@botsci compile file <FILENAME>" })
+    expect(responder.example_invocation).to eq("@botsci compile file <FILENAME>")
+  end
+
 end
