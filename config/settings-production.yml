@@ -9,14 +9,12 @@ buffy:
   responders:
     help:
       help_command: commands
-    list_of_values:
-      - reviewers:
-          only: editors
-          if:
-            role_assigned: editor
-            reject_msg: "Can't add reviewers: There is no editor assigned yet"
-          sample_value: "@username"
-          add_as_assignee: true
+    reviewers_list:
+      only: editors
+      if:
+        role_assigned: editor
+        reject_msg: "Can't add reviewers: There is no editor assigned yet"
+      add_as_assignee: true
     list_team_members:
       command: list editors
       team_id: aliadalabs/editors
