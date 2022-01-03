@@ -13,21 +13,20 @@ Allows [labeling](../labeling).
 @botname remove <value> from <list-name>
 ```
 
-For example, if you configure this responder to add/remove values for the _reviewers_ list, it would respond to:
+For example, if you configure this responder to add/remove values for the _authors_ list, it would respond to:
 ```
-@botname add @username to reviewers
+@botname add @username to authors
 ```
 ## Requirements
-
 
 The body of the issue should have the target field placeholder marked with HTML comments.
 
 ```html
 <!--<listname>-list-->  <!--end-<listname>-list-->
 ```
-Following the previous example if the name of the field is _reviewers_:
+Following the previous example if the name of the field is _authors_:
 ```html
-<!--reviewers-list-->  <!--end-reviewers-list-->
+<!--authors-list-->  <!--end-authors-list-->
 ```
 
 ## Settings key
@@ -52,7 +51,7 @@ Following the previous example if the name of the field is _reviewers_:
 ...
   responders:
     list_of_values:
-      name: reviewers
+      name: authors
 ...
 ```
 
@@ -63,10 +62,10 @@ Following the previous example if the name of the field is _reviewers_:
     list_of_values:
       - versions:
           sample_value: "v1.0.2"
-      - reviewers
+      - authors
           only: editors
           sample_value: "@username"
-          add_as_assignee: true
+          add_as_collaborator: true
 ...
 ```
 
