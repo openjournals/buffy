@@ -19,11 +19,8 @@ buffy:
             - "Our CoC: https://github.com/openjournals/joss/blob/master/CODE_OF_CONDUCT.md"
             - "It's adapted from the Contributor Covenant: http://contributor-covenant.org"
             - "Reports of abusive or harassing behavior may be reported to reports@theoj.org"
-    list_of_values:
-      - reviewers:
-          only: editors
-          sample_value: "@username"
-          add_as_assignee: true
+    reviewers_list:
+      only: editors
     assign_editor:
       only: editors
     remove_editor:
