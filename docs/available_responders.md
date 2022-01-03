@@ -17,6 +17,7 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/basic_command
    responders/assign_editor
    responders/remove_editor
+   responders/reviewers_list
    responders/invite
    responders/set_value
    responders/list_of_values
