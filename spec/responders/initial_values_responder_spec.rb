@@ -89,21 +89,21 @@ describe InitialValuesResponder do
     it "should allow warning for empty values" do
       @responder.params = { values: [{ version: [{warn_if_empty: true}] }] }
       expect(@responder).to_not receive(:update_issue)
-      expect(@responder).to receive(:respond).with("Missing values: version")
+      expect(@responder).to receive(:respond).with("The submission template is missing the following values: version")
       @responder.process_message("")
     end
 
     it "should allow warning for non-present values" do
       @responder.params = { values: [{archive: [{warn_if_empty: true}]}] }
       expect(@responder).to receive(:update_issue)
-      expect(@responder).to receive(:respond).with("Missing values: archive")
+      expect(@responder).to receive(:respond).with("The submission template is missing the following values: archive")
       @responder.process_message("")
     end
 
     it "should allow multiple warnings" do
       @responder.params = { values: [{archive: [{warn_if_empty: true}]}, {version: [{warn_if_empty: true}]}] }
       expect(@responder).to receive(:update_issue)
-      expect(@responder).to receive(:respond).with("Missing values: archive, version")
+      expect(@responder).to receive(:respond).with("The submission template is missing the following values: archive, version")
       @responder.process_message("")
     end
   end
