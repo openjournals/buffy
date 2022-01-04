@@ -1,7 +1,7 @@
 Welcome
 =======
 
-This responder acts when a new issue is opened. It can reply with text messages, using a template and/or create a background job to asynchronously call an external service's API.
+This responder acts when a new issue is opened. It can reply with text messages, using a template, create a background job to asynchronously call an external service's API and/or triggering another responder.
 
 Allows [labeling](../labeling).
 
@@ -90,8 +90,18 @@ Calling an external service:
   :query_params: *<Array>* An optional list of params to add to the query of the external call. Common place to add API_KEYS or other authentication info.
   :mapping: *<Array>* An optional mapping of variable names in the query of the external service call.
 
+```
+
+Running other responder(s):
+```eval_rst
+:run_responder: Allows to call a different responder. Subparams are:
+
+  :responder_key: *Required*. The key to find the responder in the config file.
+  :responder_name: *Optional*. The name of the responder in the config file if there are several instances under the same responder key.
+  :message: *Optional*. The message to trigger the responder with.
 
 ```
+If you want to run multiple responders, use an array of these subparams.
 
 
 General:

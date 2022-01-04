@@ -170,6 +170,38 @@ describe WelcomeResponder do
     end
   end
 
+  describe "#process_message with run_responder option" do
+    before do
+      @settings = { env: {bot_github_user: "botsci"} }
+      @context = OpenStruct.new(issue_id: 33,
+                                          issue_author: "opener",
+                                          repo: "openjournals/testing",
+                                          sender: "xuanxu",
+                                          issue_body: "Test Review\n\n<!--extra-data-->ABC123<!--end-extra-data-->")
+
+    end
+
+    it "should call a different responder" do
+      params = { responder_key: "github_action", responder_name: "compile_pdf", message: "generate pdf" }
+      responder = subject.new(@settings, {run_responder: params})
+      responder.context = @context
+
+      expect(responder).to receive(:process_other_responder).with(params)
+      responder.process_message("")
+    end
+
+    it "should call several responders" do
+      params = [{ responder_1: { responder_key: "github_action", responder_name: "compile_pdf", message: "generate pdf" }},
+                { responder_2: { responder_key: "hello" }}]
+      responder = subject.new(@settings, {run_responder: params})
+      responder.context = @context
+
+      expect(responder).to receive(:process_other_responder).with(params[0][:responder_1])
+      expect(responder).to receive(:process_other_responder).with(params[1][:responder_2])
+      responder.process_message("")
+    end
+  end
+
   describe "misconfiguration" do
     it "should raise error if there is no name for the service" do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { url: "URL" }})

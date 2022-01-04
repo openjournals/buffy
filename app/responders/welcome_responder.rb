@@ -28,6 +28,18 @@ class WelcomeResponder < Responder
       RepoChecksWorker.perform_async(locals, target_repo_value, branch_name_value, checks)
     end
 
+    if params[:run_responder]
+      if params[:run_responder].is_a?(Array)
+        params[:run_responder].each do |other_responder|
+          other_responder.each_pair do |other_responder_name, other_responder_params|
+            process_other_responder(other_responder_params)
+          end
+        end
+      else
+        process_other_responder(params[:run_responder])
+      end
+    end
+
     process_labeling
   end
 
