@@ -52,8 +52,10 @@ class ReviewersListResponder < Responder
 
   def remove(reviewer)
     if list_of_reviewers.include?(reviewer)
-      new_list = (list_of_reviewers - [reviewer]).uniq.join(", ")
-      update_value("reviewers-list", new_list)
+      new_list = (list_of_reviewers - [reviewer])
+      new_value = new_list.empty? ? no_reviewers_text : new_list.uniq.join(", ")
+
+      update_value("reviewers-list", new_value)
       respond("#{reviewer} removed from the reviewers list!")
       remove_assignee(reviewer) if add_as_assignee?(reviewer)
       process_reverse_labeling if new_list.empty?
@@ -63,7 +65,15 @@ class ReviewersListResponder < Responder
   end
 
   def list_of_reviewers
-    @list_of_reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip)
+    @list_of_reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip) - no_reviewers_texts
+  end
+
+  def no_reviewers_text
+    @no_reviewers_text ||= (params[:no_reviewers_text] || 'Pending').strip
+  end
+
+  def no_reviewers_texts
+    [no_reviewers_text, no_reviewers_text.upcase, no_reviewers_text.downcase]
   end
 
   def add_as_collaborator?(value)

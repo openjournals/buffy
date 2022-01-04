@@ -33,6 +33,8 @@ The body of the issue should have the target field placeholder marked with HTML 
 ```eval_rst
 :sample_value: *<String>* An optional sample value string for the target field. It is used for documentation purposes when the :doc:`Help responder <./help>` lists all available responders. Default value is **@username**.
 
+:no_reviewers_text: The text that will go in the reviewers list place to state there are no reviewers assigned yet. The default value is **Pending**.
+
 :add_as_assignee: *<Boolean>* Optional. If true, when adding a new reviewer will be added as assignee to the issue. Default value is **false**.
 
 :add_as_collaborator: *<Boolean>* Optional. If true, when adding a new reviewer will be added as collaborator to the repo. Default value is **false**.

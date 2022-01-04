@@ -155,6 +155,74 @@ describe ReviewersListResponder do
       end
     end
 
+    describe "No reviewers text" do
+      it "should remove 'Pending' when adding first reviewer" do
+        msg = "@botsci add @xuanxu to reviewers"
+        @responder.match_data = @responder.event_regex.match(msg)
+        issue_body = "...Reviewers: <!--reviewers-list-->Pending<!--end-reviewers-list--> ..."
+        allow(@responder).to receive(:issue_body).and_return(issue_body)
+
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@xuanxu<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+        @responder.process_message(msg)
+      end
+
+      it "should detect variations of the no reviewers text" do
+        msg = "@botsci add @xuanxu to reviewers"
+        @responder.match_data = @responder.event_regex.match(msg)
+        issue_body = "...Reviewers: <!--reviewers-list-->PENDING<!--end-reviewers-list--> ..."
+        allow(@responder).to receive(:issue_body).and_return(issue_body)
+
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@xuanxu<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+        @responder.process_message(msg)
+      end
+
+      it "should add 'Pending' when removing last reviewer" do
+        msg = "@botsci remove @xuanxu from reviewers"
+        @responder.match_data = @responder.event_regex.match(msg)
+        issue_body = "...Reviewers: <!--reviewers-list-->@xuanxu<!--end-reviewers-list--> ..."
+        allow(@responder).to receive(:issue_body).and_return(issue_body)
+
+        expected_new_body = "...Reviewers: <!--reviewers-list-->Pending<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+        @responder.process_message(msg)
+      end
+
+      describe "with custom text" do
+        before do
+          @responder.params = { no_reviewers_text: "No reviewers"}
+        end
+
+        it "should work when adding a reviewer" do
+          msg = "@botsci add @xuanxu to reviewers"
+          @responder.match_data = @responder.event_regex.match(msg)
+          issue_body = "...Reviewers: <!--reviewers-list-->No reviewers<!--end-reviewers-list--> ..."
+          allow(@responder).to receive(:issue_body).and_return(issue_body)
+
+          expected_new_body = "...Reviewers: <!--reviewers-list-->@xuanxu<!--end-reviewers-list--> ..."
+          expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+          @responder.process_message(msg)
+        end
+
+        it "should work when removing a reviewer" do
+          msg = "@botsci remove @xuanxu from reviewers"
+          @responder.match_data = @responder.event_regex.match(msg)
+          issue_body = "...Reviewers: <!--reviewers-list-->@xuanxu<!--end-reviewers-list--> ..."
+          allow(@responder).to receive(:issue_body).and_return(issue_body)
+
+          expected_new_body = "...Reviewers: <!--reviewers-list-->No reviewers<!--end-reviewers-list--> ..."
+          expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+
+          @responder.process_message(msg)
+        end
+      end
+    end
+
     describe "labeling" do
       it "should process labeling when adding the first reviewer" do
         msg = "@botsci add @xuanxu to reviewers"
