@@ -122,12 +122,18 @@ buffy:
           template_file: pre-review_welcome.md
           check_references: true
           repo_checks: true
+          run_responder:
+            responder_key: github_action
+            responder_name: draft_paper
       - review_issue:
           if:
             title: "^\\[REVIEW\\]:"
           template_file: review_welcome.md
           check_references: true
           repo_checks: true
+          run_responder:
+            responder_key: github_action
+            responder_name: draft_paper
     external_start_review:
       only: editors
       external_call:
