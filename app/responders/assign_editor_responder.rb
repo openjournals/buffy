@@ -6,14 +6,14 @@ class AssignEditorResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} assign (\S+) as editor\.?\s*\z/i
+    @event_regex = /\A@#{bot_name} (assign|add) (\S+) as editor\.?\s*\z/i
   end
 
   def process_message(message)
     mark = "<!--editor-->"
     end_mark = "<!--end-editor-->"
 
-    new_editor = @match_data[1]
+    new_editor = @match_data[2]
     new_editor = "@#{context.sender}" if new_editor == "me"
 
     old_editor = read_from_body(mark, end_mark)
