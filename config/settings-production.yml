@@ -33,6 +33,8 @@ buffy:
         silent: true
     remove_editor:
       only: editors
+    reminders:
+      only: editors
     check_references:
     repo_checks:
     reviewer_checklist_comment:
