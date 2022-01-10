@@ -1,6 +1,5 @@
 require_relative "../lib/responder"
 
-
 class ExternalStartReviewResponder < Responder
 
   keyname :external_start_review

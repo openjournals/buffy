@@ -17,6 +17,7 @@ gem 'rexml'
 gem 'github-linguist'
 gem 'licensee'
 gem 'issue'
+gem 'chronic'
 
 group :test do
   gem 'rack-test'
