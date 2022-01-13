@@ -22,12 +22,13 @@ describe RepoChecksWorker do
     end
 
     it "should run only specified checks" do
+      expect(@worker).to receive(:count_words)
       expect(@worker).to receive(:repo_summary)
       expect(@worker).to_not receive(:detect_languages)
       @worker.perform({}, 'url', 'main', ["repo summary"])
 
       expect(@worker).to_not receive(:repo_summary)
-      @worker.perform({}, 'url', 'main', ["whatever", "repo_summary"])
+      @worker.perform({}, 'url', 'main', ["wordcount", "whatever", "repo_summary"])
     end
 
     it "should cleanup created folder" do
@@ -88,6 +89,23 @@ describe RepoChecksWorker do
     end
   end
 
+  describe "#count_words" do
+    it "should do nothing if no paper found" do
+      allow(@worker).to receive(:path).and_return("")
+      expect(@worker).to_not receive(:respond)
+      @worker.count_words
+    end
+
+    it "should respond message with wordcount" do
+      allow(@worker).to receive(:paper_file).and_return(PaperFile.new("paper/paper.md"))
+      expected_wc_command = "cat paper/paper.md | wc -w"
+      allow(Open3).to receive(:capture3).with(expected_wc_command).and_return(["  263\n", "", ""])
+
+      expect(@worker).to receive(:respond).with("Wordcount for `paper.md` is 263")
+      @worker.count_words
+    end
+  end
+
   describe "#detect_license" do
     it "should do nothing if license found" do
       project = OpenStruct.new(license: "MIT")
@@ -118,6 +136,14 @@ describe RepoChecksWorker do
       allow(PaperFile).to receive(:find).with(@worker.path).and_return(paper)
       expect(@worker).to receive(:respond).with("Failed to discover a `Statement of need` section in paper")
       @worker.detect_statement_of_need
+    end
+  end
+
+  describe "#paper_file" do
+    it "should try to find a paper in the path" do
+      expect(PaperFile).to receive(:find).with(@worker.path).and_return("PaperFile OK")
+
+      expect(@worker.paper_file).to eq("PaperFile OK")
     end
   end
 end

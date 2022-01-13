@@ -4,7 +4,7 @@ require 'licensee'
 
 class RepoChecksWorker < BuffyWorker
 
-  AVAILABLE_CHECKS = ["repo summary", "languages", "license", "statement of need"]
+  AVAILABLE_CHECKS = ["repo summary", "languages", "wordcount", "license", "statement of need"]
 
   def perform(locals, url, branch, checks)
     load_context_and_env(locals)
@@ -19,6 +19,7 @@ class RepoChecksWorker < BuffyWorker
 
     repo_summary if perform_checks.include?("repo summary")
     detect_languages if perform_checks.include?("languages")
+    count_words if perform_checks.include?("wordcount")
     detect_license if perform_checks.include?("license")
     detect_statement_of_need if perform_checks.include?("statement of need")
 
@@ -56,15 +57,27 @@ class RepoChecksWorker < BuffyWorker
     label_issue(top_3) unless top_3.empty?
   end
 
+  def count_words
+    return if paper_file.paper_path.nil?
+
+    word_count = Open3.capture3("cat #{paper_file.paper_path} | wc -w")[0].to_i
+
+    respond("Wordcount for `#{File.basename(paper_file.paper_path)}` is #{word_count}")
+  end
+
   def detect_license
     license = Licensee.project(path).license
     respond("Failed to discover a valid open source license") if license.nil?
   end
 
   def detect_statement_of_need
-    unless PaperFile.find(path).text =~ /# Statement of Need/i
+    unless paper_file.text =~ /# Statement of Need/i
       respond("Failed to discover a `Statement of need` section in paper")
     end
+  end
+
+  def paper_file
+    @paper_file ||= PaperFile.find(path)
   end
 
 end
