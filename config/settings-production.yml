@@ -107,6 +107,20 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
+      - recommend_acceptance:
+          only: editors
+          command: recommend_acceptance
+          workflow_repo: openjournals/joss-papers-testing
+          workflow_name: recommend-acceptance.yml
+          workflow_ref: master
+          description: Recommends the submission for acceptance
+          message: "Attempting PDF compilation. Reticulating splines etc..."
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
     basic_command:
       - query_scope:
           only: editors
