@@ -147,7 +147,7 @@ describe "Github methods" do
 
     it "should be false if user is not a collaborator" do
       expect_any_instance_of(Octokit::Client).to receive(:collaborator?).twice.with("openjournals/buffy", "xuanxu").and_return(false)
-      expect(subject.is_collaborator?("@XuanXu")).to eq(false)
+      expect(subject.is_collaborator?("@xuanxu")).to eq(false)
       expect(subject.is_collaborator?("xuanxu")).to eq(false)
     end
   end
@@ -159,7 +159,7 @@ describe "Github methods" do
     end
 
     it "should be true if user has a pending invitation" do
-      expect(subject.is_invited?("@BUFfy")).to eq(true)
+      expect(subject.is_invited?("@buffy")).to eq(true)
       expect(subject.is_invited?("buffy")).to eq(true)
     end
 
@@ -176,7 +176,7 @@ describe "Github methods" do
 
     it "should use the user's login" do
       expect_any_instance_of(Octokit::Client).to receive(:add_collaborator).once.with("openjournals/buffy", "xuanxu")
-      subject.add_collaborator("@XuanXu")
+      subject.add_collaborator("@xuanxu")
     end
   end
 
@@ -188,7 +188,7 @@ describe "Github methods" do
 
     it "should use the user's login" do
       expect_any_instance_of(Octokit::Client).to receive(:remove_collaborator).once.with("openjournals/buffy", "xuanxu")
-      subject.remove_collaborator("@XuanXu")
+      subject.remove_collaborator("@xuanxu")
     end
   end
 
@@ -200,7 +200,7 @@ describe "Github methods" do
 
     it "should use the user's login" do
       expect_any_instance_of(Octokit::Client).to receive(:add_assignees).once.with("openjournals/buffy", 5, ["xuanxu"])
-      subject.add_assignee("@XuanXu")
+      subject.add_assignee("@xuanxu")
     end
   end
 
@@ -212,7 +212,7 @@ describe "Github methods" do
 
     it "should use the user's login" do
       expect_any_instance_of(Octokit::Client).to receive(:remove_assignees).once.with("openjournals/buffy", 5, ["xuanxu"])
-      subject.remove_assignee("@XuanXu")
+      subject.remove_assignee("@xuanxu")
     end
   end
 
@@ -492,12 +492,8 @@ describe "Github methods" do
       expect(subject.user_login("@buffy")).to eq("buffy")
     end
 
-    it "should downcase the username" do
-      expect(subject.user_login("@BuFFy")).to eq("buffy")
-    end
-
     it "should strip the username" do
-      expect(subject.user_login(" Buffy  ")).to eq("buffy")
+      expect(subject.user_login(" buffy  ")).to eq("buffy")
     end
   end
 
