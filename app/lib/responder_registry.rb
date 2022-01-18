@@ -24,6 +24,30 @@ class ResponderRegistry
         log_error(responder, err)
       end
     end; nil
+
+    reply_for_wrong_command(message, context) unless accept_message?(message)
+  end
+
+  def accept_message?(message)
+    understood = false
+    candidate_responders = responders.select{|responder| responder.event_action == "issue_comment.created" }
+    candidate_responders.each do |responder|
+      if responder.event_regex && responder.event_regex.match?(message)
+        understood = true
+        break
+      end
+    end
+    understood
+  end
+
+  def reply_for_wrong_command(message, context)
+    params = Sinatra::IndifferentHash[]
+    params = params.merge(config[:responders][:wrong_command]) if config[:responders][:wrong_command].is_a?(Hash)
+
+    wrong_command_context = context.dup
+    wrong_command_context.event_action = "wrong_command"
+
+    WrongCommandResponder.new(config, params).call(message, wrong_command_context)
   end
 
   def add_responder(responder)

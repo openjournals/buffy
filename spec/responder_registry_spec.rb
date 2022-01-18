@@ -3,15 +3,16 @@ require_relative "./spec_helper.rb"
 describe ResponderRegistry do
 
   before do
-    @config = Sinatra::IndifferentHash[responders: { "hello" => { hidden: true },
-                              "assign_editor" => { only: "editors" },
-                              "set_value" => [
-                                { version: { only: "editors" }},
-                                { archival: { name: "archive", sample_value: "doi42" }},
-                                { url: nil }
-                              ]
-                            }
-              ]
+    @config = Sinatra::IndifferentHash[env: { bot_github_user: "botsci" },
+                                        responders: { "hello" => { hidden: true },
+                                          "assign_editor" => { only: "editors" },
+                                          "set_value" => [
+                                            { version: { only: "editors" }},
+                                            { archival: { name: "archive", sample_value: "doi42" }},
+                                            { url: nil }
+                                          ]
+                                        }
+                                      ]
   end
 
   describe "initialization" do
@@ -105,4 +106,80 @@ describe ResponderRegistry do
       expect(ResponderRegistry.get_responder(@config, nil)).to be_nil
     end
   end
+
+  describe "#accept_message?" do
+    it "should be true if any responder responds to the message" do
+      registry = described_class.new(@config)
+      expect(registry.accept_message?("Hello @botsci")).to be true
+      expect(registry.accept_message?("@botsci assign me as editor")).to be true
+      expect(registry.accept_message?("@botsci set v1.0 as version")).to be true
+      expect(registry.accept_message?("@botsci set dois212 as archive")).to be true
+      expect(registry.accept_message?("@botsci set www as url")).to be true
+    end
+
+    it "should be false if no responder responds to the message" do
+      registry = described_class.new(@config)
+      expect(registry.accept_message?("@botsci whatever")).to be false
+      expect(registry.accept_message?("Hello @bot")).to be false
+      expect(registry.accept_message?("@botsci set v1.0 as unknown_param")).to be false
+    end
+  end
+
+  describe "#reply_for_wrong_command" do
+    it "should call WrongCommandResponder with proper info" do
+      context = OpenStruct.new(issue_id: 15, issue_author: "opener", event_action: "issue_comment.created")
+      message = "@botsci whatever"
+
+      expected_context = OpenStruct.new(issue_id: 15, issue_author: "opener", event_action: "wrong_command")
+      expect(WrongCommandResponder).to receive(:new).with(@config, {}).and_return(WrongCommandResponder.new(@config, {}))
+      expect_any_instance_of(WrongCommandResponder).to receive(:call).with(message, expected_context)
+
+      registry = described_class.new(@config)
+      registry.reply_for_wrong_command(message, context)
+    end
+
+    it "should use params from wrong_command config" do
+      message = "@botsci whatever"
+      context = OpenStruct.new(event_action: "issue_comment.created")
+      expected_context = OpenStruct.new(event_action: "wrong_command")
+      params =  {ignore: true, message: "I don't understand"}
+      config = @config.merge(responders: {wrong_command: params})
+      registry = described_class.new(config)
+
+      expect(WrongCommandResponder).to receive(:new).with(config, params).and_return(WrongCommandResponder.new(config, params))
+      expect_any_instance_of(WrongCommandResponder).to receive(:call).with(message, expected_context)
+
+      registry.reply_for_wrong_command(message, context)
+    end
+  end
+
+  describe "#respond" do
+    it "should call responders" do
+      msg = "Hi @botsci"
+      context = OpenStruct.new(event_action: "issue_comment.created")
+
+      registry = described_class.new(@config)
+      registry.responders.each do |responder|
+        expect(responder).to receive(:call).with(msg, context)
+      end
+
+      registry.respond(msg, context)
+    end
+
+    it "should call reply_for_wrong_command if no responder understand the message" do
+      registry = described_class.new(@config)
+      expect(registry).to receive(:reply_for_wrong_command)
+
+      registry.respond("@botsci whatever", OpenStruct.new(event_action: "issue_comment.created"))
+    end
+
+    it "should not call reply_for_wrong_command if any responder understand the message" do
+      registry = described_class.new(@config)
+      expect(registry).to_not receive(:reply_for_wrong_command)
+      expect_any_instance_of(HelloResponder).to receive(:call)
+
+      registry.respond("Hi @botsci", OpenStruct.new(event_action: "issue_comment.created"))
+    end
+  end
+
 end
