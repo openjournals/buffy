@@ -121,6 +121,8 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
+          add_labels:
+            - recommend-accept
     basic_command:
       - query_scope:
           only: editors
