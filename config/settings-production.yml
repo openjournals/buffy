@@ -114,7 +114,7 @@ buffy:
           workflow_name: recommend-acceptance.yml
           workflow_ref: master
           description: Recommends the submission for acceptance
-          message: "Attempting PDF compilation. Reticulating splines etc..."
+          message: "```\nAttempting dry run of processing paper acceptance...\n```"
           data_from_issue:
             - branch
             - target-repository
