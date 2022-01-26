@@ -123,6 +123,23 @@ buffy:
             repository_url: target-repository
           add_labels:
             - recommend-accept
+      - accept:
+          only: eics
+          command: accept
+          workflow_repo: openjournals/joss-papers-testing
+          workflow_name: accept.yml
+          workflow_ref: master
+          description: Accept and publish the paper
+          message: "```\nDoing it live! Attempting automated processing of paper acceptance...\n```"
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
+          add_labels:
+            - accepted
+            - published
     basic_command:
       - query_scope:
           only: editors
