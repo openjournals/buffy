@@ -8,7 +8,10 @@ buffy:
     eics: aliadalabs/editors
   responders:
     help:
-      help_command: commands
+      - commands:
+          help_command: commands
+      - help:
+          help_command: help
     whedon:
     reviewers_list:
       only: editors
