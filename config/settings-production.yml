@@ -9,6 +9,7 @@ buffy:
   responders:
     help:
       help_command: commands
+    whedon:
     reviewers_list:
       only: editors
       if:
