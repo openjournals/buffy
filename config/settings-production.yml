@@ -12,6 +12,7 @@ buffy:
           help_command: commands
       - help:
           help_command: help
+          hidden: true
     whedon:
     reviewers_list:
       only: editors
