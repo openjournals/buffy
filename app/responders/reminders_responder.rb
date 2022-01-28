@@ -59,7 +59,8 @@ class RemindersResponder < Responder
   end
 
   def description
-    "Remind an author or reviewer to return to a review after a certain period of time (supported units days and weeks)"
+    "Remind an author or reviewer to return to a review after a " + "\n" +
+    "# certain period of time (supported units days and weeks)"
   end
 
   def example_invocation
