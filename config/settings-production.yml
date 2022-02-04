@@ -114,7 +114,7 @@ buffy:
             repository_url: target-repository
       - recommend_acceptance:
           only: editors
-          command: recommend acceptance
+          command: recommend-accept
           workflow_repo: openjournals/joss-papers-testing
           workflow_name: recommend-acceptance.yml
           workflow_ref: master
