@@ -237,6 +237,11 @@ module GitHub
     "https://github.com/#{context.repo}/invitations"
   end
 
+  # The url of a comment in the current issue
+  def comment_url(comment_id)
+    "https://github.com/#{context.repo}/issues/#{context.issue_id}#issuecomment-#{comment_id}"
+  end
+
   # Returns the user login (removes the @ from the username)
   def user_login(username)
     username.strip.sub(/^@/, "")

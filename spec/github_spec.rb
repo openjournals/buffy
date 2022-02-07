@@ -449,6 +449,14 @@ describe "Github methods" do
     end
   end
 
+  describe "#comment_url" do
+    it "should return the url of the comment in the context's issue" do
+      expected_url = "https://github.com/openjournals/buffy/issues/5#issuecomment-1031221716"
+      expect(subject.comment_url("1031221716")).to eq(expected_url)
+      expect(subject.comment_url(1031221716)).to eq(expected_url)
+    end
+  end
+
   describe ".get_team_ids" do
     it "should convert all team entries to ids" do
       config = { teams: { editors: 11, eics: "openjournals/eics", nonexistent: "openjournals/nope" }, env: {gh_access_token: "ABC123"}}
