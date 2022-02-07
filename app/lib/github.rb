@@ -238,7 +238,8 @@ module GitHub
   end
 
   # The url of a comment in the current issue
-  def comment_url(comment_id)
+  def comment_url(comment_id=nil)
+    comment_id = context.comment_id if comment_id.nil?
     "https://github.com/#{context.repo}/issues/#{context.issue_id}#issuecomment-#{comment_id}"
   end
 

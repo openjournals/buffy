@@ -450,10 +450,19 @@ describe "Github methods" do
   end
 
   describe "#comment_url" do
+    before do
+      subject.context[:comment_id] = "3333333"
+    end
+
     it "should return the url of the comment in the context's issue" do
       expected_url = "https://github.com/openjournals/buffy/issues/5#issuecomment-1031221716"
       expect(subject.comment_url("1031221716")).to eq(expected_url)
       expect(subject.comment_url(1031221716)).to eq(expected_url)
+    end
+
+    it "should return the url of the context's comment if no comment_id" do
+      expected_url = "https://github.com/openjournals/buffy/issues/5#issuecomment-3333333"
+      expect(subject.comment_url).to eq(expected_url)
     end
   end
 
