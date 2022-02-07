@@ -30,7 +30,7 @@ class ReviewerChecklistCommentResponder < Responder
       mapping = checklists_mapping.merge({"#{context.sender}" => "📝 [Checklist for @#{context.sender}](#{comment_url})"})
 
       checklists = mapping.keys.map do |k|
-        "<!--checklist-for-#{k}-->#{mapping[k]}<!--end-checklist-for-#{k}-->"
+        "<!--checklist-for-#{k}-->\n#{mapping[k]}\n<!--end-checklist-for-#{k}-->"
       end
 
       update_value("checklist-comments", "\n#{checklists.join('\n')}\n")

@@ -67,8 +67,8 @@ describe ReviewerChecklistCommentResponder do
         expect(@responder).to receive(:update_comment).with(111222, expected_checklist)
 
 
-        @link1 = "<!--checklist-for-reviewer1-->📝 [Checklist for @reviewer1](https://github.com/openjournals/buffy/issues/5#issuecomment-111222)<!--end-checklist-for-reviewer1-->"
-        @link2 = "<!--checklist-for-reviewer2-->📝 [Checklist for @reviewer2](https://github.com/openjournals/buffy/issues/5#issuecomment-222222)<!--end-checklist-for-reviewer2-->"
+        @link1 = "<!--checklist-for-reviewer1-->\n📝 [Checklist for @reviewer1](https://github.com/openjournals/buffy/issues/5#issuecomment-111222)\n<!--end-checklist-for-reviewer1-->"
+        @link2 = "<!--checklist-for-reviewer2-->\n📝 [Checklist for @reviewer2](https://github.com/openjournals/buffy/issues/5#issuecomment-222222)\n<!--end-checklist-for-reviewer2-->"
         @checklists_links = "\n#{@link1}\n#{@link2}\n"
       end
 
