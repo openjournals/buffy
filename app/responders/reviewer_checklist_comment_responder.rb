@@ -15,14 +15,40 @@ class ReviewerChecklistCommentResponder < Responder
     if sender_in_reviewers_list?
       checklist = render_external_template(template_file, locals)
       update_comment(context.comment_id, checklist)
+      update_checklists_links
     else
       respond("@#{context.sender} I can't do that because you are not a reviewer")
     end
   end
 
   def sender_in_reviewers_list?
-    reviewers = read_value_from_body("reviewers-list").split(",").map(&:strip)
     reviewers.include?("@#{context.sender}")
+  end
+
+  def update_checklists_links
+    if issue_body_has?("checklist-comments")
+      mapping = checklists_mapping.merge({"#{context.sender}" => "📝 [Checklist for @#{context.sender}](#{comment_url})"})
+
+      checklists = mapping.keys.map do |k|
+        "<!--checklist-for-#{k}-->#{mapping[k]}<!--end-checklist-for-#{k}-->"
+      end
+
+      update_value("checklist-comments", "\n#{checklists.join('\n')}\n")
+    end
+  end
+
+  def reviewers
+    @reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip)
+  end
+
+  def checklists_mapping
+    mapping = {}
+    reviewers.each do |rev|
+      rev_login = rev.gsub("@", "")
+      checklink_link = read_value_from_body("checklist-for-rev_login")
+      mapping[rev_login] = checklink_link unless checklink_link.empty?
+    end
+    mapping
   end
 
   def command
