@@ -33,7 +33,7 @@ class ReviewerChecklistCommentResponder < Responder
         "<!--checklist-for-#{k}-->\n#{mapping[k]}\n<!--end-checklist-for-#{k}-->"
       end
 
-      update_value("checklist-comments", "\n#{checklists.join('\n')}\n")
+      update_value("checklist-comments", "\n"+checklists.join("\n")+"\n")
     end
   end
 
@@ -45,7 +45,7 @@ class ReviewerChecklistCommentResponder < Responder
     mapping = {}
     reviewers.each do |rev|
       rev_login = rev.gsub("@", "")
-      checklink_link = read_value_from_body("checklist-for-rev_login")
+      checklink_link = read_value_from_body("checklist-for-#{rev_login}")
       mapping[rev_login] = checklink_link unless checklink_link.empty?
     end
     mapping

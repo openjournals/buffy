@@ -60,6 +60,8 @@ describe ReviewerChecklistCommentResponder do
 
     context "checklist links" do
       before do
+        @responder.context[:sender] = "reviewer1"
+
         expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "reviewer1" }
         expected_checklist = "Checklist for @reviewer1 \n[] A"
 
@@ -69,28 +71,29 @@ describe ReviewerChecklistCommentResponder do
 
         @link1 = "<!--checklist-for-reviewer1-->\n📝 [Checklist for @reviewer1](https://github.com/openjournals/buffy/issues/5#issuecomment-111222)\n<!--end-checklist-for-reviewer1-->"
         @link2 = "<!--checklist-for-reviewer2-->\n📝 [Checklist for @reviewer2](https://github.com/openjournals/buffy/issues/5#issuecomment-222222)\n<!--end-checklist-for-reviewer2-->"
-        @checklists_links = "\n#{@link1}\n#{@link2}\n"
       end
 
       it "should not add link to checklist if no checklist-comments mark" do
-        @responder.context[:sender] = "reviewer1"
-
         expect(@responder).to_not receive(:update_value)
         @responder.process_message(@msg)
       end
 
-      it "should add link to checklist to the issue text" do
-        @responder.context[:sender] = "reviewer1"
-
+      it "should add link to the issue's text" do
         @responder.context[:issue_body] += "<!--checklist-comments--><!--end-checklist-comments-->"
 
         expect(@responder).to receive(:update_value).with("checklist-comments", "\n#{@link1}\n")
         @responder.process_message(@msg)
       end
 
-      it "should update links to checklist in the issue's text" do
-        @responder.context[:sender] = "reviewer1"
+      it "should add link to existing checklist" do
+        @responder.context[:issue_body] += "<!--checklist-comments-->#{@link2}<!--end-checklist-comments-->"
 
+        expect(@responder).to receive(:update_value).with("checklist-comments", "\n#{@link2}\n#{@link1}\n")
+        @responder.process_message(@msg)
+      end
+
+      it "should update links to checklist in the issue's text" do
+        previous_link = "<!--checklist-for-reviewer1-->Whatever<!--end-checklist-for-reviewer1-->"
         @responder.context[:issue_body] += "<!--checklist-comments--><!--end-checklist-comments-->"
 
         expect(@responder).to receive(:update_value).with("checklist-comments", "\n#{@link1}\n")
