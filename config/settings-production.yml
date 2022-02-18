@@ -4,98 +4,190 @@ buffy:
     gh_access_token: <%= ENV['BUFFY_GH_ACCESS_TOKEN'] %>
     gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
-    editors: 3824115
+    editors: aliadalabs/editors
+    eics: aliadalabs/editors
   responders:
     help:
-    hello:
-      hidden: true
-    thanks:
-      hidden: true
-    basic_command:
-      - code_of_conduct:
-          command: code of conduct
-          description: Show our community Code of Conduct and Guidelines
-          messages:
-            - "Our CoC: https://github.com/openjournals/joss/blob/master/CODE_OF_CONDUCT.md"
-            - "It's adapted from the Contributor Covenant: http://contributor-covenant.org"
-            - "Reports of abusive or harassing behavior may be reported to reports@theoj.org"
+      - commands:
+          help_command: commands
+      - help:
+          help_command: help
+          hidden: true
+    whedon:
     reviewers_list:
       only: editors
-    assign_editor:
-      only: editors
-    remove_editor:
-      only: editors
-      no_editor_text: "TBD"
-    invite:
-      only: editors
-    add_remove_assignee:
-      only: editors
+      if:
+        role_assigned: editor
+        reject_msg: "Can't add reviewers: There is no editor assigned yet"
+      add_as_assignee: true
     list_team_members:
       command: list editors
-      team_id: 3824115
-      heading: Current journal editors
+      team_id: aliadalabs/editors
+      heading: List of Test-JOSS editors
+      description: "Get a list of all editors's GitHub handles"
+    assign_editor:
+      only: editors
+      external_call:
+        url: "https://test.joss.theoj.org/papers/api_assign_editor"
+        method: post
+        query_params:
+          secret: <%= ENV['JOSS_TEST_SECRET'] %>
+        mapping:
+          id: issue_id
+          editor: editor
+        silent: true
+    remove_editor:
+      only: editors
+    reminders:
+      only: editors
     check_references:
     repo_checks:
+    reviewer_checklist_comment:
+      template_file: reviewer_checklist.md
+      data_from_issue:
+        - target-repository
+        - author-handle
     set_value:
       - version:
           only: editors
           sample_value: "v1.0.0"
       - archive:
           only: editors
-          sample_value: "10.21105/joss.12345"
-    label_command:
-      - review_ok:
+          sample_value: "10.21105/zenodo.12345"
+      - branch:
           only: editors
-          command: review successful
-          add_labels:
-            - reviewed
-            - recommend publication
-            - pending publication
-          remove_labels:
-            - ongoing
-            - pending review
-      - review_nok:
-          only: editors
-          command: review failed
-          add_labels:
-            - recommend rejection
-    welcome:
-      template_file: welcome.md
-      data_from_issue:
-        - repository
-    close_issue_command:
-      only: editors
-      command: reject
-      add_labels:
-        - rejected
+          sample_value: "joss-paper"
     external_service:
-      - code_quality:
-          only: editors
-          command: analyze code
-          description: Reports on the quality of the code
-          message: Inspecting code...
-          url: https://dummy-external-service.herokuapp.com/code-analysis
-          method: post
+      - reject:
+          only: eics
+          command: reject
+          description: "Reject paper"
+          url: "https://test.joss.theoj.org/papers/api_reject"
           query_params:
-            secret: A1234567890Z
-          data_from_issue:
-            - target-repository
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
           mapping:
-            target_url: target-repository
-          headers:
-            Authorization: OAUTH-token 123456
-            Time-Zone: Europe/Amsterdam
-      - cat_facts:
-          command: tell me something about cats
-          description: Random facts about cats
-          url: "https://cat-fact.herokuapp.com/facts/random"
-          method: get
+            id: issue_id
+          add_labels:
+            - rejected
+          success_msg: "Paper rejected."
+          error_msg: "There was a problem rejecting the paper."
+          close: true
+      - withdraw:
+          only: eics
+          command: withdraw
+          description: "Withdraw paper"
+          url: "https://test.joss.theoj.org/papers/api_withdraw"
           query_params:
-              animal_type: cat
-              amount: 1
-          template_file: cats.md
-    reviewer_checklist_comment:
-      template_file: reviewer_checklist.md
-      data_from_issue:
-        - target-repository
-        - author-handle
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
+          mapping:
+            id: issue_id
+          add_labels:
+            - withdrawn
+          success_msg: "Paper withdrawn."
+          error_msg: "There was a problem withdrawing the paper."
+          close: true
+      - invite_editor:
+          only: eics
+          command: "invite @(.*) as editor"
+          description: "Invite an editor to edit a submission (sending them an email)"
+          url: "https://test.joss.theoj.org/papers/api_editor_invite"
+          query_params:
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
+          mapping:
+            id: issue_id
+            editor: match_data_1
+          success_msg: Invitation to edit this submission sent!
+          error_msg: "There was a problem inviting the user to edit this submission."
+    github_action:
+      - draft_paper:
+          command: generate pdf
+          workflow_repo: openjournals/joss-papers-testing
+          workflow_name: draft-paper.yml
+          workflow_ref: master
+          description: Generates the pdf paper
+          message: "Attempting PDF compilation. Reticulating splines etc..."
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
+      - recommend_acceptance:
+          only: editors
+          command: recommend-accept
+          workflow_repo: openjournals/joss-papers-testing
+          workflow_name: recommend-acceptance.yml
+          workflow_ref: master
+          description: Recommends the submission for acceptance
+          message: "```\nAttempting dry run of processing paper acceptance...\n```"
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
+          add_labels:
+            - recommend-accept
+      - accept:
+          only: eics
+          command: accept
+          workflow_repo: openjournals/joss-papers-testing
+          workflow_name: accept.yml
+          workflow_ref: master
+          description: Accept and publish the paper
+          message: "```\nDoing it live! Attempting automated processing of paper acceptance...\n```"
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
+          add_labels:
+            - accepted
+            - published
+    basic_command:
+      - query_scope:
+          only: editors
+          command: query scope
+          description: Flag submission with questionable scope
+          add_labels:
+            - query-scope
+          message: "Submission flagged for editorial review."
+      - list_reviewers:
+          command: list reviewers
+          description: Get a link to the complete list of reviewers
+          template_file: reviewers_list.md
+    welcome:
+      - pre_review_issue:
+          if:
+            title: "^\\[PRE REVIEW\\]:"
+          template_file: pre-review_welcome.md
+          check_references: true
+          repo_checks: true
+          run_responder:
+            responder_key: github_action
+            responder_name: draft_paper
+      - review_issue:
+          if:
+            title: "^\\[REVIEW\\]:"
+          template_file: review_welcome.md
+          check_references: true
+          repo_checks: true
+          run_responder:
+            responder_key: github_action
+            responder_name: draft_paper
+    external_start_review:
+      only: editors
+      external_call:
+        url: "https://test.joss.theoj.org/papers/api_start_review"
+        query_params:
+          secret: <%= ENV['JOSS_TEST_SECRET'] %>
+        data_from_issue:
+          - branch
+        mapping:
+          id: issue_id
+          editor: editor_login
+          reviewers: reviewers_logins
+        silent: true
+        template_file: "review_started.md"
+        close: true
