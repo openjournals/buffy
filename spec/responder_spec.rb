@@ -72,6 +72,7 @@ describe Responder do
     before do
       @responder = Responder.new({}, {})
       @responder.context = OpenStruct.new(issue_title: "[REVIEW] Software review",
+                                          issue_labels: ["accepted", "python"],
                                           issue_body: "Test Review\n\n ... description ...\n" +
                                                       "<!--editor-->@editor<!--end-editor-->\n" +
                                                       "<!--editor-2-->L.B.<!--end-editor-2-->\n" +
@@ -140,8 +141,16 @@ describe Responder do
       expect(@responder.meet_conditions?).to be_falsy
     end
 
+    it "should be false if labels condition is not met" do
+      @responder.params = { if: {labels: "whatever"} }
+      expect(@responder.meet_conditions?).to be_falsy
+
+      @responder.params = { if: {labels: ["accepted", "published"]} }
+      expect(@responder.meet_conditions?).to be_falsy
+    end
+
     it "should be false if any condition is not met" do
-      @responder.params = { if: {title: "REVIEW", body: "^Test Review", value_exists: "author", reject_msg: "Can't do that"} }
+      @responder.params = { if: {title: "REVIEW", body: "^Test Review", labels: "accepted", value_exists: "author", reject_msg: "Can't do that"} }
       expect(@responder).to receive(:respond).with("Can't do that")
       expect(@responder.meet_conditions?).to be_falsey
     end
@@ -200,11 +209,23 @@ describe Responder do
       expect(@responder.meet_conditions?).to be_truthy
     end
 
+    it "should be true if labels condition is met" do
+      @responder.params = { if: {labels: "accepted"} }
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {labels: "python"} }
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.params = { if: {labels: ["accepted", "python"]} }
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+
     it "should be true only if all conditions are met" do
       @responder.params = { if: {title: "REVIEW",
                                  body: "^Test Review",
                                  value_exists: "editor-2",
                                  role_assigned: "editor",
+                                 labels: "accepted",
                                  submission_type: "astro",
                                  reject_msg: "Error"} }
       expect(@responder).to_not receive(:respond)
