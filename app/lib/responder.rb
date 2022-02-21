@@ -82,6 +82,7 @@ class Responder
     value_condition = params[:if][:value_exists].nil? ? "" : params[:if][:value_exists]
     role_assigned_condition = params[:if][:role_assigned].nil? ? "" : params[:if][:role_assigned]
     value_matches_condition = params[:if][:value_matches].nil? ? {} : params[:if][:value_matches]
+    labels_condition = params[:if][:labels].nil? ? [] : [params[:if][:labels]].flatten
     rejection_response = params[:if][:reject_msg].nil? ? "" : params[:if][:reject_msg]
 
     unless title_condition.empty? || Regexp.new(title_condition).match?(@context.issue_title)
@@ -113,6 +114,11 @@ class Responder
       end
     else
       raise "Configuration Error in #{self.class.name}: value_matches should be a hash of [field_name:expected_value] pairs"
+    end
+
+    unless labels_condition.all? {|l| @context.issue_labels.include?(l)}
+      respond(rejection_response) unless rejection_response.empty?
+      return false
     end
 
     return true

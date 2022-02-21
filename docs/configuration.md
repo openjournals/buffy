@@ -161,6 +161,7 @@ The _env_ section is used to declare general key/value settings. For security re
 :value_exists: *<String>* Responder will run only if there is a not empty value for this in the issue (marked with HTML comments).
 :value_matches: *<Hash>* Responder will run only if the param values (marked with HTML comments) in the body of the issue matches the ones specified here.
 :role_assigned: *<String>* Responder will be run only if there is a username assigned for the specified value.
+:labels: *<Array>* Responder will be run only if the issue is labeled with all the labels listed here.
 :reject_msg: *<String>* Optional. The response to send as comment if the conditions are not met
 ```
 
@@ -187,6 +188,14 @@ The _env_ section is used to declare general key/value settings. For security re
       if:
         value_matches:
           submission_type: astro
+
+    # This responder will run only if issue title includes '[REVIEW]' and
+    # the issue is labeled as 'accepted
+    start_review:
+      if:
+        title: "^\\[REVIEW\\]"
+        labels:
+          - accepted
   ```
   </dd>
 
