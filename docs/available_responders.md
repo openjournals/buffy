@@ -32,6 +32,7 @@ Buffy includes a list of Responders that can be used by configuring them in the 
    responders/reminders
    responders/initial_values
    responders/welcome
+   responders/goodbye
    responders/close_issue_command
    responders/external_start_review
    responders/external_service

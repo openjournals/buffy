@@ -37,6 +37,8 @@ describe WelcomeResponder do
       expect(RepoChecksWorker).to_not receive(:perform_async)
       expect(DOIWorker).to_not receive(:perform_async)
       expect(ExternalServiceWorker).to_not receive(:perform_async)
+
+      @responder.process_message("")
     end
   end
 
