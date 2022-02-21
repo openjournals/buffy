@@ -116,7 +116,7 @@ class Responder
       raise "Configuration Error in #{self.class.name}: value_matches should be a hash of [field_name:expected_value] pairs"
     end
 
-    unless labels_condition.all? {|l| @context.issue_labels.include?(l)}
+    unless labels_condition.all? {|l| @context.issue_labels.map{|il| il["name"]}.include?(l)}
       respond(rejection_response) unless rejection_response.empty?
       return false
     end

@@ -72,7 +72,8 @@ describe Responder do
     before do
       @responder = Responder.new({}, {})
       @responder.context = OpenStruct.new(issue_title: "[REVIEW] Software review",
-                                          issue_labels: ["accepted", "python"],
+                                          issue_labels: [OpenStruct.new(id: 1, name: "accepted"),
+                                                         OpenStruct.new(id: 2, name: "python")],
                                           issue_body: "Test Review\n\n ... description ...\n" +
                                                       "<!--editor-->@editor<!--end-editor-->\n" +
                                                       "<!--editor-2-->L.B.<!--end-editor-2-->\n" +
