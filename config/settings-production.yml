@@ -176,6 +176,10 @@ buffy:
           run_responder:
             responder_key: github_action
             responder_name: draft_paper
+    goodbye:
+      if:
+        labels: accepted
+      template_file: goodbye.md
     external_start_review:
       only: editors
       external_call:
