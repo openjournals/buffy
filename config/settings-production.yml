@@ -105,7 +105,6 @@ buffy:
           workflow_name: draft-paper.yml
           workflow_ref: master
           description: Generates the pdf paper
-          message: "Attempting PDF compilation. Reticulating splines etc..."
           data_from_issue:
             - branch
             - target-repository
