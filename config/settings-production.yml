@@ -14,7 +14,6 @@ buffy:
           help_command: help
           hidden: true
     whedon:
-    wrong_command:
     reviewers_list:
       only: editors
       if:
