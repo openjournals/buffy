@@ -17,7 +17,9 @@ class WrongCommandResponder < Responder
     elsif params[:message]
       respond(params[:message])
     else
-      help_command = HelpResponder.new(@settings, @settings[:responders][:help]).example_invocation
+      help_command_settings = @settings[:responders][:help]
+      help_command_settings = help_command_settings[0] if help_command_settings.is_a?(Array)
+      help_command = HelpResponder.new(@settings, help_command_settings).example_invocation
       respond "I'm sorry human, I don't understand that. You can see what commands I support by typing:\n\n`#{help_command}`\n"
     end
   end
