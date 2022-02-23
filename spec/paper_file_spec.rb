@@ -56,6 +56,25 @@ describe PaperFile do
     end
   end
 
+  describe "#bib" do
+    it "should read bibtex file" do
+      expect(subject).to receive(:bibtex_path).and_return(fixture("paper.bib"))
+      bib = subject.bib
+      expect(bib.data.size).to eq(5)
+      expect(bib.errors).to be_empty
+      expect(bib.data.first.title.value).to eq("The NumPy Array: A Structure for Efficient Numerical Computation")
+    end
+
+    it "should find lexical errors" do
+      expect(subject).to receive(:bibtex_path).and_return(fixture("paper_with_errors.bib"))
+      BibTeX.log.level = "ERROR"
+      bib = subject.bib
+      BibTeX.log.level = "WARN"
+      expect(bib.errors).to_not be_empty
+      expect(bib.errors.size).to eq(2)
+    end
+  end
+
   describe "#bibtex_entries" do
     it "should read bibtex file" do
       expect(subject).to receive(:bibtex_path).and_return(fixture("paper.bib"))

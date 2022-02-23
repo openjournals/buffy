@@ -10,9 +10,20 @@ class PaperFile
     @bibtex_error = "No paper file path" if @paper_path.nil?
   end
 
+  def bib
+    @bib ||= BibTeX.open(bibtex_path, filter: :latex)
+  end
+
   def bibtex_entries
-    @bibtex_entries ||= BibTeX.open(bibtex_path, filter: :latex).data
+    @bibtex_entries ||= bib.data
     @bibtex_entries.keep_if { |entry| !entry.comment? && !entry.preamble? && !entry.string? }
+
+    unless bib.errors.empty?
+      @bibtex_error = "Lexical or syntactical errors: \n\n"
+      @bibtex_error += bib.errors.map(&:content).join("\n")
+    end
+
+    @bibtex_entries
   rescue BibTeX::ParseError => e
     @bibtex_error = e.message
     []
