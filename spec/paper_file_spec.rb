@@ -56,17 +56,56 @@ describe PaperFile do
     end
   end
 
+  describe "#bib" do
+    it "should read bibtex file" do
+      expect(subject).to receive(:bibtex_path).and_return(fixture("paper.bib"))
+      bib = subject.bib
+      expect(bib.data.size).to eq(5)
+      expect(bib.errors).to be_empty
+      expect(bib.data.first.title.value).to eq("The NumPy Array: A Structure for Efficient Numerical Computation")
+    end
+
+    it "should find lexical errors" do
+      expect(subject).to receive(:bibtex_path).and_return(fixture("paper_with_errors.bib"))
+
+      level = BibTeX.log.level
+      BibTeX.log.level = "ERROR"
+      bib = subject.bib
+      BibTeX.log.level = level
+
+      expect(bib.errors).to_not be_empty
+      expect(bib.errors.size).to eq(2)
+      expect(bib.errors.first.content).to match(/@article{numpy/)
+      expect(bib.errors.last.content).to match(/@article{matplotlib/)
+    end
+  end
+
   describe "#bibtex_entries" do
     it "should read bibtex file" do
       expect(subject).to receive(:bibtex_path).and_return(fixture("paper.bib"))
       bibtex_entries = subject.bibtex_entries
       expect(bibtex_entries.size).to eq(5)
       expect(bibtex_entries.first.title.value).to eq("The NumPy Array: A Structure for Efficient Numerical Computation")
+      expect(subject.bibtex_error).to be_nil
     end
 
     it "should be empty if errors parsing the file" do
       expect(BibTeX).to receive(:open).and_raise BibTeX::ParseError
       expect(subject.bibtex_entries).to eq([])
+    end
+
+    it "should set bibtex_error if lexical errors found" do
+      expect(subject).to receive(:bibtex_path).and_return(fixture("paper_with_errors.bib"))
+
+      level = BibTeX.log.level
+      BibTeX.log.level = "ERROR"
+      bibtex_entries = subject.bibtex_entries
+      BibTeX.log.level = level
+
+      expect(bibtex_entries.size).to eq(4)
+      expect(subject.bibtex_error).to_not be_nil
+      expect(subject.bibtex_error).to match(/@article{numpy/)
+      expect(subject.bibtex_error).to match(/@article{matplotlib/)
     end
   end
 
