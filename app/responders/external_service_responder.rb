@@ -16,11 +16,11 @@ class ExternalServiceResponder < Responder
     ExternalServiceWorker.perform_async(params, locals)
   end
 
-  def description
-    params[:description] || "Calls external service"
+  def default_description
+    "Calls external service"
   end
 
-  def example_invocation
-    params[:example_invocation] || "@#{bot_name} #{command}"
+  def default_example_invocation
+    "@#{bot_name} #{command}"
   end
 end

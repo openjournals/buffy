@@ -86,11 +86,11 @@ class InitialValuesResponder < Responder
     changes = default_change_for(value_name).merge(value_params)
   end
 
-  def description
+  def default_description
     "Check issue body for presence of needed values"
   end
 
-  def example_invocation
+  def default_example_invocation
     "Is invoked once, when an issue is created"
   end
 

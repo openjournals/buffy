@@ -35,11 +35,11 @@ class SetValueResponder < Responder
     process_labeling unless errored
   end
 
-  def description
+  def default_description
     "Set a value for #{name}"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} set #{params[:sample_value] || 'xxxxx'} as #{name}"
   end
 

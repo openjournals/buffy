@@ -17,11 +17,11 @@ class ListTeamMembersResponder < Responder
     respond_template :list_team_members, { heading: heading, team_members: team_members }
   end
 
-  def description
-    params[:description] || "Replies to '#{command}'"
+  def default_description
+    "Replies to '#{command}'"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} #{command}"
   end
 end

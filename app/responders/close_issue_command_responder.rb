@@ -16,11 +16,11 @@ class CloseIssueCommandResponder < Responder
     process_labeling
   end
 
-  def description
-    params[:description] || "Close the issue"
+  def default_description
+    "Close the issue"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} #{command}"
   end
 end

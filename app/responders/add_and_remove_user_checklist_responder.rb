@@ -52,12 +52,12 @@ class AddAndRemoveUserChecklistResponder < Responder
     end
   end
 
-  def description
+  def default_description
     ["Add review checklist for a user",
      "Remove the checklist for a user"]
   end
 
-  def example_invocation
+  def default_example_invocation
     ["@#{bot_name} add checklist for @username",
      "@#{bot_name} remove checklist for @username"]
   end

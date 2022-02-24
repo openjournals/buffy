@@ -17,12 +17,12 @@ class RepoChecksResponder < Responder
     end
   end
 
-  def description
+  def default_description
     "Perform checks on the repository" + "\n" +
     "# Optionally, it can be run on a non-default branch "
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} check repository" + "\n" +
     "@#{bot_name} check repository from branch custom-branch-name"
   end

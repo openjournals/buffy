@@ -24,11 +24,11 @@ class WrongCommandResponder < Responder
     end
   end
 
-  def description
+  def default_description
     "Replies when the received command is not understood"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name}: this is a message you don't understand"
   end
 

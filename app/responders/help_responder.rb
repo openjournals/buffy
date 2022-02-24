@@ -31,11 +31,11 @@ class HelpResponder < Responder
     params[:help_command] || "help"
   end
 
-  def description
+  def default_description
     "List all available commands"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} #{help_command}"
   end
 end

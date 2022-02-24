@@ -62,11 +62,11 @@ class ExternalStartReviewResponder < Responder
                    editor_login: editor_login })
   end
 
-  def description
+  def default_description
     "Open the review issue"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{@bot_name} start review"
   end
 end

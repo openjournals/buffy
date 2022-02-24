@@ -36,12 +36,12 @@ class AddAndRemoveAssigneeResponder < Responder
     process_reverse_labeling
   end
 
-  def description
+  def default_description
     ["Add a user to this issue's assignees list",
      "Remove a user from this issue's assignees list"]
   end
 
-  def example_invocation
+  def default_example_invocation
     ["@#{bot_name} add assignee: @username",
      "@#{bot_name} remove assignee: @username"]
   end

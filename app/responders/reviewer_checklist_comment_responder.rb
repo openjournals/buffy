@@ -55,11 +55,11 @@ class ReviewerChecklistCommentResponder < Responder
     params[:command] || "generate my checklist"
   end
 
-  def description
+  def default_description
     "Adds a checklist for the reviewer using this command"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} #{command}"
   end
 end
