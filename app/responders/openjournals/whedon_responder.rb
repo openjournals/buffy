@@ -13,11 +13,11 @@ module Openjournals
       respond "My name is now @#{bot_name}"
     end
 
-    def description
+    def default_description
       "My name is not Whedon"
     end
 
-    def example_invocation
+    def default_example_invocation
       "@whedon whatever"
     end
 
