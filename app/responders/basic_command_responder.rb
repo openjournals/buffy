@@ -21,11 +21,11 @@ class BasicCommandResponder < Responder
     process_labeling
   end
 
-  def description
-    params[:description] || "Replies to #{command}"
+  def default_description
+    "Replies to #{command}"
   end
 
-  def example_invocation
-    params[:example_invocation] || "@#{bot_name} #{command}"
+  def default_example_invocation
+    "@#{bot_name} #{command}"
   end
 end

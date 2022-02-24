@@ -28,11 +28,11 @@ class AssignEditorResponder < Responder
     process_labeling
   end
 
-  def description
+  def default_description
     "Assign a user as the editor of this submission"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} assign @username as editor"
   end
 

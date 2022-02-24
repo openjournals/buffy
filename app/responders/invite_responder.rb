@@ -15,11 +15,11 @@ class InviteResponder < Responder
     respond reply if reply
   end
 
-  def description
+  def default_description
     "Send an invitation to a user to collaborate in the review"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} invite @username"
   end
 end

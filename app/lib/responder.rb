@@ -287,7 +287,17 @@ class Responder
 
   # True if the responder is configured as hidden
   def hidden?
-    @params[:hidden] == true
+    params[:hidden] == true
+  end
+
+  # Default description can be overriden by config param
+  def description
+    params[:description] || default_description
+  end
+
+  # Default example_invocation can be overriden by config param
+  def example_invocation
+    params[:example_invocation] || default_example_invocation
   end
 
   # To be overwritten by subclasses with settings needed and events/actions they respond to

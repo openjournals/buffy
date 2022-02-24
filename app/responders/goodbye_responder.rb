@@ -35,11 +35,11 @@ class GoodbyeResponder < Responder
     end
   end
 
-  def description
+  def default_description
     "Runs after an issue is closed"
   end
 
-  def example_invocation
+  def default_example_invocation
     "Is invoked once, when an issue is closed"
   end
 

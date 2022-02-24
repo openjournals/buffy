@@ -25,11 +25,11 @@ class RemoveEditorResponder < Responder
     params[:no_editor_text] || 'Pending'
   end
 
-  def description
+  def default_description
     "Remove the editor assigned to this submission"
   end
 
-  def example_invocation
+  def default_example_invocation
     "@#{bot_name} remove editor"
   end
 end

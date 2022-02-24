@@ -35,11 +35,11 @@ class GithubActionResponder < Responder
     end
   end
 
-  def description
-    params[:description] || "Runs a GitHub workflow"
+  def default_description
+    "Runs a GitHub workflow"
   end
 
-  def example_invocation
-    params[:example_invocation] || "@#{bot_name} #{command}"
+  def default_example_invocation
+    "@#{bot_name} #{command}"
   end
 end

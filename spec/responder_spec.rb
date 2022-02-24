@@ -396,23 +396,51 @@ describe Responder do
   end
 
   describe "#description" do
-    it "should be present for all responders" do
-      ResponderRegistry.available_responders.values.each do |responder_class|
-        responder = responder_class.new({}, sample_params(responder_class))
-        expect(responder.respond_to?(:description)).to eq(true)
-        expect(responder.description).to_not be_nil
-        expect(responder.description).to_not be_empty
-      end
+    it "should be customizable via settings file" do
+      responder = described_class.new({}, { description: "Custom description!" })
+      expect(responder).to_not receive(:default_description)
+      expect(responder.description).to eq("Custom description!")
+    end
+
+    it "should have default value" do
+      responder = described_class.new({}, {})
+      expect(responder).to receive(:default_description).and_return("Default description!")
+      expect(responder.description).to eq("Default description!")
     end
   end
 
   describe "#example_invocation" do
+    it "should be customizable via settings file" do
+      responder = described_class.new({}, { example_invocation: "Custom example_invocation!" })
+      expect(responder).to_not receive(:default_example_invocation)
+      expect(responder.example_invocation).to eq("Custom example_invocation!")
+    end
+
+    it "should have default value" do
+      responder = described_class.new({}, {})
+      expect(responder).to receive(:default_example_invocation).and_return("Default example_invocation!")
+      expect(responder.example_invocation).to eq("Default example_invocation!")
+    end
+  end
+
+  describe "#default_description" do
+    it "should be present for all responders" do
+      ResponderRegistry.available_responders.values.each do |responder_class|
+        responder = responder_class.new({}, sample_params(responder_class))
+        expect(responder.respond_to?(:description)).to eq(true)
+        expect(responder.default_description).to_not be_nil
+        expect(responder.default_description).to_not be_empty
+      end
+    end
+  end
+
+  describe "#default_example_invocation" do
     it "should be present for all responders" do
       ResponderRegistry.available_responders.values.each do |responder_class|
         responder = responder_class.new({}, sample_params(responder_class))
         expect(responder.respond_to?(:example_invocation)).to eq(true)
-        expect(responder.example_invocation).to_not be_nil
-        expect(responder.example_invocation).to_not be_empty
+        expect(responder.default_example_invocation).to_not be_nil
+        expect(responder.default_example_invocation).to_not be_empty
       end
     end
   end
@@ -421,11 +449,11 @@ describe Responder do
     it "should have the same number of each of them" do
       ResponderRegistry.available_responders.values.each do |responder_class|
         responder = responder_class.new({}, sample_params(responder_class))
-        if responder.description.is_a?(Array) || responder.example_invocation.is_a?(Array)
-          error_msg = "#{responder_class.name} descriptions and example_invocations sizes don't match"
-          expect(responder.description.is_a?(Array)).to eq(true), error_msg
-          expect(responder.example_invocation.is_a?(Array)).to eq(true), error_msg
-          expect(responder.description.size).to eq(responder.example_invocation.size), error_msg
+        if responder.default_description.is_a?(Array) || responder.default_example_invocation.is_a?(Array)
+          error_msg = "#{responder_class.name} descriptions and default_example_invocations sizes don't match"
+          expect(responder.default_description.is_a?(Array)).to eq(true), error_msg
+          expect(responder.default_example_invocation.is_a?(Array)).to eq(true), error_msg
+          expect(responder.default_description.size).to eq(responder.default_example_invocation.size), error_msg
         end
       end
     end

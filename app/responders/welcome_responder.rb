@@ -56,11 +56,11 @@ class WelcomeResponder < Responder
     end
   end
 
-  def description
+  def default_description
     "Replies after an issue is opened"
   end
 
-  def example_invocation
+  def default_example_invocation
     "Is invoked once, when an issue is created"
   end
 

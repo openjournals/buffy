@@ -13,11 +13,11 @@ class ThanksResponder < Responder
     respond(reply)
   end
 
-  def description
+  def default_description
     "You are welcome"
   end
 
-  def example_invocation
+  def default_example_invocation
     "Thanks @#{bot_name}!"
   end
 

@@ -13,11 +13,11 @@ class HelloResponder < Responder
     respond("Hi!")
   end
 
-  def description
+  def default_description
     "Say hi!"
   end
 
-  def example_invocation
+  def default_example_invocation
     "Hello @#{bot_name}"
   end
 end

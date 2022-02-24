@@ -199,6 +199,34 @@ The _env_ section is used to declare general key/value settings. For security re
   ```
   </dd>
 
+  <dt>description</dt>
+  <dd>Every responder has a default description to be shown using the help_responder. Use this param if you want to use a custom description.
+
+  Usage:
+
+  ```yaml
+    ...
+    custom_responder:
+      description: "This responder do something"
+    ...
+
+  ```
+  </dd>
+
+  <dt>example_invocation</dt>
+  <dd>Every responder defines an example string showing the command to invoke it, to be listed using the help_responder. Use this param if for some reason you want to use a custom value for the example invocation.
+
+  Usage:
+
+  ```yaml
+    ...
+    custom_responder:
+      example_invocation: "@botname run performance checks (please run this only on mondays)"
+    ...
+
+  ```
+  </dd>
+
 </dl>
 
 A complete example:
@@ -225,6 +253,7 @@ A complete example:
         role_assigned: editor
       add_labels:
         - reviewers-assigned
+      description: "Use this command to assign a reviewers once the editor is assigned"
     hello:
       hidden: true
   ...
