@@ -19,6 +19,7 @@ describe CheckReferencesResponder do
       expect(@responder.event_regex).to match("@botsci check references")
       expect(@responder.event_regex).to match("@botsci check references    \r\n")
       expect(@responder.event_regex).to match("@botsci check references from branch custom-branch")
+      expect(@responder.event_regex).to match("@botsci check references from branch custom/branch")
       expect(@responder.event_regex).to match("@botsci check references from branch development    \r\n")
       expect(@responder.event_regex).to_not match("@botsci check references from branch ")
     end

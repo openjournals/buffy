@@ -6,7 +6,7 @@ class CheckReferencesResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} check references(?: from branch ([\w-]+))?\.?\s*\z/i
+    @event_regex = /\A@#{bot_name} check references(?: from branch ([\/\w-]+))?\.?\s*\z/i
   end
 
   def process_message(message)
@@ -24,6 +24,6 @@ class CheckReferencesResponder < Responder
 
   def example_invocation
     "@#{bot_name} check references" + "\n" +
-    "@#{bot_name} check references from custom-branch-name"
+    "@#{bot_name} check references from branch custom-branch-name"
   end
 end
