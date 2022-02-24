@@ -20,6 +20,7 @@ describe RepoChecksResponder do
       expect(@responder.event_regex).to match("@botsci check repository")
       expect(@responder.event_regex).to match("@botsci check repository    \r\n")
       expect(@responder.event_regex).to match("@botsci check repository from branch custom-branch")
+      expect(@responder.event_regex).to match("@botsci check repository from branch custom/branch")
       expect(@responder.event_regex).to match("@botsci check repository from branch development    \r\n")
       expect(@responder.event_regex).to_not match("@botsci check repository from branch ")
     end
