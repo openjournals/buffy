@@ -112,6 +112,10 @@ buffy:
           mapping:
             repository_url: target-repository
       - recommend_acceptance:
+          if:
+            value_matches:
+              archive: "^((?!Pending).)*$"
+            reject_msg: "Paper is not ready for acceptance yet, the archive is missing"
           only: editors
           command: recommend-accept
           workflow_repo: openjournals/joss-papers
@@ -128,6 +132,10 @@ buffy:
           add_labels:
             - recommend-accept
       - accept:
+          if:
+            value_matches:
+              archive: "^((?!Pending).)*$"
+            reject_msg: "Paper is not ready for acceptance yet, the archive is missing"
           only: eics
           command: accept
           workflow_repo: openjournals/joss-papers
