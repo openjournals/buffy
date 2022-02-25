@@ -41,7 +41,11 @@ buffy:
     reminders:
       only: editors
     check_references:
+      description: "Check the references of the paper for missing DOIs"
+      example_invocation: "@editorialbot check references"
     repo_checks:
+      description: "Perform checks on the repository"
+      example_invocation: "@editorialbot check repository"
     reviewer_checklist_comment:
       template_file: reviewer_checklist.md
       data_from_issue:
