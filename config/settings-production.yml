@@ -59,7 +59,6 @@ buffy:
           only: editors
           sample_value: "10.21105/zenodo.12345"
       - branch:
-          only: editors
           sample_value: "joss-paper"
     external_service:
       - reject:
