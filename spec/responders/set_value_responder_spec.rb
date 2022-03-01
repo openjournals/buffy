@@ -17,6 +17,7 @@ describe SetValueResponder do
       expect(@responder.event_regex).to match("@botsci set v1.0.3-beta as version")
       expect(@responder.event_regex).to match("@botsci set v1.0.3-beta as version.")
       expect(@responder.event_regex).to match("@botsci set 2.345 as version   \r\n")
+      expect(@responder.event_regex).to match("@botsci set 2.345 as version   \r\n more")
       expect(@responder.event_regex).to_not match("@botsci set v12.0 as editor")
       expect(@responder.event_regex).to_not match("@botsci set v1.0.3-beta as version now")
     end

@@ -15,7 +15,8 @@ describe AssignEditorResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci assign @arfon as editor")
-      expect(@responder.event_regex).to match("@botsci assign @xuanxu as editor   \r\n")
+      expect(@responder.event_regex).to match("@botsci assign @xuanxu as editor   ")
+      expect(@responder.event_regex).to match("@botsci assign @xuanxu as editor   \r\n more")
       expect(@responder.event_regex).to match("@botsci assign me as editor")
       expect(@responder.event_regex).to match("@botsci add me as editor")
       expect(@responder.event_regex).to match("@botsci add @arfon as editor")

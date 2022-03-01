@@ -8,7 +8,7 @@ class ExternalStartReviewResponder < Responder
     required_params :external_call
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} start review\.?\s*\z/i
+    @event_regex = /\A@#{bot_name} start review\.?\s*$/i
   end
 
   def process_message(message)

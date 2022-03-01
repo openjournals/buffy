@@ -19,7 +19,8 @@ describe ExternalServiceResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci run tests")
-      expect(@responder.event_regex).to match("@botsci run tests   \r\n")
+      expect(@responder.event_regex).to match("@botsci run tests   ")
+      expect(@responder.event_regex).to match("@botsci run tests   \r\n more")
     end
   end
 

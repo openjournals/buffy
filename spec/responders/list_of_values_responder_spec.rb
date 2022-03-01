@@ -15,7 +15,8 @@ describe ListOfValuesResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci add @arfon to reviewers")
-      expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  \r\n")
+      expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  ")
+      expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  \r\nmore")
       expect(@responder.event_regex).to_not match("@botsci add to reviewers")
       expect(@responder.event_regex).to_not match("@botsci remove   from reviewers")
     end

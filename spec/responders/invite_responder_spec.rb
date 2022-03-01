@@ -16,7 +16,8 @@ describe InviteResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci invite @arfon")
       expect(@responder.event_regex).to match("@botsci invite @arfon.")
-      expect(@responder.event_regex).to match("@botsci invite @xuanxu  \r\n")
+      expect(@responder.event_regex).to match("@botsci invite @xuanxu  ")
+      expect(@responder.event_regex).to match("@botsci invite @xuanxu  \r\n more")
       expect(@responder.event_regex).to_not match("@botsci invite @arfon as whatever")
       expect(@responder.event_regex).to_not match("invite @buffy")
       expect(@responder.event_regex).to_not match("@botsci invite ")

@@ -8,7 +8,7 @@ class GithubActionResponder < Responder
     required_params :workflow_repo, :workflow_name, :command
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} #{command}\.?\s*\z/i
+    @event_regex = /\A@#{bot_name} #{command}\.?\s*$/i
   end
 
   def process_message(message)

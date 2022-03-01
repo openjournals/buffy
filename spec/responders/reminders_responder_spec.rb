@@ -16,7 +16,8 @@ describe RemindersResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci remind @reviewer33 in 2 weeks")
-      expect(@responder.event_regex).to match("@botsci remind @reviewer33 in 1 month    \r\n")
+      expect(@responder.event_regex).to match("@botsci remind @reviewer33 in 1 month    ")
+      expect(@responder.event_regex).to match("@botsci remind @reviewer33 in 1 month    \r\n more")
     end
   end
 
