@@ -126,6 +126,16 @@ describe ResponderRegistry do
   end
 
   describe "#reply_for_wrong_command" do
+    it "should only call WrongCommandResponder on issue_comment creation" do
+      context = OpenStruct.new(issue_id: 15, issue_author: "opener", event_action: "issue_comment.deleted")
+      message = "@botsci whatever"
+
+      expect(WrongCommandResponder).to_not receive(:new)
+
+      registry = described_class.new(@config)
+      registry.reply_for_wrong_command(message, context)
+    end
+
     it "should call WrongCommandResponder with proper info" do
       context = OpenStruct.new(issue_id: 15, issue_author: "opener", event_action: "issue_comment.created")
       message = "@botsci whatever"
