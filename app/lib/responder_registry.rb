@@ -41,6 +41,8 @@ class ResponderRegistry
   end
 
   def reply_for_wrong_command(message, context)
+    return unless context.event_action == "issue_comment.created"
+
     params = Sinatra::IndifferentHash[]
     params = params.merge(config[:responders][:wrong_command]) if config[:responders][:wrong_command].is_a?(Hash)
 
