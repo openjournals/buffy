@@ -18,7 +18,7 @@ describe AddAndRemoveUserChecklistResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci add checklist for @arfon")
       expect(@responder.event_regex).to match("@botsci add checklist for @arfon.")
-      expect(@responder.event_regex).to match("@botsci remove checklist for @arfon   \r\n")
+      expect(@responder.event_regex).to match("@botsci remove checklist for @arfon   \r\n more")
       expect(@responder.event_regex).to_not match("remove checklist for @arfon")
       expect(@responder.event_regex).to_not match("@botsci add checklist for @arfon and others")
       expect(@responder.event_regex).to_not match("@botsci add checklist for ")

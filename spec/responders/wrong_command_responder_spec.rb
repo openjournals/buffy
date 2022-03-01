@@ -16,6 +16,7 @@ describe WrongCommandResponder do
     it "should define a catch-all regex" do
       expect(@responder.event_regex).to match("@botsci whatever")
       expect(@responder.event_regex).to match("@botsci reviawwers   \n")
+      expect(@responder.event_regex).to match("@botsci reviawwers   \r\n more")
       expect(@responder.event_regex).to_not match(" @botsci whatever")
       expect(@responder.event_regex).to_not match("```@botsci whatever")
     end

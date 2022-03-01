@@ -17,6 +17,7 @@ describe HelpResponder do
       expect(@responder.event_regex).to match("@botsci help")
       expect(@responder.event_regex).to match("@botsci help!")
       expect(@responder.event_regex).to match("@botsci help.")
+      expect(@responder.event_regex).to match("@botsci help.\r\n more")
       expect(@responder.event_regex).to_not match("```@botsci help")
     end
 

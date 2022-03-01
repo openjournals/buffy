@@ -19,6 +19,7 @@ describe ReviewerChecklistCommentResponder do
       expect(@responder.event_regex).to match("@botsci generate my checklist")
       expect(@responder.event_regex).to match("@botsci generate my checklist.")
       expect(@responder.event_regex).to match("@botsci generate my checklist   \r\n")
+      expect(@responder.event_regex).to match("@botsci generate my checklist   \r\nmore")
       expect(@responder.event_regex).to_not match("@botsci generate my checklist for @arfon.")
       expect(@responder.event_regex).to_not match("@botsci generate my checkl")
     end

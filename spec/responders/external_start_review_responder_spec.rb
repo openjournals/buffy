@@ -19,7 +19,8 @@ describe ExternalStartReviewResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci start review")
-      expect(@responder.event_regex).to match("@botsci start review   \r\n")
+      expect(@responder.event_regex).to match("@botsci start review  ")
+      expect(@responder.event_regex).to match("@botsci start review   \r\n other comment \r\n more")
     end
   end
 

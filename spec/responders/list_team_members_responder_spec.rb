@@ -17,8 +17,8 @@ describe ListTeamMembersResponder do
       expect(@responder.event_regex).to match("@botsci list editors")
       expect(@responder.event_regex).to match("@botsci list editors.")
       expect(@responder.event_regex).to match("@botsci list editors  \r\n")
+      expect(@responder.event_regex).to match("@botsci list editors  \r\n ignore this")
       expect(@responder.event_regex).to_not match("```@botsci list editors")
-      expect(@responder.event_regex).to_not match("@botsci list editors  \r\n more")
     end
   end
 

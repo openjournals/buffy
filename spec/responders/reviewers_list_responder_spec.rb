@@ -18,7 +18,9 @@ describe ReviewersListResponder do
       expect(@responder.event_regex).to match("@botsci add @arfon as reviewer")
       expect(@responder.event_regex).to match("@botsci add me as reviewer")
       expect(@responder.event_regex).to match("@botsci remove me from reviewers")
+      expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  ")
       expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  \r\n")
+      expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  \r\n more ")
       expect(@responder.event_regex).to_not match("@botsci add to reviewers")
       expect(@responder.event_regex).to_not match("@botsci remove   from reviewers")
     end
