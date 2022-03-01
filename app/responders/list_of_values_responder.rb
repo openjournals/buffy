@@ -8,7 +8,7 @@ class ListOfValuesResponder < Responder
     required_params :name
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} (add|remove) (\S+) (to|from) #{name}\.?\s*\z/i
+    @event_regex = /\A@#{bot_name} (add|remove) (\S+) (to|from) #{name}\.?\s*$/i
   end
 
   def process_message(message)

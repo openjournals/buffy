@@ -15,7 +15,8 @@ describe CloseIssueCommandResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci reject")
-      expect(@responder.event_regex).to match("@botsci reject   \r\n")
+      expect(@responder.event_regex).to match("@botsci reject   ")
+      expect(@responder.event_regex).to match("@botsci reject   \r\n a comment")
       expect(@responder.event_regex).to_not match("@botsci reject publication")
       expect(@responder.event_regex).to_not match("@botsci rejec")
     end

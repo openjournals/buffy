@@ -6,7 +6,7 @@ class WrongCommandResponder < Responder
 
   def define_listening
     @event_action = "wrong_command"
-    @event_regex = /\A@#{bot_name} (.*)/i
+    @event_regex = /\A@#{bot_name} (.*)$/i
   end
 
   def process_message(message)

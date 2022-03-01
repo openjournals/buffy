@@ -17,6 +17,7 @@ describe ThanksResponder do
       expect(@responder.event_regex).to match("@botsci thanks for that")
       expect(@responder.event_regex).to match("@botsci thank you!")
       expect(@responder.event_regex).to match("Thanks @botsci!")
+      expect(@responder.event_regex).to match("Thanks @botsci! \r\n you're awesome")
       expect(@responder.event_regex).to match("THANK YOU @botsci")
       expect(@responder.event_regex).to_not match("```@botsci thanks")
     end

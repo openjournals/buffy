@@ -15,7 +15,8 @@ describe LabelCommandResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci recommend publication")
-      expect(@responder.event_regex).to match("@botsci recommend publication   \r\n")
+      expect(@responder.event_regex).to match("@botsci recommend publication   ")
+      expect(@responder.event_regex).to match("@botsci recommend publication   \r\n another comment")
       expect(@responder.event_regex).to_not match("@botsci recommend publication now")
       expect(@responder.event_regex).to_not match("@botsci recommend")
       expect(@responder.event_regex).to_not match("@botsci recommend public")

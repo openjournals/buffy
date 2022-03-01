@@ -16,6 +16,7 @@ describe BasicCommandResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci list editors")
       expect(@responder.event_regex).to match("@botsci list editors      \n")
+      expect(@responder.event_regex).to match("@botsci list editors      \r\n more")
       expect(@responder.event_regex).to_not match("@botsci list ")
       expect(@responder.event_regex).to_not match("```@botsci list editors")
     end

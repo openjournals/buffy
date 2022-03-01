@@ -16,6 +16,7 @@ describe RemoveEditorResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci remove editor")
       expect(@responder.event_regex).to match("@botsci remove editor ")
+      expect(@responder.event_regex).to match("@botsci remove editor\r\nmore")
       expect(@responder.event_regex).to_not match("@bot_name remove editor")
       expect(@responder.event_regex).to_not match("@botsci remove editor 3")
     end

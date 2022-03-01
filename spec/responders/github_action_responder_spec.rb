@@ -19,7 +19,8 @@ describe GithubActionResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci generate pdf")
-      expect(@responder.event_regex).to match("@botsci generate pdf   \r\n")
+      expect(@responder.event_regex).to match("@botsci generate pdf   ")
+      expect(@responder.event_regex).to match("@botsci generate pdf   \r\n more")
     end
   end
 
