@@ -40,6 +40,8 @@ class WelcomeResponder < Responder
       end
     end
 
+    close_issue if params[:close] == true
+
     process_labeling
   end
 
