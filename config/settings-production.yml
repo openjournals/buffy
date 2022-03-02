@@ -188,6 +188,11 @@ buffy:
           run_responder:
             responder_key: github_action
             responder_name: draft_paper
+      - close_other_issues:
+          if:
+            title: "^(?!\\[REVIEW\\]:|\\[PRE REVIEW\\]:)"
+          template_file: close.md
+          close: true
     goodbye:
       if:
         labels: accepted
