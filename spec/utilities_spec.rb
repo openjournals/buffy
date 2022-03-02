@@ -40,9 +40,9 @@ describe "Utilities" do
   end
 
   describe "#change_branch" do
-    it "should checkout branch and return true" do
+    it "should switch branch and return true" do
       expect(Open3).to receive(:capture3).
-                       with("git -C local/folder checkout paper-branch").
+                       with("git -C local/folder switch paper-branch").
                        and_return(["OK", "", OpenStruct.new(success?: true)])
 
       expect(subject.change_branch("paper-branch", "local/folder")).to be_truthy
@@ -50,7 +50,7 @@ describe "Utilities" do
 
     it "should return false if command fails" do
       expect(Open3).to receive(:capture3).
-                       with("git -C local/folder checkout newbranch").
+                       with("git -C local/folder switch newbranch").
                        and_return(["", "No such file or directory", OpenStruct.new(success?: false)])
 
       expect(subject.change_branch("newbranch", "local/folder")).to be_falsy
