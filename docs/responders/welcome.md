@@ -106,6 +106,7 @@ If you want to run multiple responders, use an array of these subparams.
 
 General:
 ```eval_rst
+:close: *<Boolean>* Optional parameter, if **true** the responder will close the issue. Default is **false**.
 :check_references: Optional. If present the validity of the DOIs from the paper’s references file will be checked.
 :repo_checks: Optional. If present the responder will perform (asynchronously) several checks on the target repository. You can configure which checks to perform using nested params. Available options are those of the `repository_checks responder`_
 :hidden: Is **true** by default.

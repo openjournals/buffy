@@ -204,6 +204,36 @@ describe WelcomeResponder do
     end
   end
 
+  describe "#process_message closing issue" do
+    before do
+      @settings = { env: {bot_github_user: "botsci"} }
+      @context = OpenStruct.new(issue_body: "...")
+
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { close: true})
+      @responder.context = OpenStruct.new(issue_body: "...")
+      disable_github_calls_for(@responder)
+
+    end
+
+    it "should not close issue by default" do
+      params = {}
+      responder = subject.new(@settings, params)
+      responder.context = @context
+
+      expect(responder).to_not receive(:close_issue)
+      responder.process_message("")
+    end
+
+    it "should close issue if close: true" do
+      params = { close: true }
+      responder = subject.new(@settings, params)
+      responder.context = @context
+
+      expect(responder).to receive(:close_issue)
+      responder.process_message("")
+    end
+  end
+
   describe "misconfiguration" do
     it "should raise error if there is no name for the service" do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { url: "URL" }})
