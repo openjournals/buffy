@@ -76,6 +76,7 @@ describe DOIChecker do
     end
 
     it "should invalidate urls" do
+      expect(subject.validate_doi("doi.org/10.3333/12345")[:validity]).to eq(:invalid)
       expect(subject.validate_doi("http://doi.org/10.3333/12345")[:validity]).to eq(:invalid)
       expect(subject.validate_doi("https://github.com/10.3333/12345")[:validity]).to eq(:invalid)
     end

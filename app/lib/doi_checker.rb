@@ -34,6 +34,10 @@ class DOIChecker
       return { validity: :invalid, msg: "#{doi_string} is INVALID because of 'https://doi.org/' prefix" }
     end
 
+    if doi_string.include?('doi.org/')
+      return { validity: :invalid, msg: "#{doi_string} is INVALID because of 'doi.org/' prefix" }
+    end
+
     begin
       doi_string.gsub!(/[^a-zA-z0-9.\/_-]/, "")
       doi_url = URI.join("https://doi.org", doi_string).to_s
