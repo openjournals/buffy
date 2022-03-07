@@ -128,14 +128,14 @@ buffy:
           workflow_ref: master
           description: Recommends the submission for acceptance
           message: "```\nAttempting dry run of processing paper acceptance...\n```"
+          inputs:
+            add_labels: recommend-accept
           data_from_issue:
             - branch
             - target-repository
             - issue_id
           mapping:
             repository_url: target-repository
-          add_labels:
-            - recommend-accept
       - accept:
           if:
             value_matches:
@@ -148,15 +148,14 @@ buffy:
           workflow_ref: master
           description: Accept and publish the paper
           message: "```\nDoing it live! Attempting automated processing of paper acceptance...\n```"
+          inputs:
+            add_labels: "accepted,published"
           data_from_issue:
             - branch
             - target-repository
             - issue_id
           mapping:
             repository_url: target-repository
-          add_labels:
-            - accepted
-            - published
     basic_command:
       - query_scope:
           only: editors
