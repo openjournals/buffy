@@ -38,6 +38,19 @@ Some parameters are required for the responder to work: the `command` to invoke 
 
 ```
 
+You can use this action to run other responder(s) after after the GitHub action is triggered:
+
+```eval_rst
+:run_responder: Allows to call a different responder. Subparams are:
+
+  :responder_key: *Required*. The key to find the responder in the config file.
+  :responder_name: *Optional*. The name of the responder in the config file if there are several instances under the same responder key.
+  :message: *Optional*. The message to trigger the responder with.
+
+```
+If you want to run multiple responders, use an array of these subparams.
+
+
 ## Examples
 
 **A complete example:**
