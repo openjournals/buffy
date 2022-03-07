@@ -93,6 +93,40 @@ describe GithubActionResponder do
     end
   end
 
+  describe "#process_message with run_responder option" do
+    before do
+      @settings = { env: {bot_github_user: "botsci"} }
+      @params = { workflow_repo: "openjournals/joss-reviews", workflow_name: "compiler", command: "generate pdf" }
+      @context = OpenStruct.new(issue_id: 33,
+                                          issue_author: "opener",
+                                          repo: "openjournals/testing",
+                                          sender: "xuanxu",
+                                          issue_body: "Test Review\n\n<!--extra-data-->ABC123<!--end-extra-data-->")
+    end
+
+    it "should call a different responder" do
+      other_params = { responder_key: "check_references" }
+      responder = subject.new(@settings, @params.merge(run_responder: other_params))
+      responder.context = @context
+      disable_github_calls_for(responder)
+
+      expect(responder).to receive(:process_other_responder).with(other_params)
+      responder.process_message("")
+    end
+
+    it "should call several responders" do
+      other_params = [{ responder_1: { responder_key: "github_action", responder_name: "compile_pdf", message: "generate pdf" }},
+                { responder_2: { responder_key: "hello" }}]
+      responder = subject.new(@settings, @params.merge(run_responder: other_params))
+      responder.context = @context
+      disable_github_calls_for(responder)
+
+      expect(responder).to receive(:process_other_responder).with(other_params[0][:responder_1])
+      expect(responder).to receive(:process_other_responder).with(other_params[1][:responder_2])
+      responder.process_message("")
+    end
+  end
+
   describe "misconfiguration" do
     it "should raise error if workflow_name is missing from config" do
       expect {
