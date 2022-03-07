@@ -136,6 +136,8 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
+          run_responder:
+            responder_key: check_references
       - accept:
           if:
             value_matches:
