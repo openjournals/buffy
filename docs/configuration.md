@@ -136,7 +136,7 @@ The _env_ section is used to declare general key/value settings. For security re
   </dd>
 
   <dt>only</dt>
-  <dd>List of teams (referred by the name used in the <em>teams</em> node) that can have access to the responder. Used to limit access to the responder. If <em>only</em> is not present the responder is considered public and every user in the repository can invoke it.
+  <dd>List of teams (referred by the name used in the <em>teams</em> node) that can have access to the responder. Used to limit access to the responder. If <em>only</em> and <em>authorized_roles_in_issue</em> are not present the responder is considered public and every user in the repository can invoke it.
 
   Usage:
 
@@ -149,7 +149,23 @@ The _env_ section is used to declare general key/value settings. For security re
         - editors
         - reviewers
   ```
+  </dd>
 
+  <dt>authorized_roles_in_issue</dt>
+  <dd>List of values in the body of the issue marked with HTML comments that contains user(s) allowed to run the responder. Used to grant access to the responder per issue. If <em>only</em> and <em>authorized_roles_in_issue</em> are not present the responder is considered public and every user in the repository can invoke it.
+
+  Usage:
+
+
+  ```yaml
+    public_responder:
+    restricted_responder:
+      only: editors
+      authorized_roles_in_issue:
+        - author-handle
+        - reviewers-list
+  ```
+  <em>(restricted_responder can only be called by members of the editors team and by users listed in the issue in the author-handle and reviewers-list HTML-marked fields)</em>
   </dd>
 
   <dt>if</dt>

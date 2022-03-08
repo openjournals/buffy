@@ -51,7 +51,7 @@ describe Responder do
       @context = OpenStruct.new({ sender: "sender" })
     end
 
-    it "should be true if there is not restrictions (via :only setting)" do
+    it "should be true if there is not restrictions (nil :only/:authorized_roles_in_issue settings)" do
       expect(subject.authorized?(@context)).to be_truthy
     end
 
@@ -61,8 +61,60 @@ describe Responder do
       expect(subject.authorized?(@context)).to be_truthy
     end
 
+    it "should be true if sender is listed in an autorized role in the issue" do
+      subject.params = { authorized_roles_in_issue: 'reviewers' }
+      @context[:issue_body] = "<!--reviewers-->@rev1, @sender<!--end-reviewers-->"
+      subject.context = @context
+
+      expect(subject).to_not receive(:user_authorized?)
+      expect(subject.authorized?(@context)).to be_truthy
+    end
+
+    it "should be true if sender is not in an autorized role but is in authorized team" do
+      @context[:issue_body] = "<!--reviewers-->@rev1, @rev2<!--end-reviewers-->"
+      subject.params = { only: 'editors', authorized_roles_in_issue: 'reviewers'}
+      subject.context = @context
+      allow(subject).to receive(:user_authorized?).with("sender").and_return(true)
+
+      expect(subject.authorized?(@context)).to be_truthy
+    end
+
+    it "should be true if sender is not in an autorized team but is in authorized role" do
+      @context[:issue_body] = "<!--reviewers-->@rev1, @sender<!--end-reviewers-->"
+      subject.params = { only: 'editors', authorized_roles_in_issue: 'reviewers'}
+      subject.context = @context
+      allow(subject).to receive(:user_authorized?).with("sender").and_return(false)
+
+      expect(subject.authorized?(@context)).to be_truthy
+    end
+
+    it "should be true if sender is in an autorized team and in authorized role" do
+      @context[:issue_body] = "<!--reviewers-->@rev1, @sender<!--end-reviewers-->"
+      subject.params = { only: 'editors', authorized_roles_in_issue: 'reviewers'}
+      subject.context = @context
+      allow(subject).to receive(:user_authorized?).with("sender").and_return(true)
+
+      expect(subject.authorized?(@context)).to be_truthy
+    end
+
     it "should be false if sender is not in any authorized team" do
       subject.params = { only: 'editors' }
+      allow(subject).to receive(:user_authorized?).with("sender").and_return(false)
+      expect(subject.authorized?(@context)).to be_falsey
+    end
+
+    it "should be false if sender is not in any authorized role" do
+      @context[:issue_body] = "<!--author-->AuthorName<!--end-author--><!--reviewers-->@rev1, @rev2<!--end-reviewers-->"
+      subject.params = { authorized_roles_in_issue: ['reviewers', 'author']}
+      subject.context = @context
+      expect(subject).to_not receive(:user_authorized?)
+      expect(subject.authorized?(@context)).to be_falsey
+    end
+
+    it "should be false if sender is not in any authorized team or role" do
+      @context[:issue_body] = "<!--reviewers-->@rev1, @rev2<!--end-reviewers-->"
+      subject.params = { only: 'editors', authorized_roles_in_issue: 'reviewers'}
+      subject.context = @context
       allow(subject).to receive(:user_authorized?).with("sender").and_return(false)
       expect(subject.authorized?(@context)).to be_falsey
     end
