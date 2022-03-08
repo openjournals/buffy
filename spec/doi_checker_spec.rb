@@ -105,8 +105,8 @@ describe DOIChecker do
     end
 
     it "should sanitize doi strings" do
-      doi = "10.1#{}234/jou'(r)nal_567\"89"
-      doi_url = "https://doi.org/10.1234/journal_56789"
+      doi = "10.1#}{234/jou'rnal_5(67)\"89"
+      doi_url = "https://doi.org/10.1234/journal_5(67)89"
       expect(Faraday).to receive(:head).with(doi_url).and_return(OpenStruct.new(status: 400))
       subject.validate_doi(doi)
     end
