@@ -75,6 +75,15 @@ module Actions
     read_from_body(start_mark, end_mark)
   end
 
+  # Read multiple values in issue's body between HTML comments
+  def read_values_from_body(value_names)
+    values_from_body = []
+    [value_names].flatten.each do |value_name|
+      values_from_body += read_value_from_body(value_name).split(",")
+    end
+    values_from_body.compact.uniq.map(&:strip) - [""]
+  end
+
   # Read value in issue's body between HTML comments
   # if value name exists, otherwise use default value name
   def value_of_or_default(option_1, default_value)

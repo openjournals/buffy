@@ -258,6 +258,29 @@ describe "Actions" do
     end
   end
 
+  describe "#read_values_from_body" do
+    before { allow(subject).to receive(:issue_body).and_return("... <!--where--> Here! <!--end-where--> ..." +
+                                                               "... <!--who--> You! <!--end-who--> ..." +
+                                                               "... <!--when--> Now! <!--end-when--> ...") }
+    it "should return stripped list of values between HTML comments" do
+      expected_values = ["Here!", "Now!", "You!"]
+
+      expect(subject.read_values_from_body(["where", "when", "who"])).to eq expected_values
+    end
+
+    it "should return only existing values" do
+      expected_values = ["Here!", "Now!"]
+
+      expect(subject.read_values_from_body(["where", "when", "what"])).to eq expected_values
+    end
+
+    it "should accept a single string value" do
+      expected_values = ["Here!"]
+
+      expect(subject.read_values_from_body("where")).to eq expected_values
+    end
+  end
+
   describe "#value_of_or_default" do
     before { allow(subject).to receive(:issue_body).and_return("... <!--version--> 3.1.2 <!--end-version--> ...\n" +
                                                                "... <!--v--> 0.0.1-alpha <!--end-v--> ...") }

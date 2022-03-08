@@ -65,11 +65,21 @@ class Responder
   # Returns true if user belongs to any authorized team
   # or if there's no list of authorized teams
   def authorized?(buffy_context)
-    if params[:only].nil?
-      return true
-    else
-      user_authorized? buffy_context.sender
+    role_nil = params[:authorized_roles_in_issue].nil?
+    only_nil = params[:only].nil?
+
+    return true if (role_nil && only_nil)
+
+    if !role_nil
+      authorized_users_in_issue = read_values_from_body([params[:authorized_roles_in_issue]].flatten)
+      return true if authorized_users_in_issue.include?("@#{buffy_context.sender}")
     end
+
+    if !only_nil
+      return user_authorized?(buffy_context.sender)
+    end
+
+    false
   end
 
   # Check conditions set in the config file
