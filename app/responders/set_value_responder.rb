@@ -18,6 +18,8 @@ class SetValueResponder < Responder
     new_value = @match_data[1]
     reply = "Done! #{name} is now #{new_value}"
 
+    errored = false
+
     case params[:if_missing].to_s.downcase
     when "append"
       update_or_add_value(name, new_value, append: true, heading: params[:heading])
@@ -31,7 +33,13 @@ class SetValueResponder < Responder
     else
       update_body(mark, end_mark, new_value)
     end
-    respond(reply)
+
+    if params[:template_file] && !errored
+      respond_external_template(params[:template_file], locals.merge(name: name, value: new_value))
+    else
+      respond(reply)
+    end
+
     process_labeling unless errored
   end
 
