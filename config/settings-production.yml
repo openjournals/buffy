@@ -60,6 +60,7 @@ buffy:
       - archive:
           only: editors
           sample_value: "10.21105/zenodo.12345"
+          template_file: set_archive.md
       - branch:
           sample_value: "joss-paper"
     external_service:
