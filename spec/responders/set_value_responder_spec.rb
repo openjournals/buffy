@@ -105,6 +105,44 @@ describe SetValueResponder do
     end
   end
 
+  describe "with config option: template_file" do
+    before do
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "version", if_missing: "error", template_file: "version_changed.md"})
+      @responder.context = OpenStruct.new(issue_id: 5, issue_author: "opener", repo: "openjournals/buffy", sender: "user33")
+      disable_github_calls_for(@responder)
+      @msg = "@botsci set v0.0.33-alpha as version"
+      @responder.match_data = @responder.event_regex.match(@msg)
+    end
+
+    it "should reply with the template" do
+      issue_body = "...Latest Version: <!--version-->Pending<!--end-version--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
+
+      expected_locals = { name: "version",
+                          value: "v0.0.33-alpha",
+                          bot_name: "botsci",
+                          issue_author: "opener",
+                          issue_id: 5,
+                          match_data_1: "v0.0.33-alpha",
+                          repo: "openjournals/buffy",
+                          sender: "user33" }
+
+      expect(@responder).to receive(:respond_external_template).with("version_changed.md", expected_locals)
+      expect(@responder).to_not receive(:respond)
+      @responder.process_message(@msg)
+    end
+
+    it "should not use template if error" do
+      issue_body = "... text ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
+
+      expect(@responder).to_not receive(:update_issue)
+      expect(@responder).to_not receive(:respond_external_template)
+      expect(@responder).to receive(:respond).with("Error: `version` not found in the issue's body")
+      @responder.process_message(@msg)
+    end
+  end
+
   describe "misconfiguration" do
     it "should raise error if name is missing from config" do
       expect {

@@ -40,6 +40,8 @@ Following the previous example if the name of the field is _version_:
 :heading: if the value placeholder is missing and the `if_missing` strategy is set to append or prepend, when adding the value it will include this text as heading instead of just the value name.
 
 :sample_value: A sample value string for the target field. It is used for documentation purposes when the :doc:`Help responder <./help>` lists all available responders. Default value is **xxxxx**.
+
+:template_file: *Optional* A template file to use to build the response message (name and value are passed to it).
 ```
 
 ## Examples
