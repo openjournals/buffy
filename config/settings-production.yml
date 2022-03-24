@@ -125,7 +125,6 @@ buffy:
           command: generate pdf
           workflow_repo: openjournals/joss-papers
           workflow_name: draft-paper.yml
-          workflow_ref: master
           description: Generates the pdf paper
           data_from_issue:
             - branch
@@ -142,7 +141,6 @@ buffy:
           command: recommend-accept
           workflow_repo: openjournals/joss-papers
           workflow_name: recommend-acceptance.yml
-          workflow_ref: master
           description: Recommends the submission for acceptance
           message: "```\nAttempting dry run of processing paper acceptance...\n```"
           inputs:
@@ -164,7 +162,6 @@ buffy:
           command: accept
           workflow_repo: openjournals/joss-papers
           workflow_name: accept.yml
-          workflow_ref: master
           description: Accept and publish the paper
           message: "```\nDoing it live! Attempting automated processing of paper acceptance...\n```"
           inputs:
