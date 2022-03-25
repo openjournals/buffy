@@ -159,6 +159,24 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
+      - reaccept:
+          if:
+            value_matches:
+              archive: "^((?!Pending).)*$"
+            reject_msg: "Can't rebuild paper, there's no value for archive"
+          only: eics
+          command: reaccept
+          workflow_repo: openjournals/joss-papers
+          workflow_name: reaccept.yml
+          workflow_ref: master
+          description: Update data on an accepted/published paper
+          message: "```\nRebuilding paper!\n```"
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
     basic_command:
       - query_scope:
           only: editors
