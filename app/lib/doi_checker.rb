@@ -39,7 +39,7 @@ class DOIChecker
     end
 
     begin
-      doi_string.gsub!(/[^a-zA-z0-9.()\/_-]/, "")
+      doi_string.gsub!(/[^a-zA-z0-9.:()\/_-]/, "")
       doi_url = URI.join("https://doi.org", doi_string).to_s
 
       status_code = Faraday.head(doi_url).status
