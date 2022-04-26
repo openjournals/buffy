@@ -193,4 +193,12 @@ describe Buffy do
       expect(last_response.body).to include("botsci in test: up and running!")
     end
   end
+
+  describe "#root" do
+    it "should respond" do
+      get "/"
+
+      expect(last_response).to be_ok
+    end
+  end
 end
