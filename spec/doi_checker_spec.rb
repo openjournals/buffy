@@ -54,6 +54,19 @@ describe DOIChecker do
       expect(doi_summary[:missing][0]).to eq("10.maybe/doi may be a valid DOI for title: No DOI")
     end
 
+    it "should create error message for missing entries when Crossref errors" do
+      missing_doi = BibTeX::Entry.new({title: "No DOI"})
+      doi_checker = DOIChecker.new([missing_doi])
+
+      expect(doi_checker).to receive(:crossref_lookup).with("No DOI").and_return("CROSSREF-ERROR")
+
+      doi_summary = doi_checker.check_dois
+      expect(doi_summary[:ok]).to be_empty
+      expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:missing].size).to eq(1)
+      expect(doi_summary[:missing][0]).to eq("Errored finding suggestions for No DOI, please try later")
+    end
+
     it "should ignore entries no DOI and no crossref alternative" do
       missing_doi = BibTeX::Entry.new({title: "No DOI"})
       doi_checker = DOIChecker.new([missing_doi])
@@ -105,9 +118,16 @@ describe DOIChecker do
     end
 
     it "should sanitize doi strings" do
-      doi = "10.1#}{234/jou'rnal:_5(67)\"89"
-      doi_url = "https://doi.org/10.1234/journal:_5(67)89"
+      doi = "10.1#}{234/jou'rnal:_5(67)\"-89"
+      doi_url = "https://doi.org/10.1234/journal:_5(67)-89"
       expect(Faraday).to receive(:head).with(doi_url).and_return(OpenStruct.new(status: 400))
+      subject.validate_doi(doi)
+    end
+
+    it "should allow all DOI valid characters and query escape special characters" do
+      doi = "10.1002/(sici)1096-9136(199606)13:6<536::aid-dia110>3.0.co;2-j"
+      doi_url = "https://doi.org/10.1002/(sici)1096-9136(199606)13:6%3C536::aid-dia110%3E3.0.co;2-j"
+      expect(Faraday).to receive(:head).with(doi_url).and_return(OpenStruct.new(status: 301))
       subject.validate_doi(doi)
     end
   end
@@ -134,9 +154,9 @@ describe DOIChecker do
       expect(subject.crossref_lookup(title)).to be_nil
     end
 
-    it "should return nothing if crossref errors" do
+    it "should return CROSSREF-ERROR if crossref errors" do
       expect(Serrano).to receive(:works).and_raise Serrano::InternalServerError
-      expect(subject.crossref_lookup("Title")).to be_nil
+      expect(subject.crossref_lookup("Title")).to eq("CROSSREF-ERROR")
     end
   end
 

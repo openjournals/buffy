@@ -19,7 +19,11 @@ class DOIChecker
         # If there's no DOI present, check Crossref to see if we can find a candidate DOI for this entry.
         elsif entry.has_field?('title')
             candidate_doi = crossref_lookup(entry.title.value)
-            doi_summary[:missing].push("#{candidate_doi} may be a valid DOI for title: #{entry.title}") if candidate_doi
+            if candidate_doi == "CROSSREF-ERROR"
+              doi_summary[:missing].push("Errored finding suggestions for #{entry.title}, please try later")
+            elsif candidate_doi
+              doi_summary[:missing].push("#{candidate_doi} may be a valid DOI for title: #{entry.title}")
+            end
         end
       end
     end
@@ -39,8 +43,10 @@ class DOIChecker
     end
 
     begin
-      doi_string.gsub!(/[^a-zA-z0-9.:()\/_-]/, "")
-      doi_url = URI.join("https://doi.org", doi_string).to_s
+      doi_string.gsub!(/[^a-zA-z0-9:;<>\.\(\)\/\-_]/, "")
+      escaped_doi_string = doi_string.gsub("<", "%3C").gsub(">", "%3E")
+
+      doi_url = URI.join("https://doi.org", escaped_doi_string).to_s
 
       status_code = Faraday.head(doi_url).status
       return { validity: :ok, msg: "#{doi_string} is OK" } if [301, 302].include? status_code
@@ -65,8 +71,8 @@ class DOIChecker
       end
     end
     nil
-  rescue Serrano::InternalServerError
-    return nil
+  rescue Serrano::InternalServerError, Serrano::GatewayTimeout, Serrano::BadGateway, Serrano::ServiceUnavailable
+    return "CROSSREF-ERROR"
   end
 
   # How different are two strings?
