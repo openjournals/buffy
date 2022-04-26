@@ -39,8 +39,10 @@ class DOIChecker
     end
 
     begin
-      doi_string.gsub!(/[^a-zA-z0-9.:()\/_-]/, "")
-      doi_url = URI.join("https://doi.org", doi_string).to_s
+      doi_string.gsub!(/[^a-zA-z0-9:;<>\.\(\)\/\-_]/, "")
+      escaped_doi_string = doi_string.gsub("<", "%3C").gsub(">", "%3E")
+
+      doi_url = URI.join("https://doi.org", escaped_doi_string).to_s
 
       status_code = Faraday.head(doi_url).status
       return { validity: :ok, msg: "#{doi_string} is OK" } if [301, 302].include? status_code
