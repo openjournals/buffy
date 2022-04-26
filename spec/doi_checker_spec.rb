@@ -54,6 +54,19 @@ describe DOIChecker do
       expect(doi_summary[:missing][0]).to eq("10.maybe/doi may be a valid DOI for title: No DOI")
     end
 
+    it "should create error message for missing entries when Crossref errors" do
+      missing_doi = BibTeX::Entry.new({title: "No DOI"})
+      doi_checker = DOIChecker.new([missing_doi])
+
+      expect(doi_checker).to receive(:crossref_lookup).with("No DOI").and_return("CROSSREF-ERROR")
+
+      doi_summary = doi_checker.check_dois
+      expect(doi_summary[:ok]).to be_empty
+      expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:missing].size).to eq(1)
+      expect(doi_summary[:missing][0]).to eq("Errored finding suggestions for No DOI, please try later")
+    end
+
     it "should ignore entries no DOI and no crossref alternative" do
       missing_doi = BibTeX::Entry.new({title: "No DOI"})
       doi_checker = DOIChecker.new([missing_doi])
@@ -141,9 +154,9 @@ describe DOIChecker do
       expect(subject.crossref_lookup(title)).to be_nil
     end
 
-    it "should return nothing if crossref errors" do
+    it "should return CROSSREF-ERROR if crossref errors" do
       expect(Serrano).to receive(:works).and_raise Serrano::InternalServerError
-      expect(subject.crossref_lookup("Title")).to be_nil
+      expect(subject.crossref_lookup("Title")).to eq("CROSSREF-ERROR")
     end
   end
 
