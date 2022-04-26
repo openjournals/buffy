@@ -18,4 +18,8 @@ class Buffy < Sinatra::Base
   get '/status' do
     "#{settings.buffy[:env][:bot_github_user]} in #{settings.environment}: up and running!"
   end
+
+  get '/' do
+    "👋🤖"
+  end
 end
