@@ -20,7 +20,9 @@ class DOIChecker
         elsif entry.has_field?('title')
             candidate_doi = crossref_lookup(entry.title.value)
             if candidate_doi == "CROSSREF-ERROR"
-              doi_summary[:missing].push("Errored finding suggestions for #{entry.title}, please try later")
+              truncated_title = entry.title.to_s[0,50]
+              truncated_title += "..." if truncated_title.length < entry.title.to_s.length
+              doi_summary[:missing].push("Errored finding suggestions for \"#{truncated_title}\", please try later")
             elsif candidate_doi
               doi_summary[:missing].push("#{candidate_doi} may be a valid DOI for title: #{entry.title}")
             end
