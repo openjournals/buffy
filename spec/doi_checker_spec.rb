@@ -64,7 +64,22 @@ describe DOIChecker do
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
       expect(doi_summary[:missing].size).to eq(1)
-      expect(doi_summary[:missing][0]).to eq("Errored finding suggestions for No DOI, please try later")
+      expect(doi_summary[:missing][0]).to eq('Errored finding suggestions for "No DOI", please try later')
+    end
+
+    it "should truncate missing entry title in error messages" do
+      title = "1111111111222222222233333333334444444444555555555566666666667777777777"
+      expected_title = "11111111112222222222333333333344444444445555555555..."
+      missing_doi = BibTeX::Entry.new({title: title})
+      doi_checker = DOIChecker.new([missing_doi])
+
+      expect(doi_checker).to receive(:crossref_lookup).with(title).and_return("CROSSREF-ERROR")
+
+      doi_summary = doi_checker.check_dois
+      expect(doi_summary[:ok]).to be_empty
+      expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:missing].size).to eq(1)
+      expect(doi_summary[:missing][0]).to eq("Errored finding suggestions for \"#{expected_title}\", please try later")
     end
 
     it "should ignore entries no DOI and no crossref alternative" do
