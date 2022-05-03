@@ -73,7 +73,7 @@ GEM
       nio4r (~> 2.0)
     racc (1.6.0)
     rack (2.2.3)
-    rack-protection (2.1.0)
+    rack-protection (2.2.0)
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -108,16 +108,16 @@ GEM
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
       redis (>= 4.2.0)
-    sinatra (2.1.0)
+    sinatra (2.2.0)
       mustermann (~> 1.0)
       rack (~> 2.2)
-      rack-protection (= 2.1.0)
+      rack-protection (= 2.2.0)
       tilt (~> 2.0)
-    sinatra-contrib (2.1.0)
+    sinatra-contrib (2.2.0)
       multi_json
       mustermann (~> 1.0)
-      rack-protection (= 2.1.0)
-      sinatra (= 2.1.0)
+      rack-protection (= 2.2.0)
+      sinatra (= 2.2.0)
       tilt (~> 2.0)
     thor (1.2.1)
     tilt (2.0.10)
@@ -144,8 +144,8 @@ DEPENDENCIES
   rspec
   serrano
   sidekiq
-  sinatra (= 2.1.0)
-  sinatra-contrib (= 2.1.0)
+  sinatra (= 2.2.0)
+  sinatra-contrib (= 2.2.0)
   webmock
 
 BUNDLED WITH
