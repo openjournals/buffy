@@ -32,11 +32,11 @@ describe DOIWorker do
       expect(paper_file).to receive(:bibtex_entries).and_return(["bibtex_entries"])
 
       doi_checker = DOIChecker.new(["bibtex_entries"])
-      expected_doi_summary = {ok: ["10.1234/567"], invalid: ["wrong-doi"], missing: []}
+      expected_doi_summary = { invalid: ["wrong-doi"], missing: [], ok: ["10.1234/567"] }
       expect(DOIChecker).to receive(:new).with(["bibtex_entries"]).and_return(doi_checker)
       expect(doi_checker).to receive(:check_dois).and_return(expected_doi_summary)
 
-      expect(@worker).to receive(:respond_template).once.with(:doi_checks, doi_summary: expected_doi_summary)
+      expect(@worker).to receive(:respond_template).once.with(:doi_checks, { doi_summary: expected_doi_summary })
 
       @worker.perform({}, 'url', 'main')
     end
