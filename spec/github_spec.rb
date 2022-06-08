@@ -304,25 +304,50 @@ describe "Github methods" do
       expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
       expect(subject).to receive(:api_team_id).and_return(nil)
       expect(subject).to receive(:add_new_team).with("openjournals/superusers").and_return(double(id: 3333))
+      expect_any_instance_of(Octokit::Client).to receive(:org_member?).and_return(false)
       expect(Faraday).to receive(:post).and_return(double(status: 200))
 
       subject.invite_user_to_team("user42", "openjournals/superusers")
     end
 
-    it "should be false if invitation can not be created" do
-      expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
-      expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
-      expect(Faraday).to receive(:post).and_return(double(status: 403))
+    describe "when user is not a member of the organization" do
+      it "should be false if invitation can not be created" do
+        expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
+        expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
+        expect_any_instance_of(Octokit::Client).to receive(:org_member?).and_return(false)
+        expect(Faraday).to receive(:post).and_return(double(status: 403))
 
-      expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
+        expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
+      end
+
+      it "should be true when invitation is created" do
+        expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
+        expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
+        expect_any_instance_of(Octokit::Client).to receive(:org_member?).and_return(false)
+        expect(Faraday).to receive(:post).and_return(double(status: 201))
+
+        expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_truthy
+      end
     end
 
-    it "should be true when invitation is created" do
-      expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
-      expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
-      expect(Faraday).to receive(:post).and_return(double(status: 201))
+    describe "when user is already a member of the organization" do
+      it "should be false if user can't be added to the team" do
+        expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
+        expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
+        expect_any_instance_of(Octokit::Client).to receive(:org_member?).and_return(true)
+        expect(Faraday).to receive(:put).and_return(double(status: 403))
 
-      expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_truthy
+        expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
+      end
+
+      it "should be true when user is added to the team" do
+        expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
+        expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
+        expect_any_instance_of(Octokit::Client).to receive(:org_member?).and_return(true)
+        expect(Faraday).to receive(:put).and_return(double(status: 201))
+
+        expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_truthy
+      end
     end
   end
 
