@@ -190,10 +190,16 @@ module GitHub
     return false unless invited_team_id
 
     org_name, team_name = org_team_name.split('/')
-    url = "https://api.github.com/orgs/#{org_name}/invitations"
-    parameters = { invitee_id: invitee.id, team_ids: [invited_team_id] }
 
-    response = Faraday.post(url, parameters.to_json, github_headers)
+    if github_client.org_member?(org_name, username)
+      url = "https://api.github.com/orgs/#{org_name}/teams/#{org_team_name}/memberships/#{username}"
+      response = Faraday.put(url, nil, github_headers)
+    else
+      url = "https://api.github.com/orgs/#{org_name}/invitations"
+      parameters = { invitee_id: invitee.id, team_ids: [invited_team_id] }
+      response = Faraday.post(url, parameters.to_json, github_headers)
+    end
+
     response.status.between?(200, 299)
   end
 
