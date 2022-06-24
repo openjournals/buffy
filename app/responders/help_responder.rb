@@ -13,7 +13,7 @@ class HelpResponder < Responder
     descriptions_and_examples = []
     visible_responders = ResponderRegistry.new(@settings).responders.select {|r| !r.hidden? }
     comment_responders = visible_responders.select{|r| r.responds_on?(context)}
-    active_responders = comment_responders.select {|r| r.authorized?(context)}
+    active_responders = comment_responders.select {|r| r.context = context; r.authorized?(context) }
 
     active_responders.each do |r|
       if r.description.is_a? Array
