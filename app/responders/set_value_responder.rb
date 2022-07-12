@@ -8,7 +8,7 @@ class SetValueResponder < Responder
     required_params :name
 
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} set (.*) as #{name}\.?\s*$/i
+    @event_regex = /\A@#{bot_name} set (.*) as #{alias_or_name}\.?\s*$/i
   end
 
   def process_message(message)
@@ -16,7 +16,7 @@ class SetValueResponder < Responder
     end_mark = "<!--end-#{name}-->"
 
     new_value = @match_data[1]
-    reply = "Done! #{name} is now #{new_value}"
+    reply = "Done! #{alias_or_name} is now #{new_value}"
 
     errored = false
 
@@ -43,12 +43,16 @@ class SetValueResponder < Responder
     process_labeling unless errored
   end
 
+  def alias_or_name
+    params[:aliased_as] || name
+  end
+
   def default_description
-    "Set a value for #{name}"
+    "Set a value for #{alias_or_name}"
   end
 
   def default_example_invocation
-    "@#{bot_name} set #{params[:sample_value] || 'xxxxx'} as #{name}"
+    "@#{bot_name} set #{params[:sample_value] || 'xxxxx'} as #{alias_or_name}"
   end
 
 end

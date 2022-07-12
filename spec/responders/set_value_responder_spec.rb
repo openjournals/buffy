@@ -53,6 +53,34 @@ describe SetValueResponder do
     end
   end
 
+  describe "using an alias" do
+    before do
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "version", aliased_as: "release-number" })
+      disable_github_calls_for(@responder)
+
+      issue_body = "...Latest Version: <!--version-->Pending<!--end-version--> ..."
+      allow(@responder).to receive(:issue_body).and_return(issue_body)
+    end
+
+    it "should accept command using alias" do
+      msg = "@botsci set v0.0.33-alpha as release-number"
+      expect(@responder.event_regex).to match(msg)
+      @responder.match_data = @responder.event_regex.match(msg)
+
+      expected_new_body = "...Latest Version: <!--version-->v0.0.33-alpha<!--end-version--> ..."
+      expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+      expect(@responder).to receive(:respond).with("Done! release-number is now v0.0.33-alpha")
+      expect(@responder).to receive(:process_labeling)
+      expect(@responder).to_not receive(:process_reverse_labeling)
+
+      @responder.process_message(msg)
+    end
+
+    it "should not accept command using name" do
+      expect(@responder.event_regex).to_not match("@botsci set v0.0.33-alpha as version")
+    end
+  end
+
   describe "with config option: if_missing" do
     before do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "version" })
