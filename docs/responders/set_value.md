@@ -44,6 +44,10 @@ Following the previous example if the name of the field is _version_:
 :sample_value: A sample value string for the target field. It is used for documentation purposes when the :doc:`Help responder <./help>` lists all available responders. Default value is **xxxxx**.
 
 :template_file: *Optional* A template file to use to build the response message (name and value are passed to it).
+
+:external_call: *Optional* Configuration for a external service call. All available subparams are described in the `external_service docs`_.
+
+.. _`external_service docs`: ./external_service.html#params
 ```
 
 ## Examples

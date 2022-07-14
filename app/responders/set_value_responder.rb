@@ -40,7 +40,10 @@ class SetValueResponder < Responder
       respond(reply)
     end
 
-    process_labeling unless errored
+    unless errored
+      process_labeling
+      process_external_service(params[:external_call], locals.merge({new_value: new_value})) if params[:external_call]
+    end
   end
 
   def alias_or_name
