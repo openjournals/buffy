@@ -63,6 +63,19 @@ buffy:
           template_file: set_archive.md
       - branch:
           sample_value: "joss-paper"
+      - target-repository:
+          only: editors
+          sample_value: "https://github.com/organization/repo"
+          aliased_as: repository
+          external_call:
+            url: "https://joss.theoj.org/papers/api_update_paper_info"
+            method: post
+            query_params:
+              secret: <%= ENV['JOSS_SECRET'] %>
+            mapping:
+              id: issue_id
+              repository_url: new_value
+            silent: true
     external_service:
       - reject:
           only: eics
