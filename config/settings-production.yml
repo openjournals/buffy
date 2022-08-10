@@ -4,8 +4,8 @@ buffy:
     gh_access_token: <%= ENV['BUFFY_GH_ACCESS_TOKEN'] %>
     gh_secret_token: <%= ENV['BUFFY_GH_SECRET_TOKEN'] %>
   teams:
-    editors: openjournals/joss-editors
-    eics: openjournals/joss-eics
+    editors: aliadalabs/editors
+    eics: aliadalabs/editors
   responders:
     help:
       - commands:
@@ -24,16 +24,16 @@ buffy:
       add_as_assignee: true
     list_team_members:
       command: list editors
-      team_id: openjournals/joss-editors
+      team_id: aliadalabs/editors
       heading: List of JOSS editors
       description: "Get a list of all editors's GitHub handles"
     assign_editor:
       only: editors
       external_call:
-        url: "https://joss.theoj.org/papers/api_assign_editor"
+        url: "https://test.joss.theoj.org/papers/api_assign_editor"
         method: post
         query_params:
-          secret: <%= ENV['JOSS_SECRET'] %>
+          secret: <%= ENV['JOSS_TEST_SECRET'] %>
         mapping:
           id: issue_id
           editor: editor
@@ -65,16 +65,16 @@ buffy:
           sample_value: "10.21105/zenodo.12345"
           template_file: set_archive.md
       - branch:
-          sample_value: "joss-paper"
+          sample_value: "testjoss-paper"
       - target-repository:
           only: editors
           sample_value: "https://github.com/organization/repo"
           aliased_as: repository
           external_call:
-            url: "https://joss.theoj.org/papers/api_update_paper_info"
+            url: "https://test.joss.theoj.org/papers/api_update_paper_info"
             method: post
             query_params:
-              secret: <%= ENV['JOSS_SECRET'] %>
+              secret: <%= ENV['JOSS_TEST_SECRET'] %>
             mapping:
               id: issue_id
               repository_url: new_value
@@ -84,9 +84,9 @@ buffy:
           only: eics
           command: reject
           description: "Reject paper"
-          url: "https://joss.theoj.org/papers/api_reject"
+          url: "https://test.joss.theoj.org/papers/api_reject"
           query_params:
-            secret: <%= ENV['JOSS_SECRET'] %>
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
           mapping:
             id: issue_id
           add_labels:
@@ -98,9 +98,9 @@ buffy:
           only: eics
           command: withdraw
           description: "Withdraw paper"
-          url: "https://joss.theoj.org/papers/api_withdraw"
+          url: "https://test.joss.theoj.org/papers/api_withdraw"
           query_params:
-            secret: <%= ENV['JOSS_SECRET'] %>
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
           mapping:
             id: issue_id
           add_labels:
@@ -112,9 +112,9 @@ buffy:
           only: eics
           command: "invite @(.*) as editor"
           description: "Invite an editor to edit a submission (sending them an email)"
-          url: "https://joss.theoj.org/papers/api_editor_invite"
+          url: "https://test.joss.theoj.org/papers/api_editor_invite"
           query_params:
-            secret: <%= ENV['JOSS_SECRET'] %>
+            secret: <%= ENV['JOSS_TEST_SECRET'] %>
           mapping:
             id: issue_id
             editor: match_data_1
@@ -123,7 +123,7 @@ buffy:
     github_action:
       - draft_paper:
           command: generate pdf
-          workflow_repo: openjournals/joss-papers
+          workflow_repo: openjournals/joss-papers-testing
           workflow_name: draft-paper.yml
           description: Generates the pdf paper
           data_from_issue:
@@ -139,7 +139,7 @@ buffy:
             reject_msg: "Paper is not ready for acceptance yet, the archive is missing"
           only: editors
           command: recommend-accept
-          workflow_repo: openjournals/joss-papers
+          workflow_repo: openjournals/joss-papers-testing
           workflow_name: recommend-acceptance.yml
           description: Recommends the submission for acceptance
           message: "```\nAttempting dry run of processing paper acceptance...\n```"
@@ -160,7 +160,7 @@ buffy:
             reject_msg: "Paper is not ready for acceptance yet, the archive is missing"
           only: eics
           command: accept
-          workflow_repo: openjournals/joss-papers
+          workflow_repo: openjournals/joss-papers-testing
           workflow_name: accept.yml
           description: Accept and publish the paper
           message: "```\nDoing it live! Attempting automated processing of paper acceptance...\n```"
@@ -179,7 +179,7 @@ buffy:
             reject_msg: "Can't rebuild paper, there's no value for archive"
           only: eics
           command: reaccept
-          workflow_repo: openjournals/joss-papers
+          workflow_repo: openjournals/joss-papers-testing
           workflow_name: reaccept.yml
           workflow_ref: master
           description: Update data on an accepted/published paper
@@ -233,9 +233,9 @@ buffy:
     external_start_review:
       only: editors
       external_call:
-        url: "https://joss.theoj.org/papers/api_start_review"
+        url: "https://test.joss.theoj.org/papers/api_start_review"
         query_params:
-          secret: <%= ENV['JOSS_SECRET'] %>
+          secret: <%= ENV['JOSS_TEST_SECRET'] %>
         data_from_issue:
           - branch
         mapping:
