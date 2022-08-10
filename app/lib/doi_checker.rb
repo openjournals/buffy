@@ -46,7 +46,7 @@ class DOIChecker
 
     begin
       doi_string.gsub!(/[^a-zA-z0-9:;<>\.\(\)\/\-_]/, "")
-      escaped_doi_string = doi_string.gsub("<", "%3C").gsub(">", "%3E")
+      escaped_doi_string = doi_string.gsub("<", "%3C").gsub(">", "%3E").gsub("[", "%5B").gsub("]", "%5D")
 
       doi_url = URI.join("https://doi.org", escaped_doi_string).to_s
 

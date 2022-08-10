@@ -144,6 +144,11 @@ describe DOIChecker do
       doi_url = "https://doi.org/10.1002/(sici)1096-9136(199606)13:6%3C536::aid-dia110%3E3.0.co;2-j"
       expect(Faraday).to receive(:head).with(doi_url).and_return(OpenStruct.new(status: 301))
       subject.validate_doi(doi)
+
+      doi = "10.1577/1548-8446(2006)31[590:TCFIE]2.0.CO;2"
+      doi_url = "https://doi.org/10.1577/1548-8446(2006)31%5B590:TCFIE%5D2.0.CO;2"
+      expect(Faraday).to receive(:head).with(doi_url).and_return(OpenStruct.new(status: 301))
+      subject.validate_doi(doi)
     end
   end
 
