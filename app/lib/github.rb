@@ -184,15 +184,15 @@ module GitHub
 
     invited_team_id = api_team_id(org_team_name)
     if invited_team_id.nil?
-      invited_team_id = add_new_team(org_team_name)
-      invited_team_id = invited_team_id.id if invited_team_id
+      invited_team = add_new_team(org_team_name)
+      invited_team_id = invited_team.id if invited_team
     end
     return false unless invited_team_id
 
     org_name, team_name = org_team_name.split('/')
 
     if github_client.org_member?(org_name, username)
-      url = "https://api.github.com/orgs/#{org_name}/teams/#{org_team_name}/memberships/#{username}"
+      url = "https://api.github.com/orgs/#{org_name}/teams/#{team_name}/memberships/#{username}"
       response = Faraday.put(url, nil, github_headers)
     else
       url = "https://api.github.com/orgs/#{org_name}/invitations"

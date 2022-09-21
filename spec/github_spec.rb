@@ -331,11 +331,13 @@ describe "Github methods" do
     end
 
     describe "when user is already a member of the organization" do
+      before { @expected_url = "https://api.github.com/orgs/openjournals/teams/superusers/memberships/user42" }
+
       it "should be false if user can't be added to the team" do
         expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
         expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
         expect_any_instance_of(Octokit::Client).to receive(:org_member?).and_return(true)
-        expect(Faraday).to receive(:put).and_return(double(status: 403))
+        expect(Faraday).to receive(:put).with(@expected_url, nil, subject.github_headers).and_return(double(status: 403))
 
         expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_falsy
       end
@@ -344,7 +346,7 @@ describe "Github methods" do
         expect_any_instance_of(Octokit::Client).to receive(:user).and_return(double(id: 33))
         expect(subject).to receive(:api_team_id).with("openjournals/superusers").and_return(1234)
         expect_any_instance_of(Octokit::Client).to receive(:org_member?).and_return(true)
-        expect(Faraday).to receive(:put).and_return(double(status: 201))
+        expect(Faraday).to receive(:put).with(@expected_url, nil, subject.github_headers).and_return(double(status: 201))
 
         expect(subject.invite_user_to_team("user42", "openjournals/superusers")).to be_truthy
       end
