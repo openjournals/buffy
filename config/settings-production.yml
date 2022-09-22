@@ -193,6 +193,18 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
+      - preprint:
+          command: generate preprint
+          workflow_repo: openjournals/joss-papers
+          workflow_name: preprint.yml
+          workflow_ref: master
+          description: Generates a LaTeX preprint file
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
     basic_command:
       - query_scope:
           only: editors
