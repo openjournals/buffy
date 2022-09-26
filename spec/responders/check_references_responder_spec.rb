@@ -26,7 +26,7 @@ describe CheckReferencesResponder do
   end
 
   describe "#process_message" do
-    let(:expected_locals) { {bot_name: "botsci", issue_author: nil, issue_id: nil, repo: nil, sender: nil} }
+    let(:expected_locals) { {"bot_name" => "botsci", "issue_author" => nil, "issue_id" => nil, "repo" => nil, "sender" => nil} }
 
     it "should respond an error message if no url" do
       expect(@responder).to receive(:respond).with("I couldn't find the URL for the target repository")
@@ -47,7 +47,7 @@ describe CheckReferencesResponder do
       @responder.context.issue_body +=  "<!--target-repository-->http://test.ing<!--end-target-repository-->"
       expected_url = "http://test.ing"
       expected_branch = "custom-branch"
-      expected_locals_with_branch = expected_locals.merge({match_data_1: "custom-branch"})
+      expected_locals_with_branch = expected_locals.merge({"match_data_1" => "custom-branch"})
       msg = "@botsci check references from branch custom-branch"
       @responder.match_data = @responder.event_regex.match(msg)
 

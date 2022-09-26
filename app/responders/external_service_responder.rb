@@ -13,7 +13,8 @@ class ExternalServiceResponder < Responder
 
   def process_message(message)
     respond(params[:message]) if params[:message]
-    ExternalServiceWorker.perform_async(params, locals)
+
+    ExternalServiceWorker.perform_async(serializable(params), serializable(locals))
   end
 
   def default_description

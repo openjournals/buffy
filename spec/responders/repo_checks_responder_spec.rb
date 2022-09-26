@@ -28,7 +28,7 @@ describe RepoChecksResponder do
   end
 
   describe "#process_message" do
-    let(:expected_locals) { {bot_name: "botsci", issue_author: nil, issue_id: nil, repo: nil, sender: nil} }
+    let(:expected_locals) { {"bot_name" => "botsci", "issue_author" => nil, "issue_id" => nil, "repo" => nil, "sender" => nil} }
 
     it "should respond an error message if no url" do
       @responder.params[:url_field] = "url"
@@ -49,7 +49,7 @@ describe RepoChecksResponder do
     it "should call RepoChecksWorker with custom branch" do
       expected_url = "http://repo.url"
       expected_branch = "custom-branch"
-      expected_locals_with_branch = expected_locals.merge({match_data_1: "custom-branch"})
+      expected_locals_with_branch = expected_locals.merge({"match_data_1" => "custom-branch"})
       expected_checks = nil
 
       msg = "@botsci check repository from branch custom-branch"

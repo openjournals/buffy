@@ -650,7 +650,7 @@ describe Responder do
     it "should pass right info to the worker" do
       expected_params = { name: "test-service", command: "run tests", url: "http://testing.openjournals.org" }
       expected_locals = { bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
-      expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
+      expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params.transform_keys(&:to_s), expected_locals.transform_keys(&:to_s))
       @responder.process_external_service(expected_params, expected_locals)
     end
   end
@@ -747,6 +747,26 @@ describe Responder do
       @responder.match_data = @responder.event_regex.match(command)
 
       expect(@responder.branch_name_value).to eq("custom-branch")
+    end
+  end
+
+  describe "#serializable" do
+    before do
+      @responder = Responder.new({}, {})
+      disable_github_calls_for(@responder)
+    end
+
+    it "should recursively stringify keys of hashes" do
+      expect(@responder.serializable({a: 1, b: {c: "two"}})).to eq({"a" => 1, "b" => { "c" => "two" }})
+    end
+
+    it "should stringify keys of hashes inside arrays" do
+      expect(@responder.serializable([{a: 1}, 33, "name"])).to eq([{"a" => 1}, 33, "name"])
+    end
+
+    it "should not change string or numeric data" do
+      expect(@responder.serializable("hey")).to eq("hey")
+      expect(@responder.serializable(42)).to eq(42)
     end
   end
 end

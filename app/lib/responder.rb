@@ -212,7 +212,7 @@ class Responder
   def process_external_service(service_config, service_data)
     unless service_config.nil? || service_config.empty?
       service_locals = get_data_from_issue(service_config[:data_from_issue]).merge(service_data)
-      ExternalServiceWorker.perform_async(service_config, service_locals)
+      ExternalServiceWorker.perform_async(serializable(service_config), serializable(service_locals))
     end
   end
 
@@ -226,6 +226,20 @@ class Responder
       matching_responder.match_data = matching_responder.event_regex.match(msg) unless msg.empty?
       matching_responder.process_message(msg)
     end
+  end
+
+  def serializable(info)
+    if info.is_a?(Hash)
+      serializable_data = {}
+      info.each_pair {|k, v| serializable_data[k.to_s] = serializable(v)}
+    elsif info.is_a?(Array)
+      serializable_data = []
+      info.each{|item| serializable_data << serializable(item)}
+    else
+      serializable_data = info
+    end
+
+    serializable_data
   end
 
   # Add/remove labels as configured in the responder' settings

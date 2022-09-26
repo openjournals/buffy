@@ -27,7 +27,7 @@ describe ExternalServiceResponder do
   describe "#process_message" do
     before do
       settings = { env: {bot_github_user: "botsci"} }
-      params = { name: "test-service", command: "run tests", url: "http://testing.openjournals.org" }
+      params = { name: "test-service", command: "run tests", url: "http://testing.openjournals.org", extra: {restrict_access: true} }
       @responder = subject.new(settings, params)
       @responder.context = OpenStruct.new(issue_id: 33,
                                           issue_author: "opener",
@@ -53,8 +53,11 @@ describe ExternalServiceResponder do
     end
 
     it "should pass right info to the worker" do
-      expected_params = { name: "test-service", command: "run tests", url: "http://testing.openjournals.org" }
-      expected_locals = { bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
+      params = { name: "test-service", command: "run tests", url: "http://testing.openjournals.org" }
+      locals = { bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
+
+      expected_params = { "name" => "test-service", "command" => "run tests", "url" => "http://testing.openjournals.org", "extra" => {"restrict_access" => true}  }
+      expected_locals = { "bot_name" => "botsci", "issue_author" => "opener", "issue_id" => 33, "repo" => "openjournals/testing", "sender" => "xuanxu"}
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
       @responder.process_message("")
     end
