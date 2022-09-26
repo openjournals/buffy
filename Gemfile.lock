@@ -13,12 +13,14 @@ GEM
       rexml
     diff-lcs (1.5.0)
     dotenv (2.7.6)
-    faraday (2.3.0)
-      faraday-net_http (~> 2.0)
+    faraday (2.5.2)
+      faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-follow_redirects (0.1.0)
       faraday (>= 2, < 3)
-    faraday-net_http (2.0.3)
+    faraday-net_http (3.0.0)
+    faraday-retry (2.0.0)
+      faraday (~> 2.0)
     github-linguist (7.22.0)
       cgi
       charlock_holmes (~> 0.7.7)
@@ -114,6 +116,7 @@ DEPENDENCIES
   bibtex-ruby
   chronic
   faraday
+  faraday-retry
   github-linguist
   issue
   licensee
