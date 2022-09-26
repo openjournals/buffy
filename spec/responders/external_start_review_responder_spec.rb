@@ -64,16 +64,16 @@ describe ExternalStartReviewResponder do
     it "should create ExternalServiceWorker with proper config" do
       @responder.context[:issue_body] = "<!--editor-->@arfon<!--end-editor-->" +
                                         "<!--reviewers-list-->@xuanxu, @karthik<!--end-reviewers-list-->"
-      expected_params = {:url=>"http://testing.openjournals.org"}
-      expected_locals = { bot_name: "botsci",
-                          editor_login: "arfon",
-                          editor_username: "@arfon",
-                          issue_author: "opener",
-                          issue_id: 33,
-                          repo: "openjournals/testing",
-                          reviewers_logins: "xuanxu,karthik",
-                          reviewers_usernames: ["@xuanxu", "@karthik"],
-                          sender: "xuanxu" }
+      expected_params = {"url" =>"http://testing.openjournals.org"}
+      expected_locals = { "bot_name" => "botsci",
+                          "editor_login" => "arfon",
+                          "editor_username" => "@arfon",
+                          "issue_author" => "opener",
+                          "issue_id" => 33,
+                          "repo" => "openjournals/testing",
+                          "reviewers_logins" => "xuanxu,karthik",
+                          "reviewers_usernames" => ["@xuanxu", "@karthik"],
+                          "sender" => "xuanxu" }
 
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
       @responder.process_message("")

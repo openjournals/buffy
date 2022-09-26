@@ -165,8 +165,8 @@ describe WelcomeResponder do
     end
 
     it "should pass right info to the worker" do
-      expected_params = { name: "test-service", url: "http://testing.openjournals.org", data_from_issue: ["extra-data"] }
-      expected_locals = { "extra-data": "ABC123", bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
+      expected_params = { "name" => "test-service", "url" => "http://testing.openjournals.org", "data_from_issue" => ["extra-data"] }
+      expected_locals = { "extra-data" => "ABC123", "bot_name" => "botsci", "issue_author" => "opener", "issue_id" => 33, "repo" => "openjournals/testing", "sender" => "xuanxu" }
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
       @responder.process_message("")
     end

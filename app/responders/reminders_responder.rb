@@ -23,7 +23,7 @@ class RemindersResponder < Responder
     schedule_at = target_time(size, unit)
 
     if schedule_at
-      ReviewReminderWorker.perform_at(schedule_at, locals, human, authors_list.include?(human))
+      ReviewReminderWorker.perform_at(schedule_at, serializable(locals), human, authors_list.include?(human))
       respond("Reminder set for #{human} in #{size} #{unit}")
     else
       respond ("I don't recognize this description of time: '#{size}' '#{unit}'.")
