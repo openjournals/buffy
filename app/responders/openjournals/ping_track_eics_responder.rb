@@ -31,7 +31,7 @@ module Openjournals
     end
 
     def default_example_invocation
-      "@{bot_name} ping track-eic"
+      "@#{bot_name} ping track-eic"
     end
   end
 end
