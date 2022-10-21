@@ -67,7 +67,7 @@ class ExternalStartReviewResponder < Responder
   end
 
   def default_example_invocation
-    "@#{@bot_name} start review"
+    "@#{bot_name} start review"
   end
 end
 
