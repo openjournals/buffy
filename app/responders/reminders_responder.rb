@@ -15,6 +15,8 @@ class RemindersResponder < Responder
     size = @match_data[2].strip
     unit = @match_data[3].strip
 
+    human = "@#{user_login(context.sender)}" if human == "me"
+
     unless targets.include?(human)
       respond("#{human} doesn't seem to be a reviewer or author for this submission.")
       return false
@@ -23,7 +25,12 @@ class RemindersResponder < Responder
     schedule_at = target_time(size, unit)
 
     if schedule_at
-      ReviewReminderWorker.perform_at(schedule_at, serializable(locals), human, authors_list.include?(human))
+      if user_login(human) == user_login(context.sender)
+        msg = ":wave: #{human}, please take a look at the state of the submission (this is an automated reminder)."
+        AsyncMessageWorker.perform_at(schedule_at, serializable(locals), msg)
+      else
+        ReviewReminderWorker.perform_at(schedule_at, serializable(locals), human, authors_list.include?(human))
+      end
       respond("Reminder set for #{human} in #{size} #{unit}")
     else
       respond ("I don't recognize this description of time: '#{size}' '#{unit}'.")
@@ -31,7 +38,7 @@ class RemindersResponder < Responder
   end
 
   def targets
-    (authors_list + reviewers_list).uniq
+    (authors_list + reviewers_list + ["@#{user_login(context.sender)}"]).uniq
   end
 
   def reviewers_list
@@ -59,7 +66,7 @@ class RemindersResponder < Responder
   end
 
   def default_description
-    "Remind an author or reviewer to return to a review after a " + "\n" +
+    "Remind an author, a reviewer or the editor to return to a review after a " + "\n" +
     "# certain period of time (supported units days and weeks)"
   end
 
