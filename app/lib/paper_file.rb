@@ -11,7 +11,16 @@ class PaperFile
   end
 
   def bib
-    @bib ||= BibTeX.open(bibtex_path, filter: :latex)
+    return @bib unless @bib.nil?
+
+    parsed_bib = BibTeX.open(bibtex_path, filter: :latex)
+    no_filter_bib = BibTeX.open(bibtex_path)
+
+    parsed_bib.data.each_with_index do |entry, i|
+      entry.doi = no_filter_bib.data[i].doi if entry.is_a?(BibTeX::Entry) && entry.has_field?('doi')
+    end
+
+    @bib = parsed_bib
   end
 
   def bibtex_entries
