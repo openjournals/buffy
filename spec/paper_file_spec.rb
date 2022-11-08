@@ -86,6 +86,7 @@ describe PaperFile do
       bibtex_entries = subject.bibtex_entries
       expect(bibtex_entries.size).to eq(5)
       expect(bibtex_entries.first.title.value).to eq("The NumPy Array: A Structure for Efficient Numerical Computation")
+      expect(bibtex_entries.first.author.value).to eq("van der Walt, S. and Colbert, S. C. and Varoquaux, G.")
       expect(subject.bibtex_error).to be_nil
     end
 
