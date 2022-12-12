@@ -306,13 +306,13 @@ describe Responder do
 
     it "should not process message if authorized? is false" do
       context = OpenStruct.new(sender: "tester", repo: "openjournals/buffy")
-      subject.params = {only: ['editors', 'owners']}
+      subject.params = {only: ['editors', 'owners'], authorized_roles_in_issue: ["author"]}
       allow(subject).to receive(:responds_on?).and_return(true)
       allow(subject).to receive(:responds_to?).and_return(true)
       allow(subject).to receive(:authorized?).and_return(false)
       allow(subject).to receive(:respond).and_return(true)
       allow(subject).to receive(:process_message).never
-      expected_msg = "I'm sorry @tester, I'm afraid I can't do that. That's something only editors and owners are allowed to do."
+      expected_msg = "I'm sorry @tester, I'm afraid I can't do that. That's something only editors, owners and author are allowed to do."
       expect(subject).to receive(:respond).once.with(expected_msg)
       expect(subject.call("testing", context)).to be true
     end

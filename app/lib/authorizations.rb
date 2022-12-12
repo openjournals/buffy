@@ -54,12 +54,26 @@ module Authorizations
     end
   end
 
-  def authorized_teams_sentence
-    @authorized_teams_sentence ||= begin
-      if authorized_team_names.size == 1
-        authorized_team_names[0]
-      elsif authorized_team_names.size > 1
-        "#{authorized_team_names[0...-1] * ', '} and #{authorized_team_names[-1]}"
+  def authorized_roles_names
+    @authorized_roles_names ||= begin
+      roles_names = []
+      case params[:authorized_roles_in_issue]
+      when String
+        roles_names << params[:authorized_roles_in_issue]
+      when Array
+        params[:authorized_roles_in_issue].each { |role_name| roles_names << role_name }
+      end
+      roles_names
+    end
+  end
+
+  def authorized_teams_and_roles_sentence
+    authorized_teams_and_roles = authorized_team_names + authorized_roles_names
+    @authorized_people_sentence ||= begin
+      if authorized_teams_and_roles.size == 1
+        authorized_teams_and_roles[0]
+      elsif authorized_teams_and_roles.size > 1
+        "#{authorized_teams_and_roles[0...-1] * ', '} and #{authorized_teams_and_roles[-1]}"
       else
         ""
       end

@@ -145,7 +145,7 @@ class Responder
     if authorized?(buffy_context)
       process_message(message) if meet_conditions?
     else
-      respond "I'm sorry @#{buffy_context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_sentence} are allowed to do."
+      respond "I'm sorry @#{buffy_context.sender}, I'm afraid I can't do that. That's something only #{authorized_teams_and_roles_sentence} are allowed to do."
     end
     true
   end

@@ -10,7 +10,7 @@ describe "Authorizations" do
         guests: "orgbuffy/guests",
         trusted_people: ["user33", "user42"],
         empty: nil }]
-    params = { only: ['editors', 'eics', 'trusted_people'] }
+    params = { only: ['editors', 'eics', 'trusted_people'], authorized_roles_in_issue: ['author', 'other-authors', 'reviewers'] }
     Responder.new(settings, params)
   end
 
@@ -80,9 +80,15 @@ describe "Authorizations" do
     end
   end
 
-  describe "#authorized_teams_sentence" do
-    it "should return a sentence of names of all authorized teams" do
-      expect(subject.authorized_teams_sentence).to eq('editors, eics and trusted_people')
+  describe "#authorized_roles_names" do
+    it "should return names of all authorized roles from the issue body" do
+      expect(subject.authorized_roles_names).to eq(['author', 'other-authors', 'reviewers'])
+    end
+  end
+
+  describe "#authorized_teams_and_roles_sentence" do
+    it "should return a sentence of names of all authorized teams and roles" do
+      expect(subject.authorized_teams_and_roles_sentence).to eq('editors, eics, trusted_people, author, other-authors and reviewers')
     end
   end
 
