@@ -18,7 +18,7 @@ buffy:
     whedon:
     thanks:
       hidden: true
-    reviewers_list:
+    openjournals_reviewers_list:
       only: editors
       if:
         role_assigned: editor
