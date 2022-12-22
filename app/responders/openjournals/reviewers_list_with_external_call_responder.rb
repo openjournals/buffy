@@ -96,6 +96,8 @@ module Openjournals
 
     def api_call_review_assignment(reviewer)
       return nil if env[:reviewers_host_url].to_s.empty?
+      return nil unless Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
+
       url = "#{env[:reviewers_host_url]}/api/stats/update/#{reviewer}/review_assigned"
       idempotency_key = "assign-#{reviewer}-#{context.issue_id}"
 
@@ -108,6 +110,8 @@ module Openjournals
 
     def api_call_review_unassignment(reviewer)
       return nil if env[:reviewers_host_url].to_s.empty?
+      return nil unless Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
+
       url = "#{env[:reviewers_host_url]}/api/stats/update/#{reviewer}/review_unassigned"
       idempotency_key = "assign-#{reviewer}-#{context.issue_id}"
 

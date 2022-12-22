@@ -1,7 +1,7 @@
 Reviewers list with API call
 ============================
 
-This responder adds/removes usernames to/from the list of reviewers in the body of the issue (exactly the same way as the [Reviewers List responder](../reviewers_list)) but it also calls the Reviewers management application's API to keep track of reviewer's active reviews.
+This responder adds/removes usernames to/from the list of reviewers in the body of the issue (exactly the same way as the [Reviewers List responder](../reviewers_list)) but it also calls the Reviewers management application's API to keep track of reviewer's active reviews if it is run in a REVIEW issue.
 Allows [labeling](../../labeling).
 
 ## Listens to

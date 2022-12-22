@@ -30,7 +30,8 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
   describe "#process_message" do
     before do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
-      @responder.context = double(sender: "editor", issue_id: "3342")
+      @responder.context = OpenStruct.new(sender: "editor", issue_id: "3342", issue_title: "[REVIEW]: Test")
+#      double(sender: "editor", issue_id: "3342", issue_title: "[REVIEW]: Test")
       disable_github_calls_for(@responder)
     end
 
@@ -100,6 +101,15 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
       end
 
       it "should not call Reviewers API if no configured" do
+        expect(Faraday).to_not receive(:post)
+        @responder.process_message(@msg)
+      end
+
+      it "should not call Reviewers API if issue is not a review" do
+        @responder.context[:issue_title] = "[PRE REVIEW]: Test"
+        @responder.env[:reviewers_host_url] = "https://reviewers.test"
+        @responder.env[:reviewers_api_token] = "123456789ABC"
+
         expect(Faraday).to_not receive(:post)
         @responder.process_message(@msg)
       end
@@ -175,6 +185,15 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
       end
 
       it "should not call Reviewers API if no configured" do
+        expect(Faraday).to_not receive(:post)
+        @responder.process_message(@msg)
+      end
+
+      it "should not call Reviewers API if issue is not a review" do
+        @responder.context[:issue_title] = "[PRE REVIEW]: Test"
+        @responder.env[:reviewers_host_url] = "https://reviewers.test"
+        @responder.env[:reviewers_api_token] = "123456789ABC"
+
         expect(Faraday).to_not receive(:post)
         @responder.process_message(@msg)
       end
