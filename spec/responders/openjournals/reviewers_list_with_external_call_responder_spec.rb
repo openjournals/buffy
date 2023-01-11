@@ -203,7 +203,7 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.env[:reviewers_api_token] = "123456789ABC"
 
         expected_url = "https://reviewers.test/api/stats/update/@xuanxu/review_unassigned"
-        expected_params = {idempotency_key: "assign-@xuanxu-3342"}
+        expected_params = {idempotency_key: "unassign-@xuanxu-3342"}
         expected_headers = {"TOKEN" => "123456789ABC"}
 
         expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(double(status: 204))

@@ -113,7 +113,7 @@ module Openjournals
       return nil unless Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
 
       url = "#{env[:reviewers_host_url]}/api/stats/update/#{reviewer}/review_unassigned"
-      idempotency_key = "assign-#{reviewer}-#{context.issue_id}"
+      idempotency_key = "unassign-#{reviewer}-#{context.issue_id}"
 
       response = Faraday.post(url, { idempotency_key: idempotency_key }, { "TOKEN" => env[:reviewers_api_token] })
 
