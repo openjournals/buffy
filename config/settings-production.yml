@@ -18,6 +18,12 @@ buffy:
     whedon:
     thanks:
       hidden: true
+    openjournals_reviewers_start_review:
+      if:
+        title: "^\\[REVIEW\\]:"
+    openjournals_reviewers_end_review:
+      if:
+        title: "^\\[REVIEW\\]:"
     openjournals_reviewers_list:
       only: editors
       if:
