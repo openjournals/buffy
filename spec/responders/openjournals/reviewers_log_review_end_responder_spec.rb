@@ -1,6 +1,6 @@
 require_relative "../../spec_helper.rb"
 
-describe Openjournals::ReviewersLogReviewStartResponder do
+describe Openjournals::ReviewersLogReviewEndResponder do
 
   subject do
     described_class
@@ -9,8 +9,8 @@ describe Openjournals::ReviewersLogReviewStartResponder do
   describe "listening" do
     before { @responder = subject.new({env: {bot_github_user: "botsci"}}, {}) }
 
-    it "should listen to new issues" do
-      expect(@responder.event_action).to eq("issues.opened")
+    it "should listen to issues being closed" do
+      expect(@responder.event_action).to eq("issues.closed")
     end
 
     it "should not define regex" do
@@ -49,8 +49,8 @@ describe Openjournals::ReviewersLogReviewStartResponder do
       @responder.process_message("")
     end
 
-    it "should call reviewers API's assign_reviewers method with all reviewers" do
-      expect_any_instance_of(OJRA::Client).to receive(:assign_reviewers).with(["@arfon", "@xuanxu"], 3333).and_return(true)
+    it "should call reviewers API's unassign_reviewers method with all reviewers" do
+      expect_any_instance_of(OJRA::Client).to receive(:unassign_reviewers).with(["@arfon", "@xuanxu"], 3333).and_return(true)
 
       @responder.process_message("")
     end
