@@ -31,8 +31,9 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
     before do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, {})
       @responder.context = OpenStruct.new(sender: "editor", issue_id: "3342", issue_title: "[REVIEW]: Test")
-#      double(sender: "editor", issue_id: "3342", issue_title: "[REVIEW]: Test")
+
       disable_github_calls_for(@responder)
+      allow(@responder.logger).to receive(:warn)
     end
 
     describe "adding new reviewer" do
@@ -100,8 +101,10 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.process_message(@msg)
       end
 
-      it "should not call Reviewers API if no configured" do
+      it "should not call Reviewers API if no configured and log error" do
         expect(Faraday).to_not receive(:post)
+        expected_error = "Error assigning review 3342 to @xuanxu: Missing configuration values for the API: host's URL and/or API Token"
+        expect(@responder.logger).to receive(:warn).with(expected_error)
         @responder.process_message(@msg)
       end
 
@@ -110,6 +113,7 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.env[:reviewers_host_url] = "https://reviewers.test"
         @responder.env[:reviewers_api_token] = "123456789ABC"
 
+        expect(OJRA::Client).to_not receive(:new)
         expect(Faraday).to_not receive(:post)
         @responder.process_message(@msg)
       end
@@ -118,11 +122,11 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.env[:reviewers_host_url] = "https://reviewers.test"
         @responder.env[:reviewers_api_token] = "123456789ABC"
 
-        expected_url = "https://reviewers.test/api/stats/update/@xuanxu/review_assigned"
-        expected_params = {idempotency_key: "assign-@xuanxu-3342"}
-        expected_headers = {"TOKEN" => "123456789ABC"}
-
-        expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(double(status: 204))
+        client_double = instance_double(OJRA::Client)
+        expect(OJRA::Client).to receive(:new).with("https://reviewers.test", "123456789ABC").and_return(client_double)
+        expect(client_double).to receive(:assign_reviewer).with("@xuanxu", "3342").and_return(true)
+        expect(client_double).to receive(:error_msg).and_return(nil)
+        expect(@responder.logger).to_not receive(:warn)
         @responder.process_message(@msg)
       end
     end
@@ -166,7 +170,7 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
       it "should accept 'me' as the reviewer to remove" do
         msg = "@botsci remove me from reviewers"
         @responder.match_data = @responder.event_regex.match(msg)
-        @responder.context = double(sender: "xuanxu")
+        @responder.context[:sender] = "xuanxu"
         expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon<!--end-reviewers-list--> ..."
         expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
         expect(@responder).to receive(:respond).with("@xuanxu removed from the reviewers list!")
@@ -184,8 +188,10 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.process_message(@msg)
       end
 
-      it "should not call Reviewers API if no configured" do
+      it "should not call Reviewers API if no configured and log error" do
         expect(Faraday).to_not receive(:post)
+        expected_error = "Error unassigning @xuanxu from review 3342: Missing configuration values for the API: host's URL and/or API Token"
+        expect(@responder.logger).to receive(:warn).with(expected_error)
         @responder.process_message(@msg)
       end
 
@@ -194,6 +200,7 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.env[:reviewers_host_url] = "https://reviewers.test"
         @responder.env[:reviewers_api_token] = "123456789ABC"
 
+        expect(OJRA::Client).to_not receive(:new)
         expect(Faraday).to_not receive(:post)
         @responder.process_message(@msg)
       end
@@ -202,11 +209,11 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.env[:reviewers_host_url] = "https://reviewers.test"
         @responder.env[:reviewers_api_token] = "123456789ABC"
 
-        expected_url = "https://reviewers.test/api/stats/update/@xuanxu/review_unassigned"
-        expected_params = {idempotency_key: "unassign-@xuanxu-3342"}
-        expected_headers = {"TOKEN" => "123456789ABC"}
-
-        expect(Faraday).to receive(:post).with(expected_url, expected_params, expected_headers).and_return(double(status: 204))
+        client_double = instance_double(OJRA::Client)
+        expect(OJRA::Client).to receive(:new).with("https://reviewers.test", "123456789ABC").and_return(client_double)
+        expect(client_double).to receive(:unassign_reviewer).with("@xuanxu", "3342").and_return(true)
+        expect(client_double).to receive(:error_msg).and_return(nil)
+        expect(@responder.logger).to_not receive(:warn)
         @responder.process_message(@msg)
       end
     end

@@ -1,6 +1,5 @@
 require_relative '../../lib/responder'
-require 'faraday'
-require 'json'
+require 'ojra'
 
 module Openjournals
   class ReviewersListWithExternalCallResponder < Responder
@@ -95,31 +94,25 @@ module Openjournals
     end
 
     def api_call_review_assignment(reviewer)
-      return nil if env[:reviewers_host_url].to_s.empty?
-      return nil unless Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
+      if Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
+        client = OJRA::Client.new(env[:reviewers_host_url], env[:reviewers_api_token])
+        client.assign_reviewer(reviewer, context.issue_id)
 
-      url = "#{env[:reviewers_host_url]}/api/stats/update/#{reviewer}/review_assigned"
-      idempotency_key = "assign-#{reviewer}-#{context.issue_id}"
-
-      response = Faraday.post(url, { idempotency_key: idempotency_key }, { "TOKEN" => env[:reviewers_api_token] })
-
-      if response.status.between?(400, 599)
-        logger.warn("Error assigning review #{context.issue_id} to #{reviewer}: Got response code #{response.status}")
+        logger.warn("Error assigning review #{context.issue_id} to #{reviewer}: #{client.error_msg}") unless client.error_msg.to_s.empty?
       end
+    rescue OJRA::Error => e
+      logger.warn("Error assigning review #{context.issue_id} to #{reviewer}: #{e.message}")
     end
 
     def api_call_review_unassignment(reviewer)
-      return nil if env[:reviewers_host_url].to_s.empty?
-      return nil unless Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
+      if Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
+        client = OJRA::Client.new(env[:reviewers_host_url], env[:reviewers_api_token])
+        client.unassign_reviewer(reviewer, context.issue_id)
 
-      url = "#{env[:reviewers_host_url]}/api/stats/update/#{reviewer}/review_unassigned"
-      idempotency_key = "unassign-#{reviewer}-#{context.issue_id}"
-
-      response = Faraday.post(url, { idempotency_key: idempotency_key }, { "TOKEN" => env[:reviewers_api_token] })
-
-      if response.status.between?(400, 599)
-        logger.warn("Error unassigning #{reviewer} from review #{context.issue_id}: Got response code #{response.status}")
+        logger.warn("Error unassigning #{reviewer} from review #{context.issue_id}: #{client.error_msg}") unless client.error_msg.to_s.empty?
       end
+    rescue OJRA::Error => e
+      logger.warn("Error unassigning #{reviewer} from review #{context.issue_id}: #{e.message}")
     end
 
     def default_example_invocation
