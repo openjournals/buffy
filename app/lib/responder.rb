@@ -235,6 +235,8 @@ class Responder
     elsif info.is_a?(Array)
       serializable_data = []
       info.each{|item| serializable_data << serializable(item)}
+    elsif info.is_a?(Time) || info.is_a?(Date)
+      serializable_data = info.to_s
     else
       serializable_data = info
     end
