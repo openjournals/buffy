@@ -9,7 +9,7 @@ describe GoodbyeResponder do
   describe "listening" do
     before { @responder = subject.new({env: {bot_github_user: "botsci"}}, {}) }
 
-    it "should listen to new issues" do
+    it "should listen to issues being closed" do
       expect(@responder.event_action).to eq("issues.closed")
     end
 

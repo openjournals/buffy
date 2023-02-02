@@ -47,4 +47,7 @@ Buffy includes a list of Responders that can be used by configuring them in the 
 
    responders/openjournals/ping_track_eics
    responders/openjournals/whedon
+   responders/openjournals/reviewers_log_review_start
+   responders/openjournals/reviewers_log_review_end
+   responders/openjournals/reviewers_list_with_api_call
 ```
