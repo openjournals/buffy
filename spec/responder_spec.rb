@@ -764,6 +764,17 @@ describe Responder do
       expect(@responder.serializable([{a: 1}, 33, "name"])).to eq([{"a" => 1}, 33, "name"])
     end
 
+    it "should stringify Time and Date" do
+      time = Time.parse("2023-01-26 12:46:17 +0100")
+      expect(@responder.serializable(time)).to eq("2023-01-26 12:46:17 +0100")
+
+      date = Date.parse("2023-01-26")
+      expect(@responder.serializable(date)).to eq("2023-01-26")
+
+      datetime = DateTime.parse("2023-01-26T12:49:09+01:00")
+      expect(@responder.serializable(datetime)).to eq("2023-01-26T12:49:09+01:00")
+    end
+
     it "should not change string or numeric data" do
       expect(@responder.serializable("hey")).to eq("hey")
       expect(@responder.serializable(42)).to eq(42)
