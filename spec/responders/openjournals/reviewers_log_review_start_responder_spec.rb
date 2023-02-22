@@ -50,7 +50,7 @@ describe Openjournals::ReviewersLogReviewStartResponder do
     end
 
     it "should call reviewers API's assign_reviewers method with all reviewers" do
-      expect_any_instance_of(OJRA::Client).to receive(:assign_reviewers).with(["@arfon", "@xuanxu"], 3333).and_return(true)
+      expect_any_instance_of(OJRA::Client).to receive(:start_review).with(["@arfon", "@xuanxu"], 3333).and_return(true)
 
       @responder.process_message("")
     end
