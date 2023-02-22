@@ -96,7 +96,7 @@ module Openjournals
     def api_call_review_assignment(reviewer)
       if Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
         client = OJRA::Client.new(env[:reviewers_host_url], env[:reviewers_api_token])
-        client.assign_reviewer(reviewer, context.issue_id)
+        client.assign_reviewers(reviewer, context.issue_id)
 
         logger.warn("Error assigning review #{context.issue_id} to #{reviewer}: #{client.error_msg}") unless client.error_msg.to_s.empty?
       end
@@ -107,7 +107,7 @@ module Openjournals
     def api_call_review_unassignment(reviewer)
       if Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
         client = OJRA::Client.new(env[:reviewers_host_url], env[:reviewers_api_token])
-        client.unassign_reviewer(reviewer, context.issue_id)
+        client.unassign_reviewers(reviewer, context.issue_id)
 
         logger.warn("Error unassigning #{reviewer} from review #{context.issue_id}: #{client.error_msg}") unless client.error_msg.to_s.empty?
       end

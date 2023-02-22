@@ -50,7 +50,7 @@ GEM
     octokit (6.0.1)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
-    ojra (1.0.2)
+    ojra (1.1.0)
       faraday (~> 2.7)
     openssl (3.1.0)
     public_suffix (5.0.1)

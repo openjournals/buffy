@@ -14,7 +14,7 @@ module Openjournals
     def process_message(message)
       if Regexp.new("^\\[REVIEW\\]:").match?(context.issue_title)
         client = OJRA::Client.new(env[:reviewers_host_url], env[:reviewers_api_token])
-        client.unassign_reviewers(list_of_reviewers, context.issue_id)
+        client.finish_review(list_of_reviewers, context.issue_id)
       end
 
     rescue OJRA::Error => e

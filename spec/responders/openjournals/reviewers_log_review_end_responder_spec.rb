@@ -50,7 +50,7 @@ describe Openjournals::ReviewersLogReviewEndResponder do
     end
 
     it "should call reviewers API's unassign_reviewers method with all reviewers" do
-      expect_any_instance_of(OJRA::Client).to receive(:unassign_reviewers).with(["@arfon", "@xuanxu"], 3333).and_return(true)
+      expect_any_instance_of(OJRA::Client).to receive(:finish_review).with(["@arfon", "@xuanxu"], 3333).and_return(true)
 
       @responder.process_message("")
     end
