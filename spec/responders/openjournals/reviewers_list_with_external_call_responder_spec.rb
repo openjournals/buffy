@@ -124,7 +124,7 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
 
         client_double = instance_double(OJRA::Client)
         expect(OJRA::Client).to receive(:new).with("https://reviewers.test", "123456789ABC").and_return(client_double)
-        expect(client_double).to receive(:assign_reviewer).with("@xuanxu", "3342").and_return(true)
+        expect(client_double).to receive(:assign_reviewers).with("@xuanxu", "3342").and_return(true)
         expect(client_double).to receive(:error_msg).and_return(nil)
         expect(@responder.logger).to_not receive(:warn)
         @responder.process_message(@msg)
@@ -211,7 +211,7 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
 
         client_double = instance_double(OJRA::Client)
         expect(OJRA::Client).to receive(:new).with("https://reviewers.test", "123456789ABC").and_return(client_double)
-        expect(client_double).to receive(:unassign_reviewer).with("@xuanxu", "3342").and_return(true)
+        expect(client_double).to receive(:unassign_reviewers).with("@xuanxu", "3342").and_return(true)
         expect(client_double).to receive(:error_msg).and_return(nil)
         expect(@responder.logger).to_not receive(:warn)
         @responder.process_message(@msg)
