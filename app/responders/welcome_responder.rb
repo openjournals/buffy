@@ -20,12 +20,12 @@ class WelcomeResponder < Responder
     external_service(params[:external_service]) if params[:external_service]
 
     if params[:check_references] && !target_repo_value.empty?
-      DOIWorker.perform_async(locals, target_repo_value, branch_name_value)
+      DOIWorker.perform_async(serializable(locals), target_repo_value, branch_name_value)
     end
 
     if params[:repo_checks] && !target_repo_value.empty?
       checks = params[:repo_checks].is_a?(Hash) ? params[:repo_checks][:checks] : nil
-      RepoChecksWorker.perform_async(locals, target_repo_value, branch_name_value, checks)
+      RepoChecksWorker.perform_async(serializable(locals), target_repo_value, branch_name_value, checks)
     end
 
     if params[:run_responder]
