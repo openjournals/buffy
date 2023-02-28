@@ -19,7 +19,7 @@ from recommonmark.transform import AutoStructify
 # -- Project information -----------------------------------------------------
 
 project = 'Buffy'
-copyright = '2020 Open Journals'
+copyright = 'Open Journals'
 author = 'Arfon Smith, Juanjo Bazán & the Open Journals community'
 
 
