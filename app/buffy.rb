@@ -10,6 +10,8 @@ class Buffy < Sinatra::Base
 
   config_file "../config/settings-#{settings.environment}.yml"
 
+  set :root, File.dirname(__FILE__)
+
   post '/dispatch' do
     responders.respond(@message, @context)
     halt 200, "Message processed"
