@@ -14,6 +14,7 @@ module ResponderParams
       InitialValuesResponder => { values: ["version", "target-repository"]},
       ListTeamMembersResponder => { command: "list editors", team_id: 3824115 },
       ExternalStartReviewResponder => { external_call: { url: "https://github.com/openjournals" }},
+      UpdateCommentResponder => { command: "list final steps", template_file: "final-steps.md" },
     }
 
     params_by_responder[responder_class] || {}
