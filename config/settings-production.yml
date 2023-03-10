@@ -227,6 +227,15 @@ buffy:
           command: list reviewers
           description: Get a link to the complete list of reviewers
           template_file: reviewers_list.md
+    update_comment:
+      - editor_post-review_checklist:
+          only: editors
+          if:
+            title: "^\\[REVIEW\\]:"
+            reject_msg: "This is not a review issue"
+          command: create post-review checklist
+          description: Creates a post-review checklist with editor and authors tasks
+          template_file: post-review_checklist.md
     welcome:
       - pre_review_issue:
           if:
