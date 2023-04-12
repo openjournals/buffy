@@ -638,6 +638,7 @@ describe Responder do
     end
 
     it "should do nothing if no external service config present" do
+      expect(ExternalServiceWorker).to_not receive(:perform_async)
       expect { @responder.process_external_service({}, {}) }.to_not change(ExternalServiceWorker.jobs, :size)
       expect { @responder.process_external_service("", {}) }.to_not change(ExternalServiceWorker.jobs, :size)
       expect { @responder.process_external_service(nil, {}) }.to_not change(ExternalServiceWorker.jobs, :size)
