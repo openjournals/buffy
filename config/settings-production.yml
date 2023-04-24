@@ -68,10 +68,6 @@ buffy:
       - version:
           only: editors
           sample_value: "v1.0.0"
-      - archive:
-          only: editors
-          sample_value: "10.21105/zenodo.12345"
-          template_file: set_archive.md
       - branch:
           sample_value: "joss-paper"
       - target-repository:
@@ -87,6 +83,8 @@ buffy:
               id: issue_id
               repository_url: new_value
             silent: true
+    openjournals_set_archive:
+      only: editors
     ping_track_eics:
       only: editors
     external_service:
