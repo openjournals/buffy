@@ -1,7 +1,7 @@
 GitHub Action
 =============
 
-This responder triggers workflow run on a GitHub Action using the GitHub API. Optionally if the call is successful (not the result of the workflow run but the call to trigger it) a reply message can be posted as a comment in the issue.
+This responder triggers a workflow run on a GitHub Action using the GitHub API. Optionally if the call is successful (not the result of the workflow run but the call to trigger it) a reply message can be posted as a comment in the issue.
 Allows [labeling](../labeling).
 
 ## Listens to
