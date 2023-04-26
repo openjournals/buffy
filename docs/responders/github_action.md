@@ -60,18 +60,18 @@ The following snippet sets up `buffy` to react to a `@editorialbot generate pdf`
 ```yaml
 ...
   github_action:
-        - draft_paper:
-            command: generate pdf
-            workflow_repo: openjournals/joss-papers
-            workflow_name: draft-paper.yml
-            workflow_ref: master
-            description: Generates the pdf paper
-            data_from_issue:
-              - branch
-              - target-repository
-              - issue_id
-            mapping:
-              repository_url: target-repository
+    - draft_paper:
+        command: generate pdf
+        workflow_repo: openjournals/joss-papers
+        workflow_name: draft-paper.yml
+        workflow_ref: master
+        description: Generates the pdf paper
+        data_from_issue:
+          - branch
+          - target-repository
+          - issue_id
+        mapping:
+          repository_url: target-repository
 ...
 ```
 
