@@ -1,7 +1,7 @@
 GitHub Action
 =============
 
-This responder triggers workflow run on a GitHub Action using the GitHub API. Optionally if the call is successful (not the result of the workflow run but the call to trigger it) a reply message can be posted as a comment in the issue.
+This `buffy` responder dispatches an event to trigger a GitHub Action workflow in a repository, where the workflow is defined by a `.github/workflows/*.yaml` file. If desired, upon a successful event dispatch to trigger the workflow (not the outcome of the workflow run), a reply message can be posted as a comment in the (corresponding review) issue.
 Allows [labeling](../labeling).
 
 ## Listens to
@@ -17,7 +17,7 @@ For example, if you configure the command to be _compile pdf_, it will respond t
 
 ## Requirements
 
-Some parameters are required for the responder to work: the `command` to invoke it, and the `workflow_repo` and `workflow_name` values to identify the action to run. All can be set using the settings YAML file.
+Some parameters are required for the responder to work: the `command` to invoke it, and the `workflow_repo` and `workflow_name` values to identify the action to run. All can be set using the respective settings YAML file (e.g., `buffy/config/settings-<environment>.yml`).
 
 ## Settings key
 
@@ -54,22 +54,29 @@ If you want to run multiple responders, use an array of these subparams.
 ## Examples
 
 **A complete example:**
+
+The following snippet sets up `buffy` to react to a `@editorialbot generate pdf` command issued during a `joss` review:
+
 ```yaml
 ...
   github_action:
-    only: editors
-    command: compile pdf
-    description: Generates a PDF based on the paper.md file in the repository
-    workflow_repo: openjournals/reviews
-    workflow_name: compile-pdf.yml
-    inputs:
-      file: paper.md
-    data-from-issue:
-      - branch
-      - target_repository
-    mapping:
-      repository: target_repository
-      number: issue_id
+    - draft_paper:
+        command: generate pdf
+        workflow_repo: openjournals/joss-papers
+        workflow_name: draft-paper.yml
+        workflow_ref: master
+        description: Generates the pdf paper
+        data_from_issue:
+          - branch
+          - target-repository
+          - issue_id
+        mapping:
+          repository_url: target-repository
 ...
 ```
-Once the responder is invoked it triggers the _compile-pdf.yml_ workflow on the _openjournals/reviews_ repository passing to it the _file_, _repository_, _branch_ and _number_ inputs.
+
+Once invoked, this `github_action` responder triggers the [_draft-paper_](https://github.com/openjournals/joss-papers/blob/main/.github/workflows/draft-paper.yml) workflow on the [_openjournals/joss-papers_](https://github.com/openjournals/joss-papers) repository (see the [actions tab](https://github.com/openjournals/joss-papers/actions)). 
+
+The `data_from_issue` field lists the values of _branch_, _target-repository_, and _issue-id_ (which `buffy` fetches from a review issue body) that serve as input arguments for this action. The optional `mapping` field indicates that the value _target-repository_ is mapped to the _repository_url_ variable.
+
+For additional use cases, please refer to the complete [`settings-production.yml`](https://github.com/openjournals/buffy/blob/joss/config/settings-production.yml) file located under the `joss` branch of `buffy`.
