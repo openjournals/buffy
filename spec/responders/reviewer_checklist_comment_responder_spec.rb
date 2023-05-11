@@ -55,7 +55,7 @@ describe ReviewerChecklistCommentResponder do
         @responder.context[:sender] = "ReVIEwer1"
 
         expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "ReVIEwer1" }
-        expected_checklist = "Checklist for @reviewer1 \n[] A"
+        expected_checklist = "Checklist for @ReVIEwer1 \n[] A"
 
         expect(@responder).to receive(:render_external_template).with("checklist.md", expected_locals).and_return(expected_checklist)
         expect(@responder).to receive(:update_comment).with(111222, expected_checklist)
