@@ -56,6 +56,19 @@ describe RemindersResponder do
       @responder.process_message(msg)
     end
 
+    it "should be case insensitive with the editor's GitHub handles" do
+      msg = "@botsci remind @eDItoR21 in 5 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      in_five_weeks = Chronic.parse("in 5 weeks")
+      expect(@responder).to receive(:target_time).with("5", "weeks").and_return(in_five_weeks)
+      expected_msg = ":wave: @editor21, please take a look at the state of the submission (this is an automated reminder)."
+      expect(AsyncMessageWorker).to receive(:perform_at).with(in_five_weeks, @responder.locals, expected_msg)
+      expect(ReviewReminderWorker).to_not receive(:perform_at)
+      expect(@responder).to receive(:respond).with("Reminder set for @editor21 in 5 weeks")
+
+      @responder.process_message(msg)
+    end
+
     it "should respond success message and schedule worker run for 'me'" do
       msg = "@botsci remind me in 15 days"
       @responder.match_data = @responder.event_regex.match(msg)
@@ -86,6 +99,26 @@ describe RemindersResponder do
       expect(@responder).to receive(:target_time).with("4", "days").and_return(in_four_days)
 
       expect(ReviewReminderWorker).to receive(:perform_at).with(in_four_days, @responder.locals, "@author", true)
+      @responder.process_message(msg)
+    end
+
+    it "should be case insensitive with the reviewers GitHub handles" do
+      msg = "@botsci remind @ReVieWEr42 in 3 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(ReviewReminderWorker).to receive(:perform_at)
+      expect(@responder).to receive(:respond).with("Reminder set for @ReVieWEr42 in 3 weeks")
+
+      @responder.process_message(msg)
+    end
+
+    it "should be case insensitive with the authors GitHub handles" do
+      msg = "@botsci remind @AUTHor in 4 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+
+      in_four_days = Chronic.parse("in 4 days")
+      expect(@responder).to receive(:target_time).with("4", "days").and_return(in_four_days)
+
+      expect(ReviewReminderWorker).to receive(:perform_at).with(in_four_days, @responder.locals, "@AUTHor", true)
       @responder.process_message(msg)
     end
   end

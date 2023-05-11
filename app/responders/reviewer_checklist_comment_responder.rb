@@ -22,7 +22,7 @@ class ReviewerChecklistCommentResponder < Responder
   end
 
   def sender_in_reviewers_list?
-    reviewers.include?("@#{context.sender}")
+    reviewers.include?("@#{context.sender.downcase}")
   end
 
   def update_checklists_links
@@ -38,7 +38,7 @@ class ReviewerChecklistCommentResponder < Responder
   end
 
   def reviewers
-    @reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip)
+    @reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip).map(&:downcase)
   end
 
   def checklists_mapping

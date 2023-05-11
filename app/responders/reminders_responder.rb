@@ -17,7 +17,7 @@ class RemindersResponder < Responder
 
     human = "@#{user_login(context.sender)}" if human == "me"
 
-    unless targets.include?(human)
+    unless targets.include?(human.downcase)
       respond("#{human} doesn't seem to be a reviewer or author for this submission.")
       return false
     end
@@ -25,11 +25,12 @@ class RemindersResponder < Responder
     schedule_at = target_time(size, unit)
 
     if schedule_at
-      if user_login(human) == user_login(context.sender)
+      if user_login(human).downcase == user_login(context.sender).downcase
+        human = "@#{user_login(context.sender)}"
         msg = ":wave: #{human}, please take a look at the state of the submission (this is an automated reminder)."
         AsyncMessageWorker.perform_at(schedule_at, serializable(locals), msg)
       else
-        ReviewReminderWorker.perform_at(schedule_at, serializable(locals), human, authors_list.include?(human))
+        ReviewReminderWorker.perform_at(schedule_at, serializable(locals), human, authors_list.include?(human.downcase))
       end
       respond("Reminder set for #{human} in #{size} #{unit}")
     else
@@ -38,16 +39,16 @@ class RemindersResponder < Responder
   end
 
   def targets
-    (authors_list + reviewers_list + ["@#{user_login(context.sender)}"]).uniq
+    (authors_list + reviewers_list + ["@#{user_login(context.sender).downcase}"]).uniq
   end
 
   def reviewers_list
-    @reviewers_list ||= reviewers_value.inject([]) {|re, value| re + read_value_from_body(value).split(",").map(&:strip)}
+    @reviewers_list ||= reviewers_value.inject([]) {|re, value| re + read_value_from_body(value).split(",").map(&:strip).map(&:downcase)}
     @reviewers_list.compact.uniq
   end
 
   def authors_list
-    @authors_list ||= authors_value.inject([]) {|au, value| au + read_value_from_body(value).split(",").map(&:strip)}
+    @authors_list ||= authors_value.inject([]) {|au, value| au + read_value_from_body(value).split(",").map(&:strip).map(&:downcase)}
     @authors_list.compact.uniq
   end
 
