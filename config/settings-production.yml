@@ -84,6 +84,8 @@ buffy:
       only: editors
     ping_track_eics:
       only: editors
+      default_eics_team: jose-eics
+      journal_base_url: "https://jose.theoj.org"
     external_service:
       - reject:
           only: eics
