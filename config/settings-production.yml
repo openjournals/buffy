@@ -53,14 +53,10 @@ buffy:
     repo_checks:
       description: "Perform checks on the repository"
       example_invocation: "@editorialbot check repository"
-    reviewer_checklist_comment:
+    jose_reviewer_checklist:
       if:
         title: "^\\[REVIEW\\]:"
         reject_msg: Checklists can only be created once the review has started in the review issue
-      template_file: reviewer_checklist.md
-      data_from_issue:
-        - target-repository
-        - author-handle
     set_value:
       - version:
           only: editors
