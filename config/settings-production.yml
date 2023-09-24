@@ -139,6 +139,7 @@ buffy:
             - branch
             - target-repository
             - issue_id
+            - issue_title
           mapping:
             repository_url: target-repository
       - recommend_acceptance:
@@ -159,6 +160,7 @@ buffy:
             - branch
             - target-repository
             - issue_id
+            - issue_title
           mapping:
             repository_url: target-repository
           run_responder:
@@ -181,6 +183,7 @@ buffy:
             - branch
             - target-repository
             - issue_id
+            - issue_title
           mapping:
             repository_url: target-repository
       - reaccept:
@@ -199,6 +202,7 @@ buffy:
             - branch
             - target-repository
             - issue_id
+            - issue_title
           mapping:
             repository_url: target-repository
       - preprint:
@@ -211,6 +215,7 @@ buffy:
             - branch
             - target-repository
             - issue_id
+            - issue_title
           mapping:
             repository_url: target-repository
     basic_command:
