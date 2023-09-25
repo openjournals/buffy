@@ -28,6 +28,7 @@ describe WrongCommandResponder do
       @responder = subject.new({env: { bot_github_user: "botsci" }, responders: { help: {} }}, {})
       @responder.context = OpenStruct.new(issue_id: 15,
                                           issue_author: "opener",
+                                          issue_title: "Test paper",
                                           repo: "tests",
                                           sender: "rev33",
                                           issue_body: "Test Review\n\n ... <!--x-->X<!--end-x-->...")
@@ -51,7 +52,7 @@ describe WrongCommandResponder do
 
     it "should respond with custom template" do
       @responder.params = { template_file: "wrong_command.md" }
-      expected_params = { bot_name: "botsci", issue_author: "opener", issue_id: 15, repo: "tests", sender: "rev33", match_data_1: "blah blah" }
+      expected_params = { bot_name: "botsci", issue_author: "opener", issue_title: "Test paper", issue_id: 15, repo: "tests", sender: "rev33", match_data_1: "blah blah" }
       expect(@responder).to receive(:render_external_template).
                             with("wrong_command.md", expected_params).
                             and_return("I don't understand `blah blah`")
@@ -62,7 +63,7 @@ describe WrongCommandResponder do
 
     it "should give precedence to template over custom message" do
       @responder.params = { template_file: "wrong_command.md", message: "what?"}
-      expected_params = { bot_name: "botsci", issue_author: "opener", issue_id: 15, repo: "tests", sender: "rev33", match_data_1: "blah blah" }
+      expected_params = { bot_name: "botsci", issue_author: "opener", issue_title: "Test paper", issue_id: 15, repo: "tests", sender: "rev33", match_data_1: "blah blah" }
       expect(@responder).to receive(:render_external_template).
                             with("wrong_command.md", expected_params).
                             and_return("I don't understand `blah blah`")

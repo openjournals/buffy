@@ -335,6 +335,7 @@ describe Responder do
     before do
       @responder = described_class.new({ env: {bot_github_user: 'botsci'} }, {})
       @responder.context = OpenStruct.new(issue_id: 5,
+                                          issue_title: "Test submission",
                                           issue_author: "opener",
                                           repo: "openjournals/buffy",
                                           sender: "user33",
@@ -342,18 +343,18 @@ describe Responder do
     end
 
     it "should include basic config info" do
-      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33"]
+      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", issue_title: "Test submission", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33"]
       expect(@responder.locals).to eq(expected_locals)
     end
 
     it "should add info from the issue body if requested" do
       @responder.params = {data_from_issue: ["reviewer"]}
-      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu"]
+      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", issue_title: "Test submission", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu"]
       expect(@responder.locals).to eq(expected_locals)
     end
 
     it "should add info from the event_regex if present" do
-      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", match_data_1: "@xuanxu"]
+      expected_locals = Sinatra::IndifferentHash[issue_id: 5, issue_author: "opener", issue_title: "Test submission", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", match_data_1: "@xuanxu"]
       @responder.event_regex = /\A@bot assign (.*) as editor\z/i
       @responder.match_data = @responder.event_regex.match("@bot assign @xuanxu as editor")
 

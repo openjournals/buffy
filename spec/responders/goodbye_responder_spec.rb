@@ -64,6 +64,7 @@ describe GoodbyeResponder do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, { template_file: "thanks.md", data_from_issue: ["reviewer"] })
       @responder.context = OpenStruct.new(issue_id: 5,
                                           issue_author: "opener",
+                                          issue_title: "Test paper",
                                           repo: "openjournals/buffy",
                                           sender: "user33",
                                           issue_body: "Test Software Review\n\n<!--reviewer-->@xuanxu<!--end-reviewer-->")
@@ -71,7 +72,7 @@ describe GoodbyeResponder do
     end
 
     it "should populate locals" do
-      expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
+      expected_locals = { issue_id: 5, issue_author: "opener", issue_title: "Test paper", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
 
       expect(@responder).to receive(:respond_external_template).with("thanks.md", expected_locals)
       @responder.process_message("")
@@ -96,6 +97,7 @@ describe GoodbyeResponder do
       @responder = subject.new(settings, {external_service: params})
       @responder.context = OpenStruct.new(issue_id: 33,
                                           issue_author: "opener",
+                                          issue_title: "Test paper",
                                           repo: "openjournals/testing",
                                           sender: "xuanxu",
                                           issue_body: "Test Review\n\n<!--extra-data-->ABC123<!--end-extra-data-->")
@@ -108,7 +110,7 @@ describe GoodbyeResponder do
 
     it "should pass right info to the worker" do
       expected_params = { "name" => "test-service", "url" => "http://testing.openjournals.org", "data_from_issue" => ["extra-data"] }
-      expected_locals = { "extra-data" => "ABC123", "bot_name" => "botsci", "issue_author" => "opener", "issue_id" => 33, "repo" => "openjournals/testing", "sender" => "xuanxu" }
+      expected_locals = { "extra-data" => "ABC123", "bot_name" => "botsci", "issue_author" => "opener", "issue_title" => "Test paper", "issue_id" => 33, "repo" => "openjournals/testing", "sender" => "xuanxu" }
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params, expected_locals)
       @responder.process_message("")
     end

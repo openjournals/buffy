@@ -33,6 +33,7 @@ describe BasicCommandResponder do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, params)
       @responder.context = OpenStruct.new(issue_id: 15,
                                           issue_author: "opener",
+                                          issue_title: "New paper",
                                           repo: "tests",
                                           sender: "rev33",
                                           issue_body: "Test Review\n\n ... <!--x-->X<!--end-x-->...")
@@ -43,7 +44,7 @@ describe BasicCommandResponder do
       expect(@responder).to receive(:respond).with("Here you have the list of editors")
       expect(@responder).to receive(:respond).with("msg 1")
       expect(@responder).to receive(:respond).with("msg 2")
-      expected_params = { bot_name: "botsci", issue_author: "opener", issue_id: 15, repo: "tests", sender: "rev33", "x"=>"X" }
+      expected_params = { bot_name: "botsci", issue_author: "opener", issue_title: "New paper", issue_id: 15, repo: "tests", sender: "rev33", "x"=>"X" }
       expect(@responder).to receive(:render_external_template).
                             with("editor_list.md", expected_params).
                             and_return("editor 1 & editor 2")
