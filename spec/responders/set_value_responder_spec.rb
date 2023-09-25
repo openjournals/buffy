@@ -154,7 +154,7 @@ describe SetValueResponder do
   describe "with config option: template_file" do
     before do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "version", if_missing: "error", template_file: "version_changed.md"})
-      @responder.context = OpenStruct.new(issue_id: 5, issue_author: "opener", repo: "openjournals/buffy", sender: "user33")
+      @responder.context = OpenStruct.new(issue_id: 5, issue_author: "opener", issue_title: "Title!", repo: "openjournals/buffy", sender: "user33")
       disable_github_calls_for(@responder)
       @msg = "@botsci set v0.0.33-alpha as version"
       @responder.match_data = @responder.event_regex.match(@msg)
@@ -168,6 +168,7 @@ describe SetValueResponder do
                           value: "v0.0.33-alpha",
                           bot_name: "botsci",
                           issue_author: "opener",
+                          issue_title: "Title!",
                           issue_id: 5,
                           match_data_1: "v0.0.33-alpha",
                           repo: "openjournals/buffy",

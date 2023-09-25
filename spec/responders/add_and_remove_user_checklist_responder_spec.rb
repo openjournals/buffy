@@ -29,6 +29,7 @@ describe AddAndRemoveUserChecklistResponder do
     before do
       @responder.context = OpenStruct.new(issue_id: 5,
                                           issue_author: "opener",
+                                          issue_title: "New paper",
                                           repo: "openjournals/buffy",
                                           sender: "user33",
                                           issue_body: "Test Review\n\n ... description ..." +
@@ -43,7 +44,7 @@ describe AddAndRemoveUserChecklistResponder do
         msg = "@botsci add checklist for @arfon"
         @responder.match_data = @responder.event_regex.match(msg)
 
-        expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", match_data_1: "add", match_data_2: "@arfon" }
+        expected_locals = { issue_id: 5, issue_author: "opener", issue_title: "New paper", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", match_data_1: "add", match_data_2: "@arfon" }
         expected_checklist = "\n<!--checklist-for-@arfon-->" +
                              "\n## Review checklist for @arfon" +
                              "\n[] A" +

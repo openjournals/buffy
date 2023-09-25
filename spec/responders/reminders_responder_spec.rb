@@ -5,7 +5,7 @@ describe RemindersResponder do
   before do
     settings = { env: { bot_github_user: "botsci" }}
     @responder = RemindersResponder.new(settings, {})
-    @responder.context = OpenStruct.new(issue_body: "", sender: "editor21")
+    @responder.context = OpenStruct.new(issue_body: "", issue_title: "", sender: "editor21")
     disable_github_calls_for(@responder)
   end
 
