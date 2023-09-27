@@ -91,7 +91,7 @@ GEM
       multi_json (~> 1.15)
       rexml (~> 3.2, >= 3.2.5)
       thor (~> 1.2, >= 1.2.1)
-    sidekiq (7.1.2)
+    sidekiq (7.1.4)
       concurrent-ruby (< 2)
       connection_pool (>= 2.3.0)
       rack (>= 2.2.4)
