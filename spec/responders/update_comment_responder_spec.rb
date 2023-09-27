@@ -29,6 +29,7 @@ describe UpdateCommentResponder do
     before do
       @responder.context = OpenStruct.new(issue_id: 5,
                                           issue_author: "opener",
+                                          issue_title: "Title test",
                                           sender: "editor33",
                                           repo: "openjournals/buffy",
                                           comment_id: 111222,
@@ -39,7 +40,7 @@ describe UpdateCommentResponder do
 
     context "#process_message" do
       it "should update original comment" do
-        expected_locals = { issue_id: 5, issue_author: "opener", bot_name: "botsci", repo: "openjournals/buffy", sender: "editor33" }
+        expected_locals = { issue_id: 5, issue_author: "opener", issue_title: "Title test", bot_name: "botsci", repo: "openjournals/buffy", sender: "editor33" }
         expected_checklist = "Final tasks: \n[ ] A\n[ ] B"
 
         expect(@responder).to receive(:render_external_template).with("final-checklist.md", expected_locals).and_return(expected_checklist)

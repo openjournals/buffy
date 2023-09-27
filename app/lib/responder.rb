@@ -181,6 +181,7 @@ class Responder
     from_context = Sinatra::IndifferentHash[
                      issue_id: context.issue_id,
                      issue_author: context.issue_author,
+                     issue_title: context.issue_title,
                      repo: context.repo,
                      sender: context.sender,
                      bot_name: bot_name ]

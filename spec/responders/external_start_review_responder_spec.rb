@@ -69,6 +69,7 @@ describe ExternalStartReviewResponder do
                           "editor_login" => "arfon",
                           "editor_username" => "@arfon",
                           "issue_author" => "opener",
+                          "issue_title" => "[PRE REVIEW]: TesT",
                           "issue_id" => 33,
                           "repo" => "openjournals/testing",
                           "reviewers_logins" => "xuanxu,karthik",
