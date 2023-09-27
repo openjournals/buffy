@@ -30,6 +30,7 @@ describe Openjournals::JoseReviewerChecklistResponder do
       @responder.context = OpenStruct.new(sender: "reviewer1",
                                           issue_id: 5,
                                           issue_author: "opener",
+                                          issue_title: "Test paper",
                                           repo: "openjournals/buffy",
                                           comment_id: 111222,
                                           issue_body: "Test Submission\n\n ... description ... \n\n" +
@@ -41,6 +42,7 @@ describe Openjournals::JoseReviewerChecklistResponder do
 
       @expected_locals = { issue_id: 5,
                            issue_author: "opener",
+                           issue_title: "Test paper",
                            bot_name: "botsci",
                            repo: "openjournals/buffy",
                            sender: "reviewer1",
