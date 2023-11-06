@@ -16,7 +16,8 @@ gem 'faraday-retry'
 gem 'serrano'
 gem 'rexml'
 gem 'github-linguist'
-gem 'licensee'
+# Remove git ref once a version > 9.16 is released allowing use of latest octokit
+gem 'licensee', git: 'https://github.com/licensee/licensee.git', ref: '8d95400835b'
 gem 'issue'
 gem 'chronic'
 
