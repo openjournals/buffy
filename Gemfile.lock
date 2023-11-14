@@ -15,10 +15,10 @@ GEM
   specs:
     addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
-    base64 (0.1.1)
+    base64 (0.2.0)
     bibtex-ruby (6.0.0)
       latex-decode (~> 0.0)
-    cgi (0.3.6)
+    cgi (0.4.0)
     charlock_holmes (0.7.7)
     chronic (0.10.2)
     concurrent-ruby (1.2.2)
