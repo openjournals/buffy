@@ -52,8 +52,8 @@ class RepoChecksWorker < BuffyWorker
   def detect_languages
     repo = Rugged::Repository.new(path)
     project = Linguist::Repository.new(repo, repo.head.target_id)
-
-    top_3 = project.languages.keys.take(3)
+    ordered_languages = project.languages.sort_by { |_, size| size }.reverse.first(3)
+    top_3 = ordered_languages.first(3).map {|l,s| l}
     label_issue(top_3) unless top_3.empty?
   end
 

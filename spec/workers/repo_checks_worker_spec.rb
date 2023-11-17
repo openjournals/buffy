@@ -72,7 +72,7 @@ describe RepoChecksWorker do
   describe "#detect_languages" do
     before do
       repo = OpenStruct.new(head: OpenStruct.new(target_id: 33))
-      expected_languages = OpenStruct.new(languages: {"Ruby"=>176110, "HTML"=>664, "TeX"=>475, "Go"=>21})
+      expected_languages = OpenStruct.new(languages: {"Go"=>21, "HTML"=>664, "Ruby"=>176110, "TeX"=>475, "XML" => 100})
       allow(Rugged::Repository).to receive(:new).and_return(repo)
       allow(Linguist::Repository).to receive(:new).with(repo, 33).and_return(expected_languages)
     end
