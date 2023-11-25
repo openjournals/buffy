@@ -144,7 +144,7 @@ describe PaperFile do
 
     it "should return a nil PaperFile if no paper file found" do
       expect(Dir).to receive(:exist?).with("/repo/path/").and_return(true)
-      allow(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers.pdf", "./docs", "app"])
+      allow(Find).to receive(:find).with("/repo/path/").and_return(["lib/papers.pdf", "lib/other_paper.md", "./docs", "app"])
 
       paper_file = PaperFile.find("/repo/path/")
 
