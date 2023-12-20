@@ -27,7 +27,7 @@ GEM
       rexml
     diff-lcs (1.5.0)
     dotenv (2.8.1)
-    faraday (2.7.11)
+    faraday (2.8.0)
       base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
