@@ -5,8 +5,8 @@ if ENV["CUSTOM_RUBY_VERSION"]
 end
 
 gem 'octokit'
-gem 'sinatra', '3.1.0'
-gem 'sinatra-contrib', '3.1.0'
+gem 'sinatra', '4.0.0'
+gem 'sinatra-contrib', '4.0.0'
 gem 'openssl'
 gem 'puma'
 gem 'sidekiq'
