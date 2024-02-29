@@ -53,9 +53,6 @@ buffy:
     check_references:
       description: "Check the references of the paper for missing DOIs"
       example_invocation: "@editorialbot check references"
-    repo_checks:
-      description: "Perform checks on the repository"
-      example_invocation: "@editorialbot check repository"
     reviewer_checklist_comment:
       if:
         title: "^\\[REVIEW\\]:"
@@ -129,6 +126,18 @@ buffy:
           success_msg: Invitation to edit this submission sent!
           error_msg: "There was a problem inviting the user to edit this submission."
     github_action:
+      - checks:
+          command: check repository
+          workflow_repo: openjournals/joss-papers
+          workflow_name: checks.yml
+          workflow_ref: master
+          description: "Run checks and provide information on the repository and the paper file"
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
       - draft_paper:
           command: generate pdf
           workflow_repo: openjournals/joss-papers
@@ -241,19 +250,25 @@ buffy:
             title: "^\\[PRE REVIEW\\]:"
           template_file: pre-review_welcome.md
           check_references: true
-          repo_checks: true
           run_responder:
-            responder_key: github_action
-            responder_name: draft_paper
+            - checks:
+              responder_key: github_action
+              responder_name: checks
+            - draft-paper:
+              responder_key: github_action
+              responder_name: draft_paper
       - review_issue:
           if:
             title: "^\\[REVIEW\\]:"
           template_file: review_welcome.md
           check_references: true
-          repo_checks: true
           run_responder:
-            responder_key: github_action
-            responder_name: draft_paper
+            - checks:
+              responder_key: github_action
+              responder_name: checks
+            - draft-paper:
+              responder_key: github_action
+              responder_name: draft_paper
       - close_other_issues:
           if:
             title: "^(?!\\[REVIEW\\]:|\\[PRE REVIEW\\]:)"
