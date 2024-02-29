@@ -264,11 +264,11 @@ buffy:
           check_references: true
           run_responder:
             - checks:
-              responder_key: github_action
-              responder_name: checks
+                responder_key: github_action
+                responder_name: checks
             - draft-paper:
-              responder_key: github_action
-              responder_name: draft_paper
+                responder_key: github_action
+                responder_name: draft_paper
       - close_other_issues:
           if:
             title: "^(?!\\[REVIEW\\]:|\\[PRE REVIEW\\]:)"
