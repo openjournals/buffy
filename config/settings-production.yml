@@ -50,9 +50,6 @@ buffy:
       only: editors
     reminders:
       only: editors
-    check_references:
-      description: "Check the references of the paper for missing DOIs"
-      example_invocation: "@editorialbot check references"
     reviewer_checklist_comment:
       if:
         title: "^\\[REVIEW\\]:"
@@ -138,6 +135,18 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
+      - references:
+          command: check references
+          workflow_repo: openjournals/joss-papers
+          workflow_name: references.yml
+          workflow_ref: master
+          description: "Check the references of the paper for missing DOIs"
+          data_from_issue:
+            - branch
+            - target-repository
+            - issue_id
+          mapping:
+            repository_url: target-repository
       - draft_paper:
           command: generate pdf
           workflow_repo: openjournals/joss-papers
@@ -172,7 +181,8 @@ buffy:
           mapping:
             repository_url: target-repository
           run_responder:
-            responder_key: check_references
+            responder_key: github_action
+            responder_name: references
       - accept:
           if:
             value_matches:
@@ -249,11 +259,13 @@ buffy:
           if:
             title: "^\\[PRE REVIEW\\]:"
           template_file: pre-review_welcome.md
-          check_references: true
           run_responder:
             - checks:
                 responder_key: github_action
                 responder_name: checks
+            - references:
+                responder_key: github_action
+                responder_name: references
             - draft-paper:
                 responder_key: github_action
                 responder_name: draft_paper
@@ -261,11 +273,13 @@ buffy:
           if:
             title: "^\\[REVIEW\\]:"
           template_file: review_welcome.md
-          check_references: true
           run_responder:
             - checks:
                 responder_key: github_action
                 responder_name: checks
+            - references:
+                responder_key: github_action
+                responder_name: references
             - draft-paper:
                 responder_key: github_action
                 responder_name: draft_paper
