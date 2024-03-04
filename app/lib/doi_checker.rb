@@ -25,7 +25,13 @@ class DOIChecker
               doi_summary[:missing].push("Errored finding suggestions for \"#{truncated_title}\", please try later")
             elsif candidate_doi
               doi_summary[:missing].push("#{candidate_doi} may be a valid DOI for title: #{entry.title}")
+            else
+              doi_summary[:missing].push("No DOI given, and none found for title: #{truncated_title}")
             end
+        else
+          truncated_entry = entry.to_s[0,50]
+          truncated_entry += "..." if truncated_entry.length entry.to_s.length
+          doi_summary[:missing].push("No DOI or title given for entry #{truncated_entry}")
         end
       end
     end
