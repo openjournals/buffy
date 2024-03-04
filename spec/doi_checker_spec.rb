@@ -82,8 +82,9 @@ describe DOIChecker do
       expect(doi_summary[:missing][0]).to eq("Errored finding suggestions for \"#{expected_title}\", please try later")
     end
 
-    it "should ignore entries no DOI and no crossref alternative" do
-      missing_doi = BibTeX::Entry.new({title: "No DOI"})
+    it "should report entries with no DOI and no crossref alternative as missing DOIs" do
+      title = "No DOI"
+      missing_doi = BibTeX::Entry.new({title: title})
       doi_checker = DOIChecker.new([missing_doi])
 
       expect(doi_checker).to receive(:crossref_lookup).with("No DOI").and_return(nil)
@@ -92,7 +93,17 @@ describe DOIChecker do
 
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
-      expect(doi_summary[:missing]).to be_empty
+      expect(doi_summary[:missing][0]).to eq("No DOI given, and none found for title: #{title}")
+    end
+
+    it "should report entries with no DOI or title as missing both" do
+      entry = BibTex::Entry.new(journal: "A Well Respected Journal")
+      doi_checker = DOIChecker.new([entry])
+
+      doi_summary = doi_checker.check_dois
+      expect(doi_summary[:ok]).to be_empty
+      expect(doi_summary[invalid]).to be_empty
+      expect(doi_summary[:missing][0]).to eq("No DOI or title given for entry #{entry.to_s}")
     end
   end
 
