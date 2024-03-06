@@ -97,7 +97,7 @@ describe DOIChecker do
     end
 
     it "should report entries with no DOI or title as missing both" do
-      entry = BibTex::Entry.new(journal: "A Well Respected Journal")
+      entry = BibTeX::Entry.new(journal: "A Well Respected Journal")
       doi_checker = DOIChecker.new([entry])
 
       doi_summary = doi_checker.check_dois
