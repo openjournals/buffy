@@ -102,8 +102,8 @@ describe DOIChecker do
 
       doi_summary = doi_checker.check_dois
       expect(doi_summary[:ok]).to be_empty
-      expect(doi_summary[invalid]).to be_empty
-      expect(doi_summary[:missing][0]).to eq("No DOI or title given for entry #{entry.to_s}")
+      expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:missing][0]).to eq("Entry without DOI or title found")
     end
   end
 
