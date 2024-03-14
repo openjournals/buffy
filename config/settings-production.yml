@@ -296,7 +296,7 @@ buffy:
       external_call:
         url: "https://proceedings.juliacon.org/papers/api_start_review"
         query_params:
-          secret: <%= ENV['JOSS_SECRET'] %>
+          secret: <%= ENV['JULIACON_SECRET'] %>
         data_from_issue:
           - branch
         mapping:
