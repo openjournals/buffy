@@ -36,7 +36,6 @@ This will be the "user" responding to the commands issued from a reviews reposit
 Some applications and services must be available to use by Buffy:
 
 - **[Redis](https://redis.io/)**: To process background jobs Buffy needs `redis` installed.
-- **[Gitinspector](https://github.com/ejwa/gitinspector)**: The *Respository Checks Responder* performs a statistical analysis using it.
 - **[cloc](https://github.com/AlDanial/cloc)**: The *Respository Checks Responder* can analyze source code, to run this check `cloc` is used.
 
 #### Deployment
@@ -47,7 +46,6 @@ As an example, we will use [Heroku](https://www.heroku.com) to deploy Buffy. How
 
 - To process background jobs, Buffy needs a `redis` add-on, such as Heroku Redis or RedisGreen etc.
 - You can use [this Heroku buildpack](https://github.com/openjournals/heroku-buildpack-cloc) to install the `cloc` dependency.
-- You can install Gitinspector using npm by following the instructions [here](https://www.npmjs.com/package/gitinspector). If you plan to deploy to Heroku, you can add the `heroku/nodejs` buildpack to your app.
 
 **2.** In the app settings add the following Config Vars:
 

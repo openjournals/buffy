@@ -30,20 +30,13 @@ class RepoChecksWorker < BuffyWorker
     message = "```\nSoftware report:\n"
 
     cloc_result = run_cloc(path)
-    gitinspector_result = run_gitinspector(path)
 
     if cloc_result
       message << "#{cloc_result}"
     else
       message << "cloc failed to run analysis of the source code"
     end
-    message << "\n\n"
 
-    if gitinspector_result
-      message << "#{gitinspector_result}"
-    else
-      message << "gitinspector failed to run statistical information for the repository"
-    end
     message << "\n```"
 
     respond(message)
