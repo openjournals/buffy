@@ -120,7 +120,7 @@ buffy:
     github_action:
       - checks:
           command: check repository
-          workflow_repo: openjournals/joss-papers
+          workflow_repo: openjournals/jose-papers
           workflow_name: checks.yml
           workflow_ref: master
           description: "Run checks and provide information on the repository and the paper file"
@@ -132,7 +132,7 @@ buffy:
             repository_url: target-repository
       - references:
           command: check references
-          workflow_repo: openjournals/joss-papers
+          workflow_repo: openjournals/jose-papers
           workflow_name: references.yml
           workflow_ref: master
           description: "Check the references of the paper for missing DOIs"
