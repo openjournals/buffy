@@ -39,7 +39,7 @@ The body of the issue should have the url of the repository marked with HTML com
 
 The following values are valid for the `:checks` list:
 
-* `repo summary`: This check performs an analysis of the source code and list authorship, contributions and file types information.
+* `repo summary`: This check performs an analysis of the source code and list file types information.
 * `languages`: This will detect the languages used in the repository and tagged the issue with the top three used languages.
 * `wordcount`: This will count the number of words in the paper file.
 * `license`: This will look for an Open Source License in the target repo and reply an error message if no license is found.
