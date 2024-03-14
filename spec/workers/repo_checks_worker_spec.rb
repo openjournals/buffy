@@ -43,7 +43,6 @@ describe RepoChecksWorker do
   describe "#repo_summary" do
     before do
       allow(@worker).to receive(:run_cloc).and_return("Ruby 50%, Julia 50%")
-      allow(@worker).to receive(:run_gitinspector).and_return("Author: Buffy Summers")
     end
 
     it "should include cloc report" do
@@ -51,20 +50,9 @@ describe RepoChecksWorker do
       @worker.repo_summary
     end
 
-    it "should include gitinspector report" do
-      expect(@worker).to receive(:respond).with(/Author: Buffy Summers/)
-      @worker.repo_summary
-    end
-
     it "should include error message if cloc fails" do
       expect(@worker).to receive(:run_cloc).and_return(nil)
       expect(@worker).to receive(:respond).with(/cloc failed to run/)
-      @worker.repo_summary
-    end
-
-    it "should include gitinspector report" do
-      expect(@worker).to receive(:run_gitinspector).and_return(nil)
-      expect(@worker).to receive(:respond).with(/gitinspector failed to run/)
       @worker.repo_summary
     end
   end
