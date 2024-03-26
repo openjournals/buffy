@@ -6,7 +6,7 @@ buffy:
     reviewers_host_url: <%= ENV['REVIEWERS_HOST_URL'] %>
     reviewers_api_token: <%= ENV['REVIEWERS_API_TOKEN'] %>
   teams:
-    editors: JuliaCon/jcon-editors
+    editors: JuliaCon/editors
     eics: JuliaCon/jcon-eics
   responders:
     help:
