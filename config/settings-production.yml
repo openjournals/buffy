@@ -197,28 +197,6 @@ buffy:
             - issue_id
           mapping:
             repository_url: target-repository
-      - accept_ignoring_errors:
-          if:
-            value_matches:
-              archive: "^((?!Pending).)*$"
-            reject_msg: "Paper is not ready for acceptance yet, the archive is missing"
-          only: eics
-          hidden: true
-          command: accept ignoring errors
-          workflow_repo: openjournals/joss-papers
-          workflow_name: accept.yml
-          workflow_ref: master
-          description: Accept and publish the paper
-          message: "```\nDoing it live! Attempting automated processing of paper acceptance (ignoring metadata errors)...\n```"
-          inputs:
-            add_labels: "accepted,published"
-            validation_mode: "ignore-errors"
-          data_from_issue:
-            - branch
-            - target-repository
-            - issue_id
-          mapping:
-            repository_url: target-repository
       - reaccept:
           if:
             value_matches:
