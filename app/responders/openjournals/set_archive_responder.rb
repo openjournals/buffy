@@ -42,7 +42,7 @@ module Openjournals
     end
 
     def default_example_invocation
-      "@#{bot_name} set set 10.5281/zenodo.6861996 as archive"
+      "@#{bot_name} set 10.5281/zenodo.6861996 as archive"
     end
   end
 end
