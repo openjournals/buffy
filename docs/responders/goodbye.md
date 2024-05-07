@@ -41,7 +41,7 @@ To reply with a template file:
 
 Calling an external service:
 ```eval_rst
-:external_service: All the configuration for the service is nested under this param. Posible options are:
+:external_service: All the configuration for the service is nested under this param. Possible options are:
 
   :name: *Required*. The name for this service.
   :url: *Required*. The url to call.

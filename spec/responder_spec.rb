@@ -61,7 +61,7 @@ describe Responder do
       expect(subject.authorized?(@context)).to be_truthy
     end
 
-    it "should be true if sender is listed in an autorized role in the issue" do
+    it "should be true if sender is listed in an authorized role in the issue" do
       subject.params = { authorized_roles_in_issue: 'reviewers' }
       @context[:issue_body] = "<!--reviewers-->@rev1, @sender<!--end-reviewers-->"
       subject.context = @context
@@ -70,7 +70,7 @@ describe Responder do
       expect(subject.authorized?(@context)).to be_truthy
     end
 
-    it "should be true if sender is not in an autorized role but is in authorized team" do
+    it "should be true if sender is not in an authorized role but is in authorized team" do
       @context[:issue_body] = "<!--reviewers-->@rev1, @rev2<!--end-reviewers-->"
       subject.params = { only: 'editors', authorized_roles_in_issue: 'reviewers'}
       subject.context = @context
@@ -79,7 +79,7 @@ describe Responder do
       expect(subject.authorized?(@context)).to be_truthy
     end
 
-    it "should be true if sender is not in an autorized team but is in authorized role" do
+    it "should be true if sender is not in an authorized team but is in authorized role" do
       @context[:issue_body] = "<!--reviewers-->@rev1, @sender<!--end-reviewers-->"
       subject.params = { only: 'editors', authorized_roles_in_issue: 'reviewers'}
       subject.context = @context
@@ -88,7 +88,7 @@ describe Responder do
       expect(subject.authorized?(@context)).to be_truthy
     end
 
-    it "should be true if sender is in an autorized team and in authorized role" do
+    it "should be true if sender is in an authorized team and in authorized role" do
       @context[:issue_body] = "<!--reviewers-->@rev1, @sender<!--end-reviewers-->"
       subject.params = { only: 'editors', authorized_roles_in_issue: 'reviewers'}
       subject.context = @context
