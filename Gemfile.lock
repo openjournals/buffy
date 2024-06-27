@@ -32,9 +32,9 @@ GEM
       mini_mime (~> 1.0)
       rugged (~> 1.0)
     hashdiff (1.1.0)
-    issue (1.0.0)
-      openssl
-      rack
+    issue (1.0.2)
+      openssl (~> 3.2)
+      rack (~> 3.1)
     latex-decode (0.4.0)
     licensee (9.17.1)
       dotenv (>= 2, < 4)
