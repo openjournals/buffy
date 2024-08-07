@@ -75,7 +75,7 @@ GEM
       connection_pool
     reverse_markdown (2.1.1)
       nokogiri
-    rexml (3.3.2)
+    rexml (3.3.4)
       strscan
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
