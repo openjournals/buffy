@@ -36,7 +36,7 @@ describe AddAndRemoveAssigneeResponder do
         @responder.match_data = @responder.event_regex.match(@msg)
       end
 
-      it "should add user as assignee if posible" do
+      it "should add user as assignee if possible" do
         expect_any_instance_of(Octokit::Client).to receive(:check_assignee).once.and_return(true)
         expect(@responder).to_not receive(:remove_assignee)
         expect(@responder).to receive(:add_assignee).with("@arfon")
