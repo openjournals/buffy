@@ -14,8 +14,7 @@ class DOIChecker
     if @entries.any?
       @entries.each do |entry|
         # handle special cases first
-        special_case = self.handle_special_case(entry)
-        if special_case
+        if special_case = handle_special_case(entry)
           doi_validity = special_case
         elsif entry.has_field?('doi') && !entry.doi.empty?
           # Validate entries with DOIs
@@ -38,8 +37,7 @@ class DOIChecker
   # {:validity => :ok, :msg => "whatever"} otherwise.
   # Add additional special cases as private methods and chain in a tidy sequence plz <3
   def handle_special_case(entry)
-    validity = acm_105555_prefix(entry) and return validity
-    false
+    acm_105555_prefix(entry) || false
   end
 
 
