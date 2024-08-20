@@ -9,32 +9,50 @@ class DOIChecker
   end
 
   def check_dois
-    doi_summary = {ok: [], missing: [], invalid: []}
+    doi_summary = {ok: [], skip: [], missing: [], invalid: []}
 
     if @entries.any?
       @entries.each do |entry|
-        if entry.has_field?('doi') && !entry.doi.empty?
+        # handle special cases first
+        if special_case = handle_special_case(entry)
+          doi_validity = special_case
+        elsif entry.has_field?('doi') && !entry.doi.empty?
+          # Validate entries with DOIs
           doi_validity = validate_doi(entry.doi.value)
-          doi_summary[doi_validity[:validity]].push(doi_validity[:msg])
-        # If there's no DOI present, check Crossref to see if we can find a candidate DOI for this entry.
         elsif entry.has_field?('title')
-            candidate_doi = crossref_lookup(entry.title.value)
-            truncated_title = entry.title.to_s[0,50]
-            truncated_title += "..." if truncated_title.length < entry.title.to_s.length
-            if candidate_doi == "CROSSREF-ERROR"
-              doi_summary[:missing].push("Errored finding suggestions for \"#{truncated_title}\", please try later")
-            elsif candidate_doi
-              doi_summary[:missing].push("#{candidate_doi} may be a valid DOI for title: #{truncated_title}")
-            else
-              doi_summary[:missing].push("No DOI given, and none found for title: #{truncated_title}")
-            end
+          # Try and find candidate entries if doi absent, but title present
+          doi_validity = handle_missing_doi(entry)
         else
-          doi_summary[:missing].push("Entry without DOI or title found")
+          doi_validity = {validity: :missing, msg: "Entry without DOI or title found"}
         end
+
+        doi_summary[doi_validity[:validity]].push(doi_validity[:msg])
       end
     end
 
     doi_summary
+  end
+
+  # any special case should return false if not applicable, and an object like
+  # {:validity => :ok, :msg => "whatever"} otherwise.
+  # Add additional special cases as private methods and chain in a tidy sequence plz <3
+  def handle_special_case(entry)
+    acm_105555_prefix(entry) || false
+  end
+
+
+  # If there's no DOI present, check Crossref to see if we can find a candidate DOI for this entry.
+  def handle_missing_doi(entry)
+    candidate_doi = crossref_lookup(entry.title.value)
+    truncated_title = entry.title.to_s[0,50]
+    truncated_title += "..." if truncated_title.length < entry.title.to_s.length
+    if candidate_doi == "CROSSREF-ERROR"
+      { validity: :missing, msg: "Errored finding suggestions for \"#{truncated_title}\", please try later" }
+    elsif candidate_doi
+      { validity: :missing, msg: "#{candidate_doi} may be a valid DOI for title: #{truncated_title}" }
+    else
+      { validity: :skip, msg: "No DOI given, and none found for title: #{truncated_title}" }
+    end
   end
 
   def validate_doi(doi_string)
@@ -111,5 +129,17 @@ class DOIChecker
 
   def similar?(string_1, string_2)
     levenshtein_distance(string_1, string_2) < 3
+  end
+
+  private
+
+  def acm_105555_prefix(entry)
+    if entry.has_field?('doi') && entry.doi.include?("10.5555/")
+      { validity: :invalid, msg: "#{entry.doi} is INVALID - 10.5555 is a known broken prefix, replace with https://dl.acm.org/doi/{doi} in the {url} field" }
+    elsif entry.has_field?('url') && entry.url.include?("https://dl.acm.org/doi/10.5555")
+      { validity: :skip, msg: "#{entry.url} - correctly put 10.5555 prefixed doi in the url field, editor should ensure this resolves" }
+    else
+      false
+    end
   end
 end

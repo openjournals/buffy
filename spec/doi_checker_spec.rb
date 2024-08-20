@@ -11,6 +11,7 @@ describe DOIChecker do
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
       expect(doi_summary[:missing]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
     end
 
     it "should classify as invalid entries with invalid DOI" do
@@ -25,6 +26,7 @@ describe DOIChecker do
       expect(doi_summary[:invalid].size).to eq(1)
       expect(doi_summary[:invalid].first).to eq(validity[:msg])
       expect(doi_summary[:missing]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
     end
 
     it "should classify as ok entries with valid DOI" do
@@ -39,6 +41,7 @@ describe DOIChecker do
       expect(doi_summary[:ok].first).to eq(validity[:msg])
       expect(doi_summary[:invalid]).to be_empty
       expect(doi_summary[:missing]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
     end
 
     it "should classify as missing entries without DOI but with a candidate crossref entry" do
@@ -50,6 +53,7 @@ describe DOIChecker do
       doi_summary = doi_checker.check_dois
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
       expect(doi_summary[:missing].size).to eq(1)
       expect(doi_summary[:missing][0]).to eq("10.maybe/doi may be a valid DOI for title: No DOI")
     end
@@ -63,6 +67,7 @@ describe DOIChecker do
       doi_summary = doi_checker.check_dois
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
       expect(doi_summary[:missing].size).to eq(1)
       expect(doi_summary[:missing][0]).to eq('Errored finding suggestions for "No DOI", please try later')
     end
@@ -78,6 +83,7 @@ describe DOIChecker do
       doi_summary = doi_checker.check_dois
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
       expect(doi_summary[:missing].size).to eq(1)
       expect(doi_summary[:missing][0]).to eq("Errored finding suggestions for \"#{expected_title}\", please try later")
     end
@@ -93,7 +99,9 @@ describe DOIChecker do
 
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
-      expect(doi_summary[:missing][0]).to eq("No DOI given, and none found for title: #{title}")
+      expect(doi_summary[:missing]).to be_empty
+      expect(doi_summary[:skip].size).to eq(1)
+      expect(doi_summary[:skip][0]).to eq("No DOI given, and none found for title: #{title}")
     end
 
     it "should report entries with no DOI or title as missing both" do
@@ -103,7 +111,35 @@ describe DOIChecker do
       doi_summary = doi_checker.check_dois
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:invalid]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
       expect(doi_summary[:missing][0]).to eq("Entry without DOI or title found")
+    end
+  end
+
+  describe "#handle_special_case" do
+    it "should treat DOIs with a 10.5555 prefix as invalid" do
+      entry = BibTeX::Entry.new(doi: "10.5555/xxxxxxx.yyyyyyyyy")
+      validity = subject.handle_special_case(entry)
+      expect(validity[:validity]).to eq(:invalid)
+      expect(validity[:msg]).to include("replace with https://dl.acm.org/doi")
+    end
+
+    it "should treat URLs with a 10.5555 prefix as a skip" do
+      entry = BibTeX::Entry.new(url: "https://dl.acm.org/doi/10.5555/2827719.2827740")
+      validity = subject.handle_special_case(entry)
+      expect(validity[:validity]).to eq(:skip)
+      expect(validity[:msg]).to eq("https://dl.acm.org/doi/10.5555/2827719.2827740 - correctly put 10.5555 prefixed doi in the url field, editor should ensure this resolves")
+    end
+
+    it "should handle special cases separately from normal DOI checking" do
+      entry = BibTeX::Entry.new(doi: "10.5555/xxxxxxx.yyyyyyyyy")
+      doi_checker = DOIChecker.new([entry])
+
+      doi_summary = doi_checker.check_dois
+      expect(doi_summary[:ok]).to be_empty
+      expect(doi_summary[:missing]).to be_empty
+      expect(doi_summary[:skip]).to be_empty
+      expect(doi_summary[:invalid][0]).to include("is INVALID - 10.5555 is a known broken prefix, replace with https://dl.acm.org/doi/")
     end
   end
 
