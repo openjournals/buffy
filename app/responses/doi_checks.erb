@@ -4,7 +4,7 @@ Reference check summary (note 'MISSING' DOIs are suggestions that need verificat
 <% if type.to_s === "ok" %>
 ✅ <%= type.to_s.upcase %> DOIs
 <% elsif type.to_s === "skip" %>
-❔ <%= type.to_s.upcase %> DOIs
+🟡 <%= type.to_s.upcase %> DOIs
 <% else %>
 ❌ <%= type.to_s.upcase %> DOIs
 <% end %>

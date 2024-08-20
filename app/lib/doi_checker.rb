@@ -31,7 +31,7 @@ class DOIChecker
     end
 
     doi_summary
-    end
+  end
 
   # any special case should return false if not applicable, and an object like
   # {:validity => :ok, :msg => "whatever"} otherwise.
