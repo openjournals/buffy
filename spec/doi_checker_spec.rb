@@ -128,7 +128,7 @@ describe DOIChecker do
       entry = BibTeX::Entry.new(url: "https://dl.acm.org/doi/10.5555/2827719.2827740")
       validity = subject.handle_special_case(entry)
       expect(validity[:validity]).to eq(:skip)
-      expect(validity[:msg]).to eq("https://dl.acm.org/doi/10.5555/2827719.2827740 - correctly put 10.5555 prefixed doi in the url field, editor should ensure this resolves")
+      expect(validity[:msg]).to eq("https://dl.acm.org/doi/10.5555/2827719.2827740 - non-DOI with 10.5555 correctly placed in the url field, editor should ensure this resolves")
     end
 
     it "should handle special cases separately from normal DOI checking" do
