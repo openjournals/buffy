@@ -137,7 +137,7 @@ class DOIChecker
     if entry.has_field?('doi') && entry.doi.include?("10.5555/")
       { validity: :invalid, msg: "#{entry.doi} is INVALID - 10.5555 is a known broken prefix, replace with https://dl.acm.org/doi/{doi} in the {url} field" }
     elsif entry.has_field?('url') && entry.url.include?("https://dl.acm.org/doi/10.5555")
-      { validity: :skip, msg: "#{entry.url} - correctly put 10.5555 prefixed doi in the url field, editor should ensure this resolves" }
+      { validity: :skip, msg: "#{entry.url} - non-DOI with 10.5555 correctly placed in the url field, editor should ensure this resolves" }
     else
       false
     end
