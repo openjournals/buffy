@@ -2,6 +2,7 @@ require 'yaml'
 require 'erb'
 require 'faraday'
 require 'sidekiq'
+require 'ostruct'
 
 require_relative '../lib/defaults'
 require_relative '../lib/github'
