@@ -36,7 +36,7 @@ This will be the "user" responding to the commands issued from a reviews reposit
 Some applications and services must be available to use by Buffy:
 
 - **[Redis](https://redis.io/)**: To process background jobs Buffy needs `redis` installed.
-- **[cloc](https://github.com/AlDanial/cloc)**: The *Respository Checks Responder* can analyze source code, to run this check `cloc` is used.
+- **[cloc](https://github.com/AlDanial/cloc)**: The *Repository Checks Responder* can analyze source code, to run this check `cloc` is used.
 
 #### Deployment
 
