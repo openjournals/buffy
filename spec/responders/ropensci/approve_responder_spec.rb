@@ -20,6 +20,7 @@ describe Ropensci::ApproveResponder do
     it "should define regex" do
       expect(@responder.event_regex).to match("@ropensci-review-bot approve")
       expect(@responder.event_regex).to match("@ropensci-review-bot approve package-name")
+      expect(@responder.event_regex).to match("@ropensci-review-bot approve package.name")
       expect(@responder.event_regex).to match("@ropensci-review-bot approve package-name  \r\n")
       expect(@responder.event_regex).to_not match("@ropensci-review-bot approve package-name. another-command")
       expect(@responder.event_regex).to_not match("@ropensci-review-bot approve package-name\r\nanother-command")
