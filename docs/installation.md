@@ -1,7 +1,7 @@
 Installation
 ============
 
-Buffy functions by monitoring events that are sent from a GitHub repository (e.g., openjournals/joss-reviews). Based on the information in these events, Buffy determines whether and how to respond by passing the event data to different [Responders](https://api.rubyonrails.org/v4.1/classes/ActionController/Responder.html).
+Buffy functions by monitoring events that are sent from a GitHub repository (e.g., openjournals/joss-reviews). Based on the information in these events, Buffy determines whether and how to respond by passing the event data to different [Responders](./available_responders).
 
 You can fork Buffy and configure the responders you want to use for a particular repository, and the fork doesn't necessarily
 need to be hosted under the same GitHub user or organization (as the repository where it will be used). For Buffy to be operational, it must be running either through a local installation or deployment to a platform. The following components are necessary for this setup:
