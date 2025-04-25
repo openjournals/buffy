@@ -69,6 +69,20 @@ describe Openjournals::ReviewersListWithExternalCallResponder do
         @responder.process_message(msg)
       end
 
+      it "should accept assign syntax" do
+        msg = "@botsci assign @xuanxu to reviewers"
+        @responder.match_data = @responder.event_regex.match(msg)
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon, @xuanxu<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        @responder.process_message(msg)
+
+        msg = "@botsci assign @xuanxu as reviewer"
+        @responder.match_data = @responder.event_regex.match(msg)
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon, @xuanxu<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        @responder.process_message(msg)
+      end
+
       it "should accept 'me' as the new reviewer" do
         msg = "@botsci add me as reviewer"
         @responder.match_data = @responder.event_regex.match(msg)

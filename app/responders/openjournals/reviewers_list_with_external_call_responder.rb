@@ -8,7 +8,7 @@ module Openjournals
 
     def define_listening
       @event_action = "issue_comment.created"
-      @event_regex = /\A@#{bot_name} (add|remove) +(\S+) +(to reviewers|from reviewers|as reviewer)\.?\s*$/i
+      @event_regex = /\A@#{bot_name} (assign|add|remove) +(\S+) +(to reviewers|from reviewers|as reviewer)\.?\s*$/i
     end
 
     def process_message(message)
@@ -30,7 +30,7 @@ module Openjournals
 
       add_to_or_remove_from = [add_or_remove, to_or_from].join(" ")
 
-      if ["add to reviewers", "add as reviewer"].include?(add_to_or_remove_from)
+      if ["add to reviewers", "add as reviewer", "assign to reviewers", "assign as reviewer"].include?(add_to_or_remove_from)
         add new_reviewer
       elsif ["remove from reviewers", "remove as reviewer"].include?(add_to_or_remove_from)
         remove new_reviewer
