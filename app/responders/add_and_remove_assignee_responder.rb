@@ -13,7 +13,7 @@ class AddAndRemoveAssigneeResponder < Responder
     add_or_remove = @match_data[1].downcase
     user = @match_data[2]
 
-    if add_or_remove == "add"
+    iif ["add", "assign"].include?(add_or_remove)
       add user
     elsif add_or_remove == "remove"
       remove user
