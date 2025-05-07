@@ -295,14 +295,14 @@ class Responder
 
   # Finds the value of the url of the target-repository in the body of the issue
   # by default reads the field called "target-repository"
-  # unless a diferent name is set using param :url_field
+  # unless a different name is set using param :url_field
   def target_repo_value
     @target_repo_url ||= value_of_or_default(params[:url_field], "target-repository")
   end
 
   # Finds the name of the branch in the body of the issue
   # by default reads the field called "branch"
-  # unless a diferent name is set using param :branch_field
+  # unless a different name is set using param :branch_field
   # or if it comes in the match_data in the specified position
   def branch_name_value(branch_index=1)
     if @match_data.nil? || @match_data[branch_index].nil?
@@ -317,12 +317,12 @@ class Responder
     params[:hidden] == true
   end
 
-  # Default description can be overriden by config param
+  # Default description can be overridden by config param
   def description
     params[:description] || default_description
   end
 
-  # Default example_invocation can be overriden by config param
+  # Default example_invocation can be overridden by config param
   def example_invocation
     params[:example_invocation] || default_example_invocation
   end
