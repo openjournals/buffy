@@ -116,7 +116,7 @@ Later, a POST request will be sent to https://dummy-external-service.herokuapp.c
  "secret": "A1234567890Z", # declared in the query_params setting
  "target-repo":"...",      # the value is extracted from the body of the issue
  "id":"...",               # the value corresponds to issue_id, it has been mapped to id
- "repo":"...",             # the origin repo where the invocation happend
+ "repo":"...",             # the origin repo where the invocation happenedd
  "sender":"...",           # the user invoking the command
  "bot_name":"...",         # the bot user name that will be responding
 }
