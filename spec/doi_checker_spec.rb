@@ -121,7 +121,7 @@ describe DOIChecker do
       entry = BibTeX::Entry.new(doi: "10.5555/xxxxxxx.yyyyyyyyy")
       validity = subject.handle_special_case(entry)
       expect(validity[:validity]).to eq(:invalid)
-      expect(validity[:msg]).to include("replace with https://dl.acm.org/doi")
+      expect(validity[:msg]).to include("10.5555 is not a DOI prefix")
     end
 
     it "should treat URLs with a 10.5555 prefix as a skip" do
@@ -139,7 +139,7 @@ describe DOIChecker do
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:missing]).to be_empty
       expect(doi_summary[:skip]).to be_empty
-      expect(doi_summary[:invalid][0]).to include("is INVALID - 10.5555 is a known broken prefix, replace with https://dl.acm.org/doi/")
+      expect(doi_summary[:invalid][0]).to include("is INVALID - 10.5555 is not a DOI prefix, but rather a handle prefix. Please replace the {doi} field with a {url} field that resolves in a browser")
     end
   end
 

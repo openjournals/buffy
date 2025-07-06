@@ -135,7 +135,7 @@ class DOIChecker
 
   def acm_105555_prefix(entry)
     if entry.has_field?('doi') && entry.doi.include?("10.5555/")
-      { validity: :invalid, msg: "#{entry.doi} is INVALID - 10.5555 is a known broken prefix, replace with https://dl.acm.org/doi/{doi} in the {url} field" }
+      { validity: :invalid, msg: "#{entry.doi} is INVALID - 10.5555 is not a DOI prefix, but rather a handle prefix. Please replace the {doi} field with a {url} field that resolves in a browser" }
     elsif entry.has_field?('url') && entry.url.include?("https://dl.acm.org/doi/10.5555")
       { validity: :skip, msg: "#{entry.url} - non-DOI with 10.5555 correctly placed in the url field, editor should ensure this resolves" }
     else
