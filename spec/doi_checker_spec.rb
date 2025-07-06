@@ -121,7 +121,7 @@ describe DOIChecker do
       entry = BibTeX::Entry.new(doi: "10.5555/xxxxxxx.yyyyyyyyy")
       validity = subject.handle_special_case(entry)
       expect(validity[:validity]).to eq(:invalid)
-      expect(validity[:msg]).to include("replace with https://dl.acm.org/doi")
+      expect(validity[:msg]).to include("10.5555 is not a DOI prefix")
     end
 
     it "should treat URLs with a 10.5555 prefix as a skip" do
