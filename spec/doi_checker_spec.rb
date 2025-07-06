@@ -139,7 +139,7 @@ describe DOIChecker do
       expect(doi_summary[:ok]).to be_empty
       expect(doi_summary[:missing]).to be_empty
       expect(doi_summary[:skip]).to be_empty
-      expect(doi_summary[:invalid][0]).to include("is INVALID - 10.5555 is not a DOI prefix, but rather a handle prefix. Please replace the {doi} field with a {url} field that resolves in a browser.")
+      expect(doi_summary[:invalid][0]).to include("is INVALID - 10.5555 is not a DOI prefix, but rather a handle prefix. Please replace the {doi} field with a {url} field that resolves in a browser")
     end
   end
 
