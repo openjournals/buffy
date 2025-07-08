@@ -41,6 +41,26 @@ buffy:
           - repourl
           - issue_id
         template_file: goodpractice.md
+    welcome:
+      if:
+        value_matches:
+          submission-type: "Pre-submission|pre-envio"
+      message: "Thanks for your pre-submission to rOpenSci, our editors will reply soon."
+      add_labels:
+        - "0/presubmission"
+    welcome:
+      if:
+        value_matches:
+          submission-type: "Pre-submission|pre-envio"
+        body: "\\[x\\]\\s(Bayesian|Dimensionality|Machine|Regression|Exploratory|Spatial|Time)"
+      add_labels:
+        - "stats"
+    welcome:
+      if:
+        value_matches:
+          submission-type: "Stats"
+      add_labels:
+        - "stats"
     basic_command:
       - code_of_conduct:
           command: code of conduct
