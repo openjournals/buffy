@@ -52,7 +52,7 @@ buffy:
       if:
         value_matches:
           submission-type: "Pre-submission|pre-envio"
-        body: "\\[x\\]\\s(Bayesian|Dimensionality|Machine|Regression|Exploratory|Spatial|Time)"
+        body: "\\[x\\]\\s(Bayesian|Dimensionality|Machine|Regression|Exploratory|Spatial|Time|Probability)"
       add_labels:
         - "stats"
     welcome:
