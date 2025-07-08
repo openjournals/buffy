@@ -25,22 +25,41 @@ buffy:
     thanks:
       hidden: true
     welcome:
-      if:
-        value_matches:
-          submission-type: "Standard|Estándar|Stats"
-      message: "Thanks for submitting to rOpenSci, our editors and @ropensci-review-bot will reply soon. Type `@ropensci-review-bot help` for help."
-      # message: "⭐️ Thanks for submitting to rOpenSci.  We are taking a break for the holidays. Activities are currently paused until Jan 8th 2025. Please alert us here on or after that date to proceed with your submission. ⭐️"
-      add_labels:
-        - holding
-      external_service:
-        name: editorcheck
-        url: http://138.68.123.59:8000/editorcheck
-        method: get
-        data_from_issue:
-          - repo
-          - repourl
-          - issue_id
-        template_file: goodpractice.md
+      - standard:
+          if:
+            value_matches:
+              submission-type: "Standard|Estándar|Stats"
+          message: "Thanks for submitting to rOpenSci, our editors and @ropensci-review-bot will reply soon. Type `@ropensci-review-bot help` for help."
+          # message: "⭐️ Thanks for submitting to rOpenSci.  We are taking a break for the holidays. Activities are currently paused until Jan 8th 2025. Please alert us here on or after that date to proceed with your submission. ⭐️"
+          external_service:
+            name: editorcheck
+            url: http://138.68.123.59:8000/editorcheck
+            method: get
+            data_from_issue:
+              - repo
+              - repourl
+              - issue_id
+            template_file: goodpractice.md
+      - pre_submission:
+          if:
+            value_matches:
+              submission-type: "Pre-submission|pre-envio"
+          message: "Thanks for your pre-submission to rOpenSci, our editors will reply soon."
+          add_labels:
+            - "0/presubmission"
+      - pre_submission_stats:
+          if:
+            value_matches:
+              submission-type: "Pre-submission|pre-envio"
+            body: "\\[x\\]\\s(Bayesian|Dimensionality|Machine|Regression|Exploratory|Spatial|Time|Probability)"
+          add_labels:
+            - "stats"
+      - submission_stats:
+          if:
+            value_matches:
+              submission-type: "Stats"
+          add_labels:
+            - "stats"
     basic_command:
       - code_of_conduct:
           command: code of conduct
