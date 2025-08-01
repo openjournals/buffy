@@ -3,7 +3,7 @@ require 'sinatra/indifferent_hash'
 module Defaults
 
   # Default value for needed env settings.
-  # Can be overriden from the config/settings YAML file.
+  # Can be overridden from the config/settings YAML file.
   def default_settings
     @defaults ||= Sinatra::IndifferentHash[
       bot_github_user: ENV['BUFFY_BOT_GH_USER'],
