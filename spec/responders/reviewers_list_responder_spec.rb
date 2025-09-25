@@ -20,8 +20,11 @@ describe ReviewersListResponder do
       expect(@responder.event_regex).to match("@botsci add   @arfon    to reviewers")
       expect(@responder.event_regex).to match("@botsci add @arfon as reviewer")
       expect(@responder.event_regex).to match("@botsci add me as reviewer")
+      expect(@responder.event_regex).to match("@botsci assign @arfon as reviewer")
       expect(@responder.event_regex).to match("@botsci remove me from reviewers")
+      expect(@responder.event_regex).to match("@botsci remove @arfon as reviewer")
       expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  ")
+      expect(@responder.event_regex).to match("@botsci unassign @arfon from reviewers")
       expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  \r\n")
       expect(@responder.event_regex).to match("@botsci remove @arfon from reviewers  \r\n more ")
       expect(@responder.event_regex).to_not match("@botsci add to reviewers")
@@ -60,6 +63,14 @@ describe ReviewersListResponder do
 
       it "should accept to or as syntax" do
         msg = "@botsci add @xuanxu to reviewers"
+        @responder.match_data = @responder.event_regex.match(msg)
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon, @xuanxu<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        @responder.process_message(msg)
+      end
+
+      it "should accept assign as syntax" do
+        msg = "@botsci assign @xuanxu to reviewers"
         @responder.match_data = @responder.event_regex.match(msg)
         expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon, @xuanxu<!--end-reviewers-list--> ..."
         expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
@@ -119,8 +130,24 @@ describe ReviewersListResponder do
         @responder.process_message(@msg)
       end
 
-      it "should accept to or as syntax" do
+      it "should accept as or from syntax" do
         msg = "@botsci remove @xuanxu as reviewer"
+        @responder.match_data = @responder.event_regex.match(msg)
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        @responder.process_message(msg)
+      end
+
+      it "should accept to or from syntax" do
+        msg = "@botsci remove @xuanxu from reviewers"
+        @responder.match_data = @responder.event_regex.match(msg)
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        @responder.process_message(msg)
+      end
+
+      it "should accept unassign syntax" do
+        msg = "@botsci unassign @xuanxu as reviewer"
         @responder.match_data = @responder.event_regex.match(msg)
         expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon<!--end-reviewers-list--> ..."
         expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
