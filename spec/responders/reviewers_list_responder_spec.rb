@@ -356,7 +356,9 @@ describe ReviewersListResponder do
 
     it "#description should include adding and removing reviewers" do
       expect(@responder.description[0]).to eq("Add to this issue's reviewers list")
-      expect(@responder.description[1]).to eq("Remove from this issue's reviewers list")
+      expect(@responder.description[1]).to eq("Assign to this issue's reviewer list")
+      expect(@responder.description[2]).to eq("Remove from this issue's reviewers list")
+      expect(@responder.description[3]).to eq("Unassign from this issue's reviewer list")
     end
 
     it "#example_invocation should use custom sample value if present" do
