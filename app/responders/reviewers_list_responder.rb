@@ -91,6 +91,8 @@ class ReviewersListResponder < Responder
 
   def default_example_invocation
     ["@#{bot_name} add #{params[:sample_value] || '@username'} as reviewer",
-     "@#{bot_name} remove #{params[:sample_value] || '@username'} from reviewers"]
+     "@#{bot_name} assign #{params[:sample_value] || '@username'} as reviewer",
+     "@#{bot_name} remove #{params[:sample_value] || '@username'} from reviewers",
+     "@#{bot_name} unassign #{params[:sample_value] || '@username'} from reviewers"]
   end
 end
