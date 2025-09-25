@@ -70,6 +70,14 @@ describe ReviewersListResponder do
       end
 
       it "should accept assign as syntax" do
+        msg = "@botsci assign @xuanxu as reviewer"
+        @responder.match_data = @responder.event_regex.match(msg)
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon, @xuanxu<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        @responder.process_message(msg)
+      end
+
+      it "should accept assign to syntax" do
         msg = "@botsci assign @xuanxu to reviewers"
         @responder.match_data = @responder.event_regex.match(msg)
         expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon, @xuanxu<!--end-reviewers-list--> ..."
@@ -353,13 +361,17 @@ describe ReviewersListResponder do
 
     it "#example_invocation should use custom sample value if present" do
       expect(@responder.example_invocation[0]).to eq("@botsci add @new_reviewer as reviewer")
-      expect(@responder.example_invocation[1]).to eq("@botsci remove @new_reviewer from reviewers")
+      expect(@responder.example_invocation[1]).to eq("@botsci assign @new_reviewer as reviewer")
+      expect(@responder.example_invocation[2]).to eq("@botsci remove @new_reviewer from reviewers")
+      expect(@responder.example_invocation[3]).to eq("@botsci unassign @new_reviewer from reviewers")
     end
 
     it "#example_invocation should have default sample value" do
       @responder.params = {}
       expect(@responder.example_invocation[0]).to eq("@botsci add @username as reviewer")
-      expect(@responder.example_invocation[1]).to eq("@botsci remove @username from reviewers")
+      expect(@responder.example_invocation[1]).to eq("@botsci assign @username as reviewer")
+      expect(@responder.example_invocation[2]).to eq("@botsci remove @username from reviewers")
+      expect(@responder.example_invocation[3]).to eq("@botsci unassign @username from reviewers")
     end
   end
 

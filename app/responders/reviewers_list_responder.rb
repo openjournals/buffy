@@ -28,9 +28,9 @@ class ReviewersListResponder < Responder
 
     add_to_or_remove_from = [add_or_remove, to_or_from].join(" ")
 
-    if ["add to reviewers", "add as reviewer", "assign as reviewer"].include?(add_to_or_remove_from)
+    if ["add to reviewers", "add as reviewer", "assign as reviewer", "assign to reviewers"].include?(add_to_or_remove_from)
       add new_reviewer
-    elsif ["remove from reviewers", "remove as reviewer", "unassign as reviewer"].include?(add_to_or_remove_from)
+    elsif ["remove from reviewers", "remove as reviewer", "unassign as reviewer", "unassign from reviewers"].include?(add_to_or_remove_from)
       remove new_reviewer
     else
       respond("That command is confusing. Did you mean to ADD TO REVIEWERS or to REMOVE FROM REVIEWERS?")
