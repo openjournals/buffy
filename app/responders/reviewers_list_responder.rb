@@ -86,7 +86,9 @@ class ReviewersListResponder < Responder
 
   def default_description
     ["Add to this issue's reviewers list",
-     "Remove from this issue's reviewers list"]
+     "Assign to this issue's reviewer list",
+     "Remove from this issue's reviewers list",
+     "Unassign from this issue's reviewer list"]
   end
 
   def default_example_invocation
