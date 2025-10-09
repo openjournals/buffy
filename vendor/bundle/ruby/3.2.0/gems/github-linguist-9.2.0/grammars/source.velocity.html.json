@@ -1,0 +1,1 @@
+{"name":"Velocity (HTML)","scopeName":"source.velocity.html","patterns":[{"name":"punctuation.definition.comment.velocity","begin":"\u003c!--","end":"--\u003e","patterns":[{"include":"$self"}]},{"include":"source.velocity"},{"include":"text.html.basic"}]}

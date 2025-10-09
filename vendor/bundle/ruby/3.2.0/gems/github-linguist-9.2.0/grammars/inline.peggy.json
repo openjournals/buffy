@@ -1,0 +1,1 @@
+{"scopeName":"inline.peggy","patterns":[{"contentName":"meta.embedded.block.peggy","begin":"(peg|peggy)(`)","end":"`","patterns":[{"include":"source.peggy"}]}]}

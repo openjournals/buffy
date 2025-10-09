@@ -1,0 +1,1 @@
+{"name":"Generic Hash-Commented","scopeName":"text.hash-commented","patterns":[{"include":"#main"}],"repository":{"comment":{"name":"comment.line.hash-commented","begin":"#","end":"$","beginCaptures":{"0":{"name":"punctuation.definition.comment.hash-commented"}}},"main":{"patterns":[{"include":"#comment"}]}}}

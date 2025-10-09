@@ -1,0 +1,1 @@
+{"scopeName":"inline.edgeql","patterns":[{"contentName":"meta.embedded.block.edgeql","begin":"(%edgeql\\()\\s*$","end":"(?\u003c=\\))","patterns":[{"begin":"^\\s*(`)$","end":"^\\s*(`)","patterns":[{"include":"source.edgeql"}]}]},{"contentName":"meta.embedded.block.edgeql","begin":"(%edgeql\\(`)","end":"(\\`( )?\\))","patterns":[{"include":"source.edgeql"}]}]}
