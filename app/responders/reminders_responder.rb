@@ -10,6 +10,49 @@ class RemindersResponder < Responder
     @event_regex = /\A@#{bot_name} remind (.*) in (.*) (.*)\s*$/i
   end
 
+  # Override authorization to allow reviewers/authors to set reminders for themselves
+  def authorized?(buffy_context)
+    # Check standard authorization first
+    role_nil = params[:authorized_roles_in_issue].nil?
+    only_nil = params[:only].nil?
+
+    # Standard authorization: check if user belongs to authorized teams or roles
+    if !role_nil || !only_nil
+      if !role_nil
+        authorized_users_in_issue = read_values_from_body([params[:authorized_roles_in_issue]].flatten)
+        return true if authorized_users_in_issue.include?("@#{buffy_context.sender}")
+      end
+
+      if !only_nil
+        return true if user_authorized?(buffy_context.sender)
+      end
+    elsif role_nil && only_nil
+      # No restrictions - public responder
+      return true
+    end
+
+    # If not authorized by standard rules, check if user is trying to set a reminder for themselves
+    # This allows reviewers/authors to set self-reminders even if responder is restricted to editors
+    if @match_data
+      target = @match_data[1].strip
+      sender_login = "@#{user_login(buffy_context.sender).downcase}"
+      
+      # Allow if target is "me" or the sender themselves
+      if target == "me" || user_login(target).downcase == user_login(buffy_context.sender).downcase
+        # Check if sender is a reviewer or author  
+        # We need to use the existing context's issue_body to check reviewers/authors
+        # but check against the buffy_context.sender
+        original_sender = @context.sender if @context
+        @context.sender = buffy_context.sender if @context
+        is_reviewer_or_author = (reviewers_list + authors_list).include?(sender_login)
+        @context.sender = original_sender if @context && original_sender
+        return is_reviewer_or_author
+      end
+    end
+    
+    false
+  end
+
   def process_message(message)
     human = @match_data[1].strip
     size = @match_data[2].strip
