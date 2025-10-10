@@ -20,7 +20,7 @@ This responder allows to schedule a reminder for the author or a reviewer to ret
 ## Params
 ```eval_rst
 :reviewers: *Optional.* The HTML-comment value name in the body of the issue to look for reviewers. Default value is **reviewers-list**.
-:auhors: *Optional.* The HTML-comment value name in the body of the issue to look for authors. Default value is **author-handle**.
+:authors: *Optional.* The HTML-comment value name in the body of the issue to look for authors. Default value is **author-handle**.
 
 ```
 
