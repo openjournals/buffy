@@ -1,0 +1,1 @@
+{"scopeName":"source.mermaid.c4c-diagram","patterns":[{"include":"#main"}],"repository":{"main":{"patterns":[{"include":"source.mermaid#a11y"},{"include":"source.mermaid#directive"},{"include":"source.mermaid#comment"},{"include":"source.mermaid#direction"},{"include":"source.mermaid.user-journey#title"},{"include":"source.wsd"}]}}}

@@ -173,4 +173,77 @@ describe RemindersResponder do
       expect(@responder.targets).to eq(["@author1", "@author2", "@extra-reviewer", "@reviewer33", "@reviewer42", "@editor21"])
     end
   end
+
+  describe "#authorized? for self-reminders" do
+    before do
+      @responder.context.issue_body = "<!--reviewers-list-->@reviewer33, @reviewer42<!--end-reviewers-list-->" +
+                                      "<!--author-handle-->@author<!--end-author-handle-->"
+      @responder.params = { only: "editors" }
+      # Stub user_authorized? to return false for non-editors (simulates restricted access)
+      allow(@responder).to receive(:user_authorized?).and_return(false)
+    end
+
+    it "should authorize reviewer to set reminder for themselves using 'me'" do
+      @responder.context.sender = "reviewer33"
+      msg = "@botsci remind me in 10 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+      
+      buffy_context = OpenStruct.new(sender: "reviewer33")
+      expect(@responder.authorized?(buffy_context)).to be_truthy
+    end
+
+    it "should authorize reviewer to set reminder for themselves using their handle" do
+      @responder.context.sender = "reviewer42"
+      msg = "@botsci remind @reviewer42 in 10 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+      
+      buffy_context = OpenStruct.new(sender: "reviewer42")
+      expect(@responder.authorized?(buffy_context)).to be_truthy
+    end
+
+    it "should authorize author to set reminder for themselves using 'me'" do
+      @responder.context.sender = "author"
+      msg = "@botsci remind me in 5 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+      
+      buffy_context = OpenStruct.new(sender: "author")
+      expect(@responder.authorized?(buffy_context)).to be_truthy
+    end
+
+    it "should authorize author to set reminder for themselves using their handle" do
+      @responder.context.sender = "author"
+      msg = "@botsci remind @author in 5 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+      
+      buffy_context = OpenStruct.new(sender: "author")
+      expect(@responder.authorized?(buffy_context)).to be_truthy
+    end
+
+    it "should not authorize reviewer to set reminder for another user" do
+      @responder.context.sender = "reviewer33"
+      msg = "@botsci remind @reviewer42 in 10 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+      
+      buffy_context = OpenStruct.new(sender: "reviewer33")
+      expect(@responder.authorized?(buffy_context)).to be_falsey
+    end
+
+    it "should not authorize non-reviewer/non-author to set reminder for themselves" do
+      @responder.context.sender = "randomuser"
+      msg = "@botsci remind me in 10 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+      
+      buffy_context = OpenStruct.new(sender: "randomuser")
+      expect(@responder.authorized?(buffy_context)).to be_falsey
+    end
+
+    it "should be case insensitive when checking self-reminders" do
+      @responder.context.sender = "reviewer33"
+      msg = "@botsci remind @ReViEwEr33 in 10 days"
+      @responder.match_data = @responder.event_regex.match(msg)
+      
+      buffy_context = OpenStruct.new(sender: "reviewer33")
+      expect(@responder.authorized?(buffy_context)).to be_truthy
+    end
+  end
 end

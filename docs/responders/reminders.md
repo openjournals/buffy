@@ -3,6 +3,8 @@ Reminders
 
 This responder allows to schedule a reminder for the author or a reviewer to return to a review after a certain period of time (supported units: days and weeks). The command will only work if the mentioned user is an author, a reviewer for the submission or the sender of the message (so editors can set reminders for themselves).
 
+**Note:** Reviewers and authors can set reminders for themselves even if the responder is configured to be restricted to editors only. This allows reviewers to manage their own review timelines.
+
 
 ## Listens to
 
@@ -34,6 +36,7 @@ This responder allows to schedule a reminder for the author or a reviewer to ret
       only: editors
 ...
 ```
+With this configuration, only editors can set reminders for anyone (authors, reviewers, or themselves), but reviewers and authors can still set reminders for themselves.
 
 **Custom html fields:**
 ```yaml
