@@ -17,8 +17,6 @@ class RemindersResponder < Responder
 
     human = "@#{user_login(context.sender)}" if human == "me"
 
-    #if
-
     unless targets.include?(human.downcase)
       respond("#{human} doesn't seem to be a reviewer or author for this submission.")
       return false
