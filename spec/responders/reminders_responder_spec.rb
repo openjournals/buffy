@@ -137,6 +137,16 @@ describe RemindersResponder do
       expect(@responder.targets).to eq(["@author", "@reviewer33", "@reviewer42", "@editor21"])
     end
 
+    it "targets includer reviewers list, authors list and sender" do
+      @responder.params = {}
+      expect(@responder.targets.sort).to eq((@responder.reviewers_list + @responder.authors_list + [@responder.sender_user]).sort)
+    end
+
+    it "include sender_user" do
+      @responder.params = {}
+      expect(@responder.sender_user).to eq("@editor21")
+    end
+
     it "use default value if no custom reviewers value set" do
       @responder.params = {}
       expect(@responder.reviewers_list).to eq(["@reviewer33", "@reviewer42"])
