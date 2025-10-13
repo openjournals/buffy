@@ -121,6 +121,50 @@ describe RemindersResponder do
       expect(ReviewReminderWorker).to receive(:perform_at).with(in_four_days, @responder.locals, "@AUTHor", true)
       @responder.process_message(msg)
     end
+
+    it "should allow reviewer to set a self-reminder" do
+      @responder.context.sender = "reviewer33"
+      msg = "@botsci remind @reviewer33 in 3 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(AsyncMessageWorker).to receive(:perform_at)
+      expect(ReviewReminderWorker).to_not receive(:perform_at)
+      expect(@responder).to receive(:respond).with("Reminder set for @reviewer33 in 3 weeks")
+
+      @responder.process_message(msg)
+    end
+
+    it "should not allow reviewers to set reminders for others" do
+      @responder.context.sender = "reviewer33"
+      msg = "@botsci remind @reviewer42 in 3 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(AsyncMessageWorker).to_not receive(:perform_at)
+      expect(ReviewReminderWorker).to_not receive(:perform_at)
+      expect(@responder).to receive(:respond).with("Reviewers can only set reminders to themselves.")
+
+      @responder.process_message(msg)
+    end
+
+    it "should allow author to set a self-reminder" do
+      @responder.context.sender = "author"
+      msg = "@botsci remind @author in 3 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(AsyncMessageWorker).to receive(:perform_at)
+      expect(ReviewReminderWorker).to_not receive(:perform_at)
+      expect(@responder).to receive(:respond).with("Reminder set for @author in 3 weeks")
+
+      @responder.process_message(msg)
+    end
+
+    it "should not allow author to set reminders for others" do
+      @responder.context.sender = "author"
+      msg = "@botsci remind @reviewer42 in 3 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(AsyncMessageWorker).to_not receive(:perform_at)
+      expect(ReviewReminderWorker).to_not receive(:perform_at)
+      expect(@responder).to receive(:respond).with("Authors can only set reminders to themselves.")
+
+      @responder.process_message(msg)
+    end
   end
 
   describe "configurable targets" do

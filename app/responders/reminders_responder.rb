@@ -17,6 +17,16 @@ class RemindersResponder < Responder
 
     human = "@#{user_login(context.sender)}" if human == "me"
 
+    if reviewers_list.include?(sender_user) && human.downcase != sender_user
+      respond("Reviewers can only set reminders to themselves.")
+      return false
+    end
+
+    if authors_list.include?(sender_user) && human.downcase != sender_user
+      respond("Authors can only set reminders to themselves.")
+      return false
+    end
+
     unless targets.include?(human.downcase)
       respond("#{human} doesn't seem to be a reviewer or author for this submission.")
       return false
