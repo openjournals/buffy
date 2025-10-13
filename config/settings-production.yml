@@ -50,6 +50,8 @@ buffy:
       only: editors
     reminders:
       only: editors
+      authorized_roles_in_issue:
+        - reviewers-list
     reviewer_checklist_comment:
       if:
         title: "^\\[REVIEW\\]:"
