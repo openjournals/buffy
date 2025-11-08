@@ -15,13 +15,14 @@ describe RepoChecksWorker do
     end
 
     it "should run all available checks if checks is nil/empty" do
-      expect(@worker).to receive(:repo_summary)
+      expect(@worker).to receive(:repo_summary).and_return("cloc output")
       expect(@worker).to receive(:detect_languages)
       expect(@worker).to receive(:count_words)
       expect(@worker).to receive(:detect_license)
       expect(@worker).to receive(:detect_statement_of_need)
-      expect(@worker).to receive(:detect_first_commit_date)
-      expect(@worker).to receive(:detect_repo_dump)
+      expect(@worker).to receive(:detect_first_commit_date).and_return({date: "Jan 1, 2020", timestamp: Time.now})
+      expect(@worker).to receive(:detect_repo_dump).and_return({commit_count: 10, total_additions: 100, max_window_additions: 50, max_window_percentage: 50.0, signal: {level: :moderate, icon: "⚡", text: "test"}})
+      expect(@worker).to receive(:respond).at_least(:once)
 
       @worker.perform({}, 'url', 'main', nil)
     end
@@ -37,13 +38,12 @@ describe RepoChecksWorker do
     end
 
     it "should cleanup created folder" do
-      expect(@worker).to receive(:repo_summary).and_return(true)
+      expect(@worker).to receive(:repo_summary).and_return("cloc output")
       expect(@worker).to receive(:detect_languages).and_return(true)
       expect(@worker).to receive(:count_words).and_return(true)
       expect(@worker).to receive(:detect_license).and_return(true)
       expect(@worker).to receive(:detect_statement_of_need).and_return(true)
-      expect(@worker).to receive(:detect_first_commit_date).and_return(true)
-      expect(@worker).to receive(:detect_repo_dump).and_return(true)
+      expect(@worker).to receive(:build_repository_history_section).and_return("history")
 
       expect(@worker).to receive(:cleanup)
       @worker.perform({}, 'url', 'main', nil)
@@ -56,14 +56,14 @@ describe RepoChecksWorker do
     end
 
     it "should include cloc report" do
-      expect(@worker).to receive(:respond).with(/Ruby 50%, Julia 50%/)
-      @worker.repo_summary
+      result = @worker.repo_summary
+      expect(result).to match(/Ruby 50%, Julia 50%/)
     end
 
     it "should include error message if cloc fails" do
       expect(@worker).to receive(:run_cloc).and_return(nil)
-      expect(@worker).to receive(:respond).with(/cloc failed to run/)
-      @worker.repo_summary
+      result = @worker.repo_summary
+      expect(result).to match(/cloc failed to run/)
     end
   end
 
@@ -146,7 +146,7 @@ describe RepoChecksWorker do
   end
 
   describe "#detect_first_commit_date" do
-    it "should respond with the first commit date" do
+    it "should return the first commit date info" do
       # Mock repository and commit structure
       first_commit = OpenStruct.new(time: Time.new(2020, 1, 15, 10, 0, 0))
       second_commit = OpenStruct.new(time: Time.new(2021, 6, 20, 14, 30, 0))
@@ -160,11 +160,12 @@ describe RepoChecksWorker do
       allow(Rugged::Repository).to receive(:new).and_return(repo)
       allow(Rugged::Walker).to receive(:new).and_return(mock_walker)
 
-      expect(@worker).to receive(:respond).with("First public commit was made on January 15, 2020")
-      @worker.detect_first_commit_date
+      result = @worker.detect_first_commit_date
+      expect(result[:date]).to eq("January 15, 2020")
+      expect(result[:timestamp]).to eq(Time.new(2020, 1, 15, 10, 0, 0))
     end
 
-    it "should respond with error if no commits found" do
+    it "should return nil if no commits found" do
       mock_walker = double('walker')
       allow(mock_walker).to receive(:push)
       allow(mock_walker).to receive(:each)
@@ -173,8 +174,8 @@ describe RepoChecksWorker do
       allow(Rugged::Repository).to receive(:new).and_return(repo)
       allow(Rugged::Walker).to receive(:new).and_return(mock_walker)
 
-      expect(@worker).to receive(:respond).with("Could not determine first commit date")
-      @worker.detect_first_commit_date
+      result = @worker.detect_first_commit_date
+      expect(result).to be_nil
     end
   end
 
@@ -196,8 +197,10 @@ describe RepoChecksWorker do
 
       setup_repo_dump_mocks(commits)
 
-      expect(@worker).to receive(:respond).with(/Healthy distribution/)
-      @worker.detect_repo_dump
+      result = @worker.detect_repo_dump
+      expect(result[:signal][:level]).to eq(:healthy)
+      expect(result[:commit_count]).to eq(6)
+      expect(result[:total_additions]).to eq(300)
     end
 
     it "should detect moderate repo dump signal (25-49%)" do
@@ -212,8 +215,8 @@ describe RepoChecksWorker do
 
       setup_repo_dump_mocks(commits)
 
-      expect(@worker).to receive(:respond).with(/Moderate repo dump signal/)
-      @worker.detect_repo_dump
+      result = @worker.detect_repo_dump
+      expect(result[:signal][:level]).to eq(:moderate)
     end
 
     it "should detect strong repo dump signal (50-74%)" do
@@ -227,8 +230,8 @@ describe RepoChecksWorker do
 
       setup_repo_dump_mocks(commits)
 
-      expect(@worker).to receive(:respond).with(/Strong repo dump signal/)
-      @worker.detect_repo_dump
+      result = @worker.detect_repo_dump
+      expect(result[:signal][:level]).to eq(:strong)
     end
 
     it "should detect critical repo dump signal (75%+)" do
@@ -242,15 +245,15 @@ describe RepoChecksWorker do
 
       setup_repo_dump_mocks(commits)
 
-      expect(@worker).to receive(:respond).with(/Critical repo dump signal/)
-      @worker.detect_repo_dump
+      result = @worker.detect_repo_dump
+      expect(result[:signal][:level]).to eq(:critical)
     end
 
     it "should handle repositories with no commit data" do
       setup_repo_dump_mocks([])
 
-      expect(@worker).to receive(:respond).with("No commit data available for repo dump analysis")
-      @worker.detect_repo_dump
+      result = @worker.detect_repo_dump
+      expect(result).to be_nil
     end
 
     def create_mock_commit(time, additions, sha)

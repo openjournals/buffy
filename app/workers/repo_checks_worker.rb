@@ -17,19 +17,33 @@ class RepoChecksWorker < BuffyWorker
       perform_checks = checks & AVAILABLE_CHECKS
     end
 
-    repo_summary if perform_checks.include?("repo summary")
+    # Combine checks that always produce output into a single report
+    report_sections = []
+    report_sections << "## Repository Analysis Report\n"
+
+    if perform_checks.include?("repo summary")
+      summary = repo_summary
+      report_sections << "### Software Summary\n#{summary}" if summary
+    end
+
+    if perform_checks.include?("first commit date") || perform_checks.include?("repo dump check")
+      history_section = build_repository_history_section(perform_checks)
+      report_sections << history_section if history_section
+    end
+
+    respond(report_sections.join("\n")) unless report_sections.size <= 1
+
+    # Run checks that only conditionally respond (warnings/specific info)
     detect_languages if perform_checks.include?("languages")
     count_words if perform_checks.include?("wordcount")
     detect_license if perform_checks.include?("license")
     detect_statement_of_need if perform_checks.include?("statement of need")
-    detect_first_commit_date if perform_checks.include?("first commit date")
-    detect_repo_dump if perform_checks.include?("repo dump check")
 
     cleanup
   end
 
   def repo_summary
-    message = "```\nSoftware report:\n"
+    message = "```\n"
 
     cloc_result = run_cloc(path)
 
@@ -40,8 +54,7 @@ class RepoChecksWorker < BuffyWorker
     end
 
     message << "\n```"
-
-    respond(message)
+    message
   end
 
   def detect_languages
@@ -82,10 +95,12 @@ class RepoChecksWorker < BuffyWorker
     end
 
     if first_commit
-      commit_date = first_commit.time.strftime("%B %d, %Y")
-      respond("First public commit was made on #{commit_date}")
+      {
+        date: first_commit.time.strftime("%B %d, %Y"),
+        timestamp: first_commit.time
+      }
     else
-      respond("Could not determine first commit date")
+      nil
     end
   end
 
@@ -117,7 +132,7 @@ class RepoChecksWorker < BuffyWorker
       total_additions += additions
     end
 
-    return respond("No commit data available for repo dump analysis") if commits_data.empty? || total_additions == 0
+    return nil if commits_data.empty? || total_additions == 0
 
     # Sort commits chronologically
     commits_data.sort_by! { |c| c[:time] }
@@ -142,24 +157,53 @@ class RepoChecksWorker < BuffyWorker
       end
     end
 
-    # Build response with tiered warnings based on percentage thresholds
-    message = "**Commit & LOC Distribution:**\n"
-    message << "- Total commits analyzed: #{commits_data.size}\n"
-    message << "- Total lines added: #{total_additions}\n"
-    message << "- Maximum in 48-hour window: #{max_window_additions} lines (#{max_window_percentage}%)\n"
-
-    # Tiered warning system for repo dump signals
-    if max_window_percentage >= 75
-      message << "- 🚨 **Critical repo dump signal:** ≥75% of code added in 48-hour window"
+    # Determine signal level
+    signal = if max_window_percentage >= 75
+      { level: :critical, icon: "🚨", text: "Critical repo dump signal: ≥75% of code added in 48-hour window" }
     elsif max_window_percentage >= 50
-      message << "- ⚠️ **Strong repo dump signal:** ≥50% of code added in 48-hour window"
+      { level: :strong, icon: "⚠️", text: "Strong repo dump signal: ≥50% of code added in 48-hour window" }
     elsif max_window_percentage >= 25
-      message << "- ⚡ **Moderate repo dump signal:** ≥25% of code added in 48-hour window"
+      { level: :moderate, icon: "⚡", text: "Moderate repo dump signal: ≥25% of code added in 48-hour window" }
     else
-      message << "- ✓ Healthy distribution: <25% of code added in any 48-hour window"
+      { level: :healthy, icon: "✓", text: "Healthy distribution: <25% of code added in any 48-hour window" }
     end
 
-    respond(message)
+    {
+      commit_count: commits_data.size,
+      total_additions: total_additions,
+      max_window_additions: max_window_additions,
+      max_window_percentage: max_window_percentage,
+      signal: signal
+    }
+  end
+
+  def build_repository_history_section(perform_checks)
+    section = "### Repository History\n"
+    items = []
+
+    # First commit date
+    if perform_checks.include?("first commit date")
+      commit_info = detect_first_commit_date
+      if commit_info
+        items << "- **First commit:** #{commit_info[:date]}"
+      end
+    end
+
+    # Repo dump analysis
+    if perform_checks.include?("repo dump check")
+      dump_info = detect_repo_dump
+      if dump_info
+        items << "- **Total commits:** #{dump_info[:commit_count]}"
+        items << "- **Total lines added:** #{dump_info[:total_additions]}"
+        items << ""
+        items << "### Code Distribution Analysis"
+        items << "- Maximum in 48-hour window: #{dump_info[:max_window_additions]} lines (#{dump_info[:max_window_percentage]}%)"
+        items << "- #{dump_info[:signal][:icon]} **#{dump_info[:signal][:text]}**"
+      end
+    end
+
+    return nil if items.empty?
+    section + items.join("\n")
   end
 
   def paper_file
