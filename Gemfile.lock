@@ -1,8 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
+    addressable (2.8.8)
+      public_suffix (>= 2.0.2, < 8.0)
     base64 (0.3.0)
     bibtex-ruby (6.2.0)
       latex-decode (~> 0.0)
@@ -12,12 +12,12 @@ GEM
     cgi (0.5.0)
     charlock_holmes (0.7.9)
     chronic (0.10.2)
-    connection_pool (2.5.4)
+    connection_pool (3.0.1)
     crack (1.0.1)
       bigdecimal
       rexml
     diff-lcs (1.6.2)
-    dotenv (3.1.8)
+    dotenv (3.2.0)
     faraday (2.14.0)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -37,7 +37,7 @@ GEM
     issue (1.0.2)
       openssl (~> 3.2)
       rack (~> 3.1)
-    json (2.16.0)
+    json (2.17.1)
     latex-decode (0.4.0)
     licensee (9.18.0)
       dotenv (>= 2, < 4)
@@ -48,7 +48,7 @@ GEM
     logger (1.7.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    multi_json (1.17.0)
+    multi_json (1.18.0)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
     net-http (0.8.0)
@@ -61,7 +61,7 @@ GEM
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
     openssl (3.3.2)
-    public_suffix (6.0.2)
+    public_suffix (7.0.0)
     puma (7.1.0)
       nio4r (~> 2.0)
     racc (1.8.1)
@@ -75,7 +75,7 @@ GEM
       rack (>= 3.0.0)
     rack-test (2.2.0)
       rack (>= 1.3)
-    redis-client (0.26.1)
+    redis-client (0.26.2)
       connection_pool
     reverse_markdown (3.0.0)
       nokogiri
@@ -104,7 +104,7 @@ GEM
       multi_json (~> 1.15)
       rexml (~> 3.2, >= 3.2.5)
       thor (~> 1.2, >= 1.2.1)
-    sidekiq (8.0.9)
+    sidekiq (8.0.10)
       connection_pool (>= 2.5.0)
       json (>= 2.9.0)
       logger (>= 1.6.2)
