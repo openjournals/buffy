@@ -29,8 +29,8 @@ buffy:
           if:
             value_matches:
               submission-type: "Standard|Estándar|Stats"
-          # message: "Thanks for submitting to rOpenSci, our editors and @ropensci-review-bot will reply soon. Type `@ropensci-review-bot help` for help."
-          message: "⭐️ Thanks for submitting to rOpenSci.  We are taking a break for the holidays. Activities are currently paused until Jan 6th 2026. Please alert us here on or after that date to proceed with your submission. ⭐️"
+          message: "Thanks for submitting to rOpenSci, our editors and @ropensci-review-bot will reply soon. Type `@ropensci-review-bot help` for help."
+          # message: "⭐️ Thanks for submitting to rOpenSci.  We are taking a break for the holidays. Activities are currently paused until Jan 6th 2026. Please alert us here on or after that date to proceed with your submission. ⭐️"
           external_service:
             name: editorcheck
             url: http://138.68.123.59:8000/editorcheck
