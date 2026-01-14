@@ -5,7 +5,7 @@ module Ropensci
 
     def define_listening
       @event_action = "issue_comment.created"
-      @event_regex = /\A@#{bot_name} (finalize|finalise) transfer of ([\/\w-]+)?\.?\s*\z/i
+      @event_regex = /\A@#{bot_name} (finalize|finalise) transfer of (\w+[\w\.-]*\w+)?\.?\s*\z/i
     end
 
     def process_message(message)
