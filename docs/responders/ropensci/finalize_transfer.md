@@ -1,7 +1,7 @@
 ROpenSci :: Finalize transfer
 =============================
 
-This responder is used to assing a recent approved and transfered package to a rOpenSci team. It needs owner rights to work.
+This responder is used to assign a recently approved and transferred package to an rOpenSci team. It needs owner rights to work.
 It performs a series of tasks:
 
 - Checks for the presence of the package-name repo in the rOpenSci GitHub organization
