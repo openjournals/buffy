@@ -9,7 +9,6 @@ describe Openjournals::WhedonResponder do
   before do
     settings = { env: {bot_github_user: "newbot"} }
     @responder = subject.new(settings, {})
-
   end
 
   describe "listening" do

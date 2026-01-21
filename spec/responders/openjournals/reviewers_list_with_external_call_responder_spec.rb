@@ -1,6 +1,5 @@
 require_relative "../../spec_helper.rb"
 
-
 describe Openjournals::ReviewersListWithExternalCallResponder do
 
   subject do
