@@ -24,7 +24,7 @@ Responders allowing labeling will accept in their settings two keys:
         - pending-review
 ...
 ```
-If the example responder is successfull the `review-finished` and `recommend publication` labels will be added and the `pending-review` label will be removed from the issue.
+If the example responder is successful the `review-finished` and `recommend publication` labels will be added and the `pending-review` label will be removed from the issue.
 
 ## Responders listening to Add/Remove actions
 
