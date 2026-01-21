@@ -61,6 +61,7 @@ GEM
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
     openssl (3.3.2)
+    ostruct (0.6.3)
     public_suffix (7.0.2)
     puma (7.2.0)
       nio4r (~> 2.0)
@@ -144,6 +145,7 @@ DEPENDENCIES
   licensee
   octokit
   openssl
+  ostruct
   puma
   rack-test
   rexml
@@ -155,4 +157,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   2.5.14
+  4.0.4
