@@ -16,7 +16,7 @@ describe "Utilities" do
   end
 
   describe "#clone_repo" do
-    it "should return true when succesfully cloned a repo to a local path" do
+    it "should return true when successfully cloned a repo to a local path" do
       expect(Open3).to receive(:capture3).
                        with("git clone http:/repository-url.com ./local/folder").
                        and_return(["OK", "", OpenStruct.new(success?: true)])

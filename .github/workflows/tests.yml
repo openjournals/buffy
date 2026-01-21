@@ -7,13 +7,13 @@ jobs:
     continue-on-error: ${{ matrix.failure-allowed }}
     strategy:
       matrix:
-        ruby-version: ['3.2.7', '3.3.7', '3.4.2']
+        ruby-version: ['3.2', '3.3', '3.4']
         failure-allowed: [false]
         include:
-        - ruby-version: 'truffleruby'
+        - ruby-version: '4.0'
           failure-allowed: true
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:

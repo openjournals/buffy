@@ -172,8 +172,8 @@ The _env_ section is used to declare general key/value settings. For security re
   <dd>This setting is used to impose conditions on the responder. It can include several options:
 
 ```eval_rst
-:title: *<String>* or *<Regular Expresion>* Responder will run only if issue' title matches this.
-:body: *<String>* or *<Regular Expresion>* Responder will run only if the body of the issue matches this.
+:title: *<String>* or *<Regular Expression>* Responder will run only if issue' title matches this.
+:body: *<String>* or *<Regular Expression>* Responder will run only if the body of the issue matches this.
 :value_exists: *<String>* Responder will run only if there is a not empty value for this in the issue (marked with HTML comments).
 :value_matches: *<Hash>* Responder will run only if the param values (marked with HTML comments) in the body of the issue matches the ones specified here.
 :role_assigned: *<String>* Responder will be run only if there is a username assigned for the specified value.
