@@ -52,11 +52,10 @@ buffy:
       only: editors
       authorized_roles_in_issue:
         - reviewers-list
-    reviewer_checklist_comment:
+    openjournals_reviewer_checklists:
       if:
         title: "^\\[REVIEW\\]:"
         reject_msg: Checklists can only be created once the review has started in the review issue
-      template_file: reviewer_checklist.md
       data_from_issue:
         - target-repository
         - author-handle

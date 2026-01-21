@@ -1,0 +1,69 @@
+require_relative '../../lib/responder'
+
+module Openjournals
+  class ReviewerChecklistsResponder < Responder
+
+    keyname :openjournals_reviewer_checklists
+
+    def define_listening
+      @event_action = "issue_comment.created"
+      @event_regex = /\A@#{bot_name} #{command}\.?\s*$/i
+    end
+
+    def process_message(message)
+      if sender_in_reviewers_list?
+        checklist = render_external_template(template_filename, locals)
+        update_comment(context.comment_id, checklist)
+        update_checklists_links
+      else
+        respond("@#{context.sender} I can't do that because you are not a reviewer")
+      end
+    end
+
+    def template_filename
+      context.issue_labels.map{|il| il["name"]}.include?("pre-2026-submission") ? "reviewer_checklist_pre2026.md" : "reviewer_checklist.md"
+    end
+
+    def sender_in_reviewers_list?
+      reviewers.include?("@#{context.sender.downcase}")
+    end
+
+    def update_checklists_links
+      if issue_body_has?("checklist-comments")
+        mapping = checklists_mapping.merge({"#{context.sender}" => "📝 [Checklist for @#{context.sender}](#{comment_url})"})
+
+        checklists = mapping.keys.map do |k|
+          "<!--checklist-for-#{k}-->\n#{mapping[k]}\n<!--end-checklist-for-#{k}-->"
+        end
+
+        update_value("checklist-comments", "\n"+checklists.join("\n")+"\n")
+      end
+    end
+
+    def reviewers
+      @reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip).map(&:downcase)
+    end
+
+    def checklists_mapping
+      mapping = {}
+      reviewers.each do |rev|
+        rev_login = rev.gsub("@", "")
+        checklink_link = read_value_from_body("checklist-for-#{rev_login}")
+        mapping[rev_login] = checklink_link unless checklink_link.empty?
+      end
+      mapping
+    end
+
+    def command
+      params[:command] || "generate my checklist"
+    end
+
+    def default_description
+      "Adds a checklist for the reviewer using this command"
+    end
+
+    def default_example_invocation
+      "@#{bot_name} #{command}"
+    end
+  end
+end
