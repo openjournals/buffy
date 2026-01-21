@@ -63,6 +63,7 @@ GEM
     ojra (1.1.1)
       faraday (~> 2.9)
     openssl (3.3.2)
+    ostruct (0.6.3)
     public_suffix (7.0.2)
     puma (7.2.0)
       nio4r (~> 2.0)
@@ -147,6 +148,7 @@ DEPENDENCIES
   octokit
   ojra
   openssl
+  ostruct
   puma
   rack-test
   rexml
@@ -161,4 +163,4 @@ RUBY VERSION
    ruby 3.3.3p89
 
 BUNDLED WITH
-   2.5.14
+  4.0.4

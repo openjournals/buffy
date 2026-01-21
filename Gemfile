@@ -19,6 +19,7 @@ gem 'github-linguist'
 gem 'licensee'
 gem 'issue'
 gem 'chronic'
+gem 'ostruct'
 
 group :test do
   gem 'rack-test'
