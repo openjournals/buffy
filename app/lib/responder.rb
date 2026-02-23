@@ -209,11 +209,14 @@ class Responder
     command_regex_data
   end
 
-  # Create background workers to perform external calls
+  # Create background workers to perform external services
   def process_external_service(service_config, service_data)
-    unless service_config.nil? || service_config.empty?
-      service_locals = get_data_from_issue(service_config[:data_from_issue]).merge(service_data)
-      ExternalServiceWorker.perform_async(serializable(service_config), serializable(service_locals))
+    return if service_config.nil? || service_config.empty?
+
+    services = service_config.is_a?(Array) ? service_config : [service_config]
+    services.each do |config|
+      service_locals = get_data_from_issue(config[:data_from_issue]).merge(service_data)
+      ExternalServiceWorker.perform_async(serializable(config), serializable(service_locals))
     end
   end
 

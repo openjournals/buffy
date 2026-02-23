@@ -655,6 +655,27 @@ describe Responder do
       expect(ExternalServiceWorker).to receive(:perform_async).with(expected_params.transform_keys(&:to_s), expected_locals.transform_keys(&:to_s))
       @responder.process_external_service(expected_params, expected_locals)
     end
+
+    it "should add multiple ExternalServiceWorkers for array of services" do
+      services = [
+        { name: "service1", url: "http://example1.com" },
+        { name: "service2", url: "http://example2.com" }
+      ]
+      expect { @responder.process_external_service(services, {}) }.to change(ExternalServiceWorker.jobs, :size).by(2)
+    end
+
+    it "should pass right info to workers for each service in array" do
+      services = [
+        { name: "service1", url: "http://example1.com" },
+        { name: "service2", url: "http://example2.com" }
+      ]
+      expected_locals = { bot_name: "botsci", issue_author: "opener", issue_id: 33, repo: "openjournals/testing", sender: "xuanxu" }
+
+      expect(ExternalServiceWorker).to receive(:perform_async).with({ "name" => "service1", "url" => "http://example1.com" }, expected_locals.transform_keys(&:to_s))
+      expect(ExternalServiceWorker).to receive(:perform_async).with({ "name" => "service2", "url" => "http://example2.com" }, expected_locals.transform_keys(&:to_s))
+
+      @responder.process_external_service(services, expected_locals)
+    end
   end
 
   describe "#process_other_responder" do
