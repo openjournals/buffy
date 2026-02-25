@@ -237,6 +237,38 @@ describe WelcomeResponder do
     end
   end
 
+  describe "#process_message with external service array" do
+    before do
+      settings = { env: {bot_github_user: "botsci"} }
+      services = [
+        { name: "service1", url: "http://example1.com", data_from_issue: ["extra-data"] },
+        { name: "service2", url: "http://example2.com" }
+      ]
+      @responder = subject.new(settings, {external_service: services})
+      @responder.context = OpenStruct.new(issue_id: 33,
+                                          issue_author: "opener",
+                                          issue_title: "Test paper",
+                                          repo: "openjournals/testing",
+                                          sender: "xuanxu",
+                                          issue_body: "Test Review\n\n<!--extra-data-->ABC123<!--end-extra-data-->")
+      disable_github_calls_for(@responder)
+    end
+
+    it "should add multiple ExternalServiceWorkers for array of services" do
+      expect { @responder.process_message("") }.to change(ExternalServiceWorker.jobs, :size).by(2)
+    end
+
+    it "should pass right info to workers for each service in array" do
+      expected_locals_1 = { "extra-data" => "ABC123", "bot_name" => "botsci", "issue_author" => "opener", "issue_title" => "Test paper", "issue_id" => 33, "repo" => "openjournals/testing", "sender" => "xuanxu" }
+      expected_locals_2 = { "bot_name" => "botsci", "issue_author" => "opener", "issue_title" => "Test paper", "issue_id" => 33, "repo" => "openjournals/testing", "sender" => "xuanxu" }
+
+      expect(ExternalServiceWorker).to receive(:perform_async).with({ "name" => "service1", "url" => "http://example1.com", "data_from_issue" => ["extra-data"] }, expected_locals_1)
+      expect(ExternalServiceWorker).to receive(:perform_async).with({ "name" => "service2", "url" => "http://example2.com" }, expected_locals_2)
+
+      @responder.process_message("")
+    end
+  end
+
   describe "misconfiguration" do
     it "should raise error if there is no name for the service" do
       @responder = subject.new({env: {bot_github_user: "botsci"}}, {external_service: { url: "URL" }})
