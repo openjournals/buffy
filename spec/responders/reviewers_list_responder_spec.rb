@@ -15,6 +15,7 @@ describe ReviewersListResponder do
 
     it "should define regex" do
       expect(@responder.event_regex).to match("@botsci add @arfon to reviewers")
+      expect(@responder.event_regex).to match("@botsci add @Arfon to reviewers")
       expect(@responder.event_regex).to match("@botsci add   @arfon to reviewers")
       expect(@responder.event_regex).to match("@botsci add @arfon  to reviewers")
       expect(@responder.event_regex).to match("@botsci add   @arfon    to reviewers")
