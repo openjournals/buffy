@@ -11,7 +11,7 @@ class ReviewersListResponder < Responder
 
   def process_message(message)
     add_or_remove = @match_data[1].downcase
-    new_reviewer = @match_data[2].strip
+    new_reviewer = @match_data[2].strip.downcase
     to_or_from = @match_data[3].downcase
 
     if !issue_body_has?("reviewers-list")
@@ -65,7 +65,8 @@ class ReviewersListResponder < Responder
   end
 
   def list_of_reviewers
-    @list_of_reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip) - no_reviewers_texts
+    # GitHub usernames are case insensitive, so return lower case
+    @list_of_reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip).map(&:downcase) - no_reviewers_texts
   end
 
   def no_reviewers_text
