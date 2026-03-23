@@ -13,6 +13,7 @@ class CheckReferencesResponder < Responder
     if target_repo_value.empty?
       respond("I couldn't find the URL for the target repository")
     else
+      react_to_comment
       DOIWorker.perform_async(serializable(locals), target_repo_value, branch_name_value)
     end
   end

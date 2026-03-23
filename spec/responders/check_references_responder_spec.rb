@@ -33,6 +33,17 @@ describe CheckReferencesResponder do
       @responder.process_message("@botsci check references")
     end
 
+    it "should not react to the comment if no url" do
+      expect(@responder).to_not receive(:react_to_comment)
+      @responder.process_message("@botsci check references")
+    end
+
+    it "should react to the comment when dispatching worker" do
+      @responder.context.issue_body += "<!--target-repository-->PAPERURL<!--end-target-repository-->"
+      expect(@responder).to receive(:react_to_comment)
+      @responder.process_message("@botsci check references")
+    end
+
     it "should call DOIWorker" do
       @responder.context.issue_body +=  "<!--target-repository-->PAPERURL<!--end-target-repository-->"
       expected_url = "PAPERURL"

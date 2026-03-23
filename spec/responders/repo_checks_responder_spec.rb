@@ -36,6 +36,17 @@ describe RepoChecksResponder do
       @responder.process_message("@botsci check repository")
     end
 
+    it "should not react to the comment if no url" do
+      @responder.params[:url_field] = "url"
+      expect(@responder).to_not receive(:react_to_comment)
+      @responder.process_message("@botsci check repository")
+    end
+
+    it "should react to the comment when dispatching worker" do
+      expect(@responder).to receive(:react_to_comment)
+      @responder.process_message("@botsci check repository")
+    end
+
     it "should call RepoChecksWorker" do
       expected_url = "http://repo.url"
       expected_branch = ""

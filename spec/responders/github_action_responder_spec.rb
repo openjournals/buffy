@@ -78,6 +78,17 @@ describe GithubActionResponder do
       @responder.process_message("")
     end
 
+    it "should react to the comment when workflow is triggered" do
+      expect(@responder).to receive(:react_to_comment)
+      @responder.process_message("")
+    end
+
+    it "should not react to the comment if workflow fails" do
+      allow(@responder).to receive(:trigger_workflow).and_return(false)
+      expect(@responder).to_not receive(:react_to_comment)
+      @responder.process_message("")
+    end
+
     it "should run workflow with custom inputs and params" do
       @responder.params = @responder.params.merge({ workflow_ref: "v1.2.3",
                                                     data_from_issue: ["abc", "p"],
