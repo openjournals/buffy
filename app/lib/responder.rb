@@ -89,6 +89,7 @@ class Responder
     return true if params[:if].nil? || params[:if].empty?
     title_condition = params[:if][:title].nil? ? "" : params[:if][:title]
     body_condition = params[:if][:body].nil? ? "" : params[:if][:body]
+    sender_condition = params[:if][:sender].nil? ? "" : params[:if][:sender]
     value_condition = params[:if][:value_exists].nil? ? "" : params[:if][:value_exists]
     role_assigned_condition = params[:if][:role_assigned].nil? ? "" : params[:if][:role_assigned]
     value_matches_condition = params[:if][:value_matches].nil? ? {} : params[:if][:value_matches]
@@ -101,6 +102,11 @@ class Responder
     end
 
     unless body_condition.empty? || Regexp.new(body_condition).match?(@context.issue_body)
+      respond(rejection_response) unless rejection_response.empty?
+      return false
+    end
+
+    unless sender_condition.empty? || Regexp.new(sender_condition).match?(@context.sender)
       respond(rejection_response) unless rejection_response.empty?
       return false
     end
