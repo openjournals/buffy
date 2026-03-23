@@ -40,7 +40,7 @@ describe CheckReferencesResponder do
 
     it "should react to the comment when dispatching worker" do
       @responder.context.issue_body += "<!--target-repository-->PAPERURL<!--end-target-repository-->"
-      expect(@responder).to receive(:react_to_comment)
+      expect(@responder).to receive(:react_to_comment).with("eyes")
       @responder.process_message("@botsci check references")
     end
 

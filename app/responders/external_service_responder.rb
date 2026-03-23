@@ -13,7 +13,6 @@ class ExternalServiceResponder < Responder
 
   def process_message(message)
     respond(params[:message]) if params[:message]
-    react_to_comment
     ExternalServiceWorker.perform_async(serializable(params), serializable(locals))
   end
 
