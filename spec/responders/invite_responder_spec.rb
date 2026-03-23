@@ -18,6 +18,8 @@ describe InviteResponder do
       expect(@responder.event_regex).to match("@botsci invite @arfon.")
       expect(@responder.event_regex).to match("@botsci invite @xuanxu  ")
       expect(@responder.event_regex).to match("@botsci invite @xuanxu  \r\n more")
+      expect(@responder.event_regex).to match("@botsci invite @arfon, @xuanxu")
+      expect(@responder.event_regex).to match("@botsci invite @arfon, @xuanxu, @other")
       expect(@responder.event_regex).to_not match("@botsci invite @arfon as whatever")
       expect(@responder.event_regex).to_not match("invite @buffy")
       expect(@responder.event_regex).to_not match("@botsci invite ")
@@ -38,6 +40,22 @@ describe InviteResponder do
       expect(@responder).to receive(:respond).once.with(expected_response)
 
       msg = "@botsci invite @willow_r"
+      @responder.match_data = @responder.event_regex.match(msg)
+      @responder.process_message(msg)
+    end
+
+    it "should invite multiple users" do
+      expect(@responder).to receive(:respond).twice
+      msg = "@botsci invite @willow_r, @buffy_bot"
+      @responder.match_data = @responder.event_regex.match(msg)
+      @responder.process_message(msg)
+    end
+
+    it "should deduplicate multiple users" do
+      expected_response = "OK, invitation sent!\n\n@willow_r please accept the invite here: ../invitations"
+      expect(@responder).to receive(:respond).once.with(expected_response)
+
+      msg = "@botsci invite @willow_r, @willow_r"
       @responder.match_data = @responder.event_regex.match(msg)
       @responder.process_message(msg)
     end

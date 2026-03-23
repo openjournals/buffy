@@ -165,6 +165,34 @@ describe RemindersResponder do
 
       @responder.process_message(msg)
     end
+
+    it "should set reminders for multiple users" do
+      msg = "@botsci remind @reviewer33, @reviewer42 in 2 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(ReviewReminderWorker).to receive(:perform_at).twice
+      expect(@responder).to receive(:respond).with("Reminder set for @reviewer33, @reviewer42 in 2 weeks")
+
+      @responder.process_message(msg)
+    end
+
+    it "should respond error if any user in a multiple reminder is invalid" do
+      msg = "@botsci remind @reviewer33, @wrongperson in 2 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(ReviewReminderWorker).to_not receive(:perform_at)
+      expect(@responder).to receive(:respond).with("@wrongperson doesn't seem to be a reviewer or author for this submission.")
+
+      @responder.process_message(msg)
+    end
+
+    it "should not allow reviewer to set reminders for multiple including others" do
+      @responder.context.sender = "reviewer33"
+      msg = "@botsci remind @reviewer33, @reviewer42 in 2 weeks"
+      @responder.match_data = @responder.event_regex.match(msg)
+      expect(ReviewReminderWorker).to_not receive(:perform_at)
+      expect(@responder).to receive(:respond).with("Reviewers can only set reminders to themselves.")
+
+      @responder.process_message(msg)
+    end
   end
 
   describe "configurable targets" do
