@@ -43,7 +43,7 @@ describe RepoChecksResponder do
     end
 
     it "should react to the comment when dispatching worker" do
-      expect(@responder).to receive(:react_to_comment)
+      expect(@responder).to receive(:react_to_comment).with("eyes")
       @responder.process_message("@botsci check repository")
     end
 

@@ -30,7 +30,7 @@ class GithubActionResponder < Responder
     parameters = {}.merge(inputs, mapped_parameters)
 
     if trigger_workflow(workflow_repo, workflow_name, parameters, ref)
-      react_to_comment
+      react_to_comment("eyes")
       respond(params[:message]) if params[:message]
       process_labeling
     end

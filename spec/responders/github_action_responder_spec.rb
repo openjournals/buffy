@@ -79,7 +79,7 @@ describe GithubActionResponder do
     end
 
     it "should react to the comment when workflow is triggered" do
-      expect(@responder).to receive(:react_to_comment)
+      expect(@responder).to receive(:react_to_comment).with("eyes")
       @responder.process_message("")
     end
 

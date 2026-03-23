@@ -53,8 +53,8 @@ describe ExternalServiceResponder do
       expect { @responder.process_message("") }.to change(ExternalServiceWorker.jobs, :size).by(1)
     end
 
-    it "should react to the comment" do
-      expect(@responder).to receive(:react_to_comment)
+    it "should not react to the comment" do
+      expect(@responder).to_not receive(:react_to_comment)
       @responder.process_message("")
     end
 
