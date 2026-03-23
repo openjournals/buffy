@@ -53,6 +53,11 @@ describe ExternalServiceResponder do
       expect { @responder.process_message("") }.to change(ExternalServiceWorker.jobs, :size).by(1)
     end
 
+    it "should react to the comment" do
+      expect(@responder).to receive(:react_to_comment)
+      @responder.process_message("")
+    end
+
     it "should pass right info to the worker" do
       expected_params = { "name" => "test-service", "command" => "run tests", "url" => "http://testing.openjournals.org", "extra" => {"restrict_access" => true}  }
       expected_locals = { "bot_name" => "botsci", "issue_author" => "opener", "issue_title" => "Test title","issue_id" => 33, "repo" => "openjournals/testing", "sender" => "xuanxu"}
