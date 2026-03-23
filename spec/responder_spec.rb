@@ -130,7 +130,8 @@ describe Responder do
                                                       "<!--editor-->@editor<!--end-editor-->\n" +
                                                       "<!--editor-2-->L.B.<!--end-editor-2-->\n" +
                                                       "<!--author--><!--end-author-->\n"+
-                                                      "<!--submission_type-->astro<!--end-submission_type-->\n")
+                                                      "<!--submission_type-->astro<!--end-submission_type-->\n",
+                                          sender: "editorialbot")
       disable_github_calls_for(@responder)
     end
 
@@ -155,6 +156,26 @@ describe Responder do
 
     it "should be false if body condition is not met" do
       @responder.params = { if: {body: "ABCDEFG"} }
+      expect(@responder.meet_conditions?).to be_falsy
+    end
+
+    it "should be true if sender condition is met" do
+      @responder.params = { if: {sender: "editorialbot"} }
+      expect(@responder.meet_conditions?).to be_truthy
+    end
+
+    it "should be false if sender condition is not met" do
+      @responder.params = { if: {sender: "editorialbot"} }
+      @responder.context.sender = "someoneelse"
+      expect(@responder.meet_conditions?).to be_falsy
+    end
+
+    it "should support negative lookahead in sender condition" do
+      @responder.params = { if: {sender: "^(?!editorialbot$)"} }
+      @responder.context.sender = "someoneelse"
+      expect(@responder.meet_conditions?).to be_truthy
+
+      @responder.context.sender = "editorialbot"
       expect(@responder.meet_conditions?).to be_falsy
     end
 

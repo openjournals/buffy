@@ -308,7 +308,7 @@ buffy:
                 responder_name: draft_paper
       - close_other_issues:
           if:
-            title: "^(?!\\[REVIEW\\]:|\\[PRE REVIEW\\]:)"
+            sender: "^(?!editorialbot$)"
           template_file: close.md
           close: true
     goodbye:
