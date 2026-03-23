@@ -18,6 +18,8 @@ describe Openjournals::SetArchiveResponder do
       expect(@responder.event_regex).to match("@botsci set 10.5281/zenodo.6861996 as archive.")
       expect(@responder.event_regex).to match("@botsci set 10.5281/zenodo.6861996 as archive   \r\n")
       expect(@responder.event_regex).to match("@botsci set 10.5281/zenodo.6861996 as archive   \r\n more")
+      expect(@responder.event_regex).to match("@botsci set 10.5281/zenodo.6861996 as doi")
+      expect(@responder.event_regex).to match("@botsci set 10.5281/zenodo.6861996 as doi.")
       expect(@responder.event_regex).to_not match("@botsci set 10.5281/zenodo.6861996 as editor")
       expect(@responder.event_regex).to_not match("@botsci set 10.5281/zenodo.6861996 as archive now")
     end
@@ -54,6 +56,30 @@ describe Openjournals::SetArchiveResponder do
     describe "with invalid DOI values" do
       it "should clean doi.org URLs" do
         @msg = "@botsci set https://doi.org/10.5281/zenodo.6861996 as archive"
+        @responder.match_data = @responder.event_regex.match(@msg)
+        expect(Faraday).to receive(:head).with("https://doi.org/10.5281/zenodo.6861996").and_return(double(status: 301))
+
+        expected_new_body = "...Archive: <!--archive-->10.5281/zenodo.6861996<!--end-archive--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        expect(@responder).to receive(:respond).with("Done! archive is now [10.5281/zenodo.6861996](https://doi.org/10.5281/zenodo.6861996)")
+
+        @responder.process_message(@msg)
+      end
+
+      it "should extract URL from markdown links" do
+        @msg = "@botsci set [doi.org/10.5281/zenodo.6861996](https://doi.org/10.5281/zenodo.6861996) as archive"
+        @responder.match_data = @responder.event_regex.match(@msg)
+        expect(Faraday).to receive(:head).with("https://doi.org/10.5281/zenodo.6861996").and_return(double(status: 301))
+
+        expected_new_body = "...Archive: <!--archive-->10.5281/zenodo.6861996<!--end-archive--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        expect(@responder).to receive(:respond).with("Done! archive is now [10.5281/zenodo.6861996](https://doi.org/10.5281/zenodo.6861996)")
+
+        @responder.process_message(@msg)
+      end
+
+      it "should work with 'as doi' alias" do
+        @msg = "@botsci set 10.5281/zenodo.6861996 as doi"
         @responder.match_data = @responder.event_regex.match(@msg)
         expect(Faraday).to receive(:head).with("https://doi.org/10.5281/zenodo.6861996").and_return(double(status: 301))
 
