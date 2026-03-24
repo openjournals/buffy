@@ -32,14 +32,23 @@ buffy:
           message: "Thanks for submitting to rOpenSci, our editors and @ropensci-review-bot will reply soon. Type `@ropensci-review-bot help` for help."
           # message: "⭐️ Thanks for submitting to rOpenSci.  We are taking a break for the holidays. Activities are currently paused until Jan 5th 2026. Please alert us here on or after that date to proceed with your submission. ⭐️"
           external_service:
-            name: editorcheck
-            url: http://138.68.123.59:8000/editorcheck
-            method: get
-            data_from_issue:
-              - repo
-              - repourl
-              - issue_id
-            template_file: goodpractice.md
+            - pkgmatch:
+              name: pkgmatch
+              url: http://138.68.123.59:8000/pkgmatch
+              method: get
+              data_from_issue:
+                - repo
+                - repourl
+                - issue_id
+            - editorcheck:
+              name: editorcheck
+              url: http://138.68.123.59:8000/editorcheck
+              method: get
+              data_from_issue:
+                - repo
+                - repourl
+                - issue_id
+              template_file: goodpractice.md
       - pre_submission:
           if:
             value_matches:
