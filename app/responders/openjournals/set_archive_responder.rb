@@ -9,11 +9,12 @@ module Openjournals
 
     def define_listening
       @event_action = "issue_comment.created"
-      @event_regex = /\A@#{bot_name} set (.*) as archive\.?\s*$/i
+      @event_regex = /\A@#{bot_name} set (.*) as (?:archive|doi)\.?\s*$/i
     end
 
     def process_message(message)
       new_value = @match_data[1]
+      new_value = new_value.match(/\A\[.*?\]\((.*?)\)\z/)&.captures&.first || new_value
       new_value = new_value.gsub("https://doi.org/", "")
 
       ok_reply = "Done! archive is now [#{new_value}](https://doi.org/#{new_value})"
