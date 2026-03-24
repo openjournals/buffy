@@ -47,6 +47,14 @@ buffy:
           message: "Thanks for your pre-submission to rOpenSci, our editors will reply soon."
           add_labels:
             - "0/presubmission"
+          external_service:
+            name: pkgmatch
+            url: http://138.68.123.59:8000/pkgmatch
+            method: get
+            data_from_issue:
+              - repourl
+              - repo
+              - issue_id
       - pre_submission_stats:
           if:
             value_matches:
@@ -54,6 +62,14 @@ buffy:
             body: "\\[x\\]\\s(Bayesian|Dimensionality|Machine|Regression|Exploratory|Spatial|Time|Probability)"
           add_labels:
             - "stats"
+          external_service:
+            name: pkgmatch
+            url: http://138.68.123.59:8000/pkgmatch
+            method: get
+            data_from_issue:
+              - repourl
+              - repo
+              - issue_id
       - submission_stats:
           if:
             value_matches:
@@ -170,6 +186,19 @@ buffy:
             - repourl
             - issue_id
           template_file: goodpractice.md
+      - pkgmatch:
+          only:
+            - editors
+          command: similar packages
+          description: List similar packages from rOpenSci and CRAN
+          url: http://138.68.123.59:8000/pkgmatch
+          method: get
+          query_params:
+            secret: <%= ENV['PKGCHECK_TOKEN'] %>
+          data_from_issue:
+            - repo
+            - repourl
+            - issue_id
       - srrcheck:
           only:
             - editors
