@@ -1,7 +1,7 @@
 Reminders
 =========
 
-This responder allows to schedule a reminder for the author or a reviewer to return to a review after a certain period of time (supported units: days and weeks). The command will only work if the mentioned user is an author, a reviewer for the submission or the sender of the message (so editors can set reminders for themselves).
+This responder allows to schedule a reminder for the author or a reviewer to return to a review after a certain period of time (supported units: days and weeks). The command will only work if the mentioned user is an author, a reviewer for the submission or the sender of the message (so editors can set reminders for themselves). Multiple users can be reminded at once using a comma-separated list.
 
 
 ## Listens to
@@ -12,6 +12,9 @@ This responder allows to schedule a reminder for the author or a reviewer to ret
 ```
 @botname remind @reviewer in 10 days
 ```
+```
+@botname remind @reviewer1, @reviewer2 in 2 weeks
+```
 
 ## Settings key
 
@@ -20,7 +23,7 @@ This responder allows to schedule a reminder for the author or a reviewer to ret
 ## Params
 ```eval_rst
 :reviewers: *Optional.* The HTML-comment value name in the body of the issue to look for reviewers. Default value is **reviewers-list**.
-:auhors: *Optional.* The HTML-comment value name in the body of the issue to look for authors. Default value is **author-handle**.
+:authors: *Optional.* The HTML-comment value name in the body of the issue to look for authors. Default value is **author-handle**.
 
 ```
 

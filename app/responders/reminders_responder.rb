@@ -11,35 +11,47 @@ class RemindersResponder < Responder
   end
 
   def process_message(message)
-    human = @match_data[1].strip
+    humans = @match_data[1].strip.split(",").map(&:strip).uniq
     size = @match_data[2].strip
     unit = @match_data[3].strip
 
-    human = "@#{user_login(context.sender)}" if human == "me"
+    humans = humans.map { |h| h.downcase == "me" || user_login(h).downcase == user_login(context.sender).downcase ? "@#{user_login(context.sender)}" : h }
 
-    unless targets.include?(human.downcase)
-      respond("#{human} doesn't seem to be a reviewer or author for this submission.")
+    if reviewers_list.include?(sender_user) && !humans.all? { |h| h.downcase == sender_user }
+      respond("Reviewers can only set reminders to themselves.")
+      return false
+    end
+
+    if authors_list.include?(sender_user) && !humans.all? { |h| h.downcase == sender_user }
+      respond("Authors can only set reminders to themselves.")
+      return false
+    end
+
+    invalid = humans.reject { |h| targets.include?(h.downcase) }
+    if invalid.any?
+      respond("#{invalid.join(", ")} doesn't seem to be a reviewer or author for this submission.")
       return false
     end
 
     schedule_at = target_time(size, unit)
 
     if schedule_at
-      if user_login(human).downcase == user_login(context.sender).downcase
-        human = "@#{user_login(context.sender)}"
-        msg = ":wave: #{human}, please take a look at the state of the submission (this is an automated reminder)."
-        AsyncMessageWorker.perform_at(schedule_at, serializable(locals), msg)
-      else
-        ReviewReminderWorker.perform_at(schedule_at, serializable(locals), human, authors_list.include?(human.downcase))
+      humans.each do |human|
+        if human.downcase == sender_user
+          msg = ":wave: #{human}, please take a look at the state of the submission (this is an automated reminder)."
+          AsyncMessageWorker.perform_at(schedule_at, serializable(locals), msg)
+        else
+          ReviewReminderWorker.perform_at(schedule_at, serializable(locals), human, authors_list.include?(human.downcase))
+        end
       end
-      respond("Reminder set for #{human} in #{size} #{unit}")
+      respond("Reminder set for #{humans.join(", ")} in #{size} #{unit}")
     else
-      respond ("I don't recognize this description of time: '#{size}' '#{unit}'.")
+      respond("I don't recognize this description of time: '#{size}' '#{unit}'.")
     end
   end
 
   def targets
-    (authors_list + reviewers_list + ["@#{user_login(context.sender).downcase}"]).uniq
+    (authors_list + reviewers_list + [sender_user]).uniq
   end
 
   def reviewers_list
@@ -60,6 +72,10 @@ class RemindersResponder < Responder
   def authors_value
     @authors_value = params[:authors] || "author-handle"
     @authors_value = [@authors_value].flatten
+  end
+
+  def sender_user
+    "@#{user_login(context.sender).downcase}"
   end
 
   def target_time(size, unit)

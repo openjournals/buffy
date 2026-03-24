@@ -2,12 +2,15 @@ Invite
 ======
 
 This responder creates a repo invitation for a user to be added as collaborator so they have the needed permissions to edit comments.
-Use this responder to send an invitation to a user to collaborate in the review.
+Use this responder to send an invitation to a user to collaborate in the review. Multiple users can be invited at once using a comma-separated list.
 
 ## Listens to
 
 ```
 @botname invite @username
+```
+```
+@botname invite @username1, @username2
 ```
 ## Settings key
 

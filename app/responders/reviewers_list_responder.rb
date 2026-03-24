@@ -6,12 +6,12 @@ class ReviewersListResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    @event_regex = /\A@#{bot_name} (add|remove) +(\S+) +(to reviewers|from reviewers|as reviewer)\.?\s*$/i
+    @event_regex = /\A@#{bot_name} (add|remove|assign|unassign) +(\S+) +(to reviewers|from reviewers|as reviewer)\.?\s*$/i
   end
 
   def process_message(message)
     add_or_remove = @match_data[1].downcase
-    new_reviewer = @match_data[2].strip
+    new_reviewer = @match_data[2].strip.downcase
     to_or_from = @match_data[3].downcase
 
     if !issue_body_has?("reviewers-list")
@@ -28,9 +28,9 @@ class ReviewersListResponder < Responder
 
     add_to_or_remove_from = [add_or_remove, to_or_from].join(" ")
 
-    if ["add to reviewers", "add as reviewer"].include?(add_to_or_remove_from)
+    if ["add to reviewers", "add as reviewer", "assign as reviewer", "assign to reviewers"].include?(add_to_or_remove_from)
       add new_reviewer
-    elsif ["remove from reviewers", "remove as reviewer"].include?(add_to_or_remove_from)
+    elsif ["remove from reviewers", "remove as reviewer", "unassign as reviewer", "unassign from reviewers"].include?(add_to_or_remove_from)
       remove new_reviewer
     else
       respond("That command is confusing. Did you mean to ADD TO REVIEWERS or to REMOVE FROM REVIEWERS?")
@@ -65,7 +65,8 @@ class ReviewersListResponder < Responder
   end
 
   def list_of_reviewers
-    @list_of_reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip) - no_reviewers_texts
+    # GitHub usernames are case insensitive, so return lower case
+    @list_of_reviewers ||= read_value_from_body("reviewers-list").split(",").map(&:strip).map(&:downcase) - no_reviewers_texts
   end
 
   def no_reviewers_text
@@ -86,11 +87,15 @@ class ReviewersListResponder < Responder
 
   def default_description
     ["Add to this issue's reviewers list",
-     "Remove from this issue's reviewers list"]
+     "Assign to this issue's reviewer list",
+     "Remove from this issue's reviewers list",
+     "Unassign from this issue's reviewer list"]
   end
 
   def default_example_invocation
     ["@#{bot_name} add #{params[:sample_value] || '@username'} as reviewer",
-     "@#{bot_name} remove #{params[:sample_value] || '@username'} from reviewers"]
+     "@#{bot_name} assign #{params[:sample_value] || '@username'} as reviewer",
+     "@#{bot_name} remove #{params[:sample_value] || '@username'} from reviewers",
+     "@#{bot_name} unassign #{params[:sample_value] || '@username'} from reviewers"]
   end
 end
