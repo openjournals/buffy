@@ -40,6 +40,7 @@ buffy:
                   - repo
                   - repourl
                   - issue_id
+                silent: true
             - editorcheck:
                 name: editorcheck
                 url: http://138.68.123.59:8000/editorcheck
@@ -64,6 +65,7 @@ buffy:
               - repourl
               - repo
               - issue_id
+            silent: true
       - pre_submission_stats:
           if:
             value_matches:
@@ -79,6 +81,7 @@ buffy:
               - repourl
               - repo
               - issue_id
+            silent: true
       - submission_stats:
           if:
             value_matches:
@@ -208,6 +211,7 @@ buffy:
             - repo
             - repourl
             - issue_id
+          silent: true
       - srrcheck:
           only:
             - editors
