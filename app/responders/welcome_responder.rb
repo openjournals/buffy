@@ -33,6 +33,7 @@ class WelcomeResponder < Responder
         params[:run_responder].each do |other_responder|
           other_responder.each_pair do |other_responder_name, other_responder_params|
             process_other_responder(other_responder_params)
+            sleep(2)
           end
         end
       else
