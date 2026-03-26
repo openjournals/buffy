@@ -71,7 +71,7 @@ module GitHub
 
   # Add a reaction to the comment that triggered this responder
   def react_to_comment(reaction = "+1")
-    if context.comment_id.present?
+    if context.comment_id
       github_client.create_issue_comment_reaction(context.repo, context.comment_id, reaction)
     end
   end
