@@ -33,7 +33,6 @@ buffy:
           # message: "⭐️ Thanks for submitting to rOpenSci.  We are taking a break for the holidays. Activities are currently paused until Jan 5th 2026. Please alert us here on or after that date to proceed with your submission. ⭐️"
           external_service:
             - pkgmatch:
-                name: pkgmatch
                 url: http://138.68.123.59:8000/pkgmatch
                 method: get
                 data_from_issue:
@@ -42,7 +41,6 @@ buffy:
                   - issue_id
                 silent: true
             - editorcheck:
-                name: editorcheck
                 url: http://138.68.123.59:8000/editorcheck
                 method: get
                 data_from_issue:
