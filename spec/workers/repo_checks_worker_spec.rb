@@ -86,10 +86,19 @@ describe RepoChecksWorker do
 
     it "should respond message with wordcount" do
       allow(@worker).to receive(:paper_file).and_return(PaperFile.new("paper/paper.md"))
-      expected_wc_command = "cat paper/paper.md | wc -w"
-      allow(Open3).to receive(:capture3).with(expected_wc_command).and_return(["  263\n", "", ""])
+      allow(File).to receive(:read).with("paper/paper.md").and_return("one two three four five")
 
-      expect(@worker).to receive(:respond).with("Wordcount for `paper.md` is 263")
+      expect(@worker).to receive(:respond).with("Wordcount for `paper.md` is 5")
+      @worker.count_words
+    end
+
+    it "should not invoke a shell when counting words" do
+      malicious_path = "paper/$(touch /tmp/PWNED)/paper.md"
+      allow(@worker).to receive(:paper_file).and_return(PaperFile.new(malicious_path))
+      allow(File).to receive(:read).with(malicious_path).and_return("hello world")
+
+      expect(Open3).to_not receive(:capture3)
+      expect(@worker).to receive(:respond).with("Wordcount for `paper.md` is 2")
       @worker.count_words
     end
   end
