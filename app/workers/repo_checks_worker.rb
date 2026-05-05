@@ -53,7 +53,7 @@ class RepoChecksWorker < BuffyWorker
   def count_words
     return if paper_file.paper_path.nil?
 
-    word_count = Open3.capture3("cat #{paper_file.paper_path} | wc -w")[0].to_i
+    word_count = File.read(paper_file.paper_path).split.size
 
     respond("Wordcount for `#{File.basename(paper_file.paper_path)}` is #{word_count}")
   end
