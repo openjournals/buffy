@@ -54,6 +54,16 @@ describe PaperFile do
       expect(YAML).to receive(:load_file).with("./doc/paper.md").and_return({'bibliography' => 'references.bib'})
       expect(subject.bibtex_path).to eq("./doc/references.bib")
     end
+
+    it "should clamp the bibliography filename to its basename to prevent path traversal" do
+      expect(YAML).to receive(:load_file).with("./doc/paper.md").and_return({'bibliography' => '../../../../etc/hosts'})
+      expect(subject.bibtex_path).to eq("./doc/hosts")
+    end
+
+    it "should strip leading directories from the bibliography filename" do
+      expect(YAML).to receive(:load_file).with("./doc/paper.md").and_return({'bibliography' => 'subdir/refs.bib'})
+      expect(subject.bibtex_path).to eq("./doc/refs.bib")
+    end
   end
 
   describe "#bib" do
