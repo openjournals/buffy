@@ -92,14 +92,14 @@ The _env_ section is used to declare general key/value settings. For security re
 ```
  The optional teams node includes entries to reference GitHub teams, used later to grant access to responders only to users belonging to specific teams. The teams referred here must be __visible__ teams of the organization owner of the repositories where the reviews will take place. Multiple entries can be added to the teams node. All entries follow this simple format:
 
- <dl>
+<dl>
   <dt>key: value</dt>
   <dd>Where <em>key</em> is the name for this team in Buffy and <em>value</em> can be:
-    <dl>
-      <dd>- The integer <strong>id of the team</strong> in GitHub (preferred)</dd>
-      <dd>- The <strong>reference</strong> in format <em>organization/name</em> (for example: <em>openjournals/editors</em>)</dd>
-      <dd>- An array of user handles</dd>
-    </dl>
+    <ul>
+      <li>The integer <strong>id of the team</strong> in GitHub (preferred)</li>
+      <li>The <strong>reference</strong> in format <em>organization/name</em> (for example: <em>openjournals/editors</em>)</li>
+      <li>An array of user handles</li>
+    </ul>
   </dd>
 </dl>
 
@@ -172,13 +172,13 @@ The _env_ section is used to declare general key/value settings. For security re
   <dd>This setting is used to impose conditions on the responder. It can include several options:
 
 ```eval_rst
-:title: *<String>* or *<Regular Expression>* Responder will run only if issue' title matches this.
+:title: *<String>* or *<Regular Expression>* Responder will run only if issue's title matches this.
 :body: *<String>* or *<Regular Expression>* Responder will run only if the body of the issue matches this.
 :value_exists: *<String>* Responder will run only if there is a not empty value for this in the issue (marked with HTML comments).
 :value_matches: *<Hash>* Responder will run only if the param values (marked with HTML comments) in the body of the issue matches the ones specified here.
 :role_assigned: *<String>* Responder will be run only if there is a username assigned for the specified value.
 :labels: *<Array>* Responder will be run only if the issue is labeled with all the labels listed here.
-:reject_msg: *<String>* Optional. The response to send as comment if the conditions are not met
+:reject_msg: *<String>* Optional. The response to send as comment if the conditions are not met.
 ```
 
   Usage:

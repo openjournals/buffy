@@ -16,7 +16,7 @@ A non-default branch can be specified to look for the paper's files in it:
 
 ## Requirements
 
-The target repository should include a paper.md or paper.tex file and its corresponding references file (paper.bib or paper.yml) with the BIbTeX entries.
+The target repository should include a `paper.md` or `paper.tex` file and its corresponding references file (`paper.bib` or `paper.yml`) with the BibTeX entries.
 
 The body of the issue should have the url of the repository with the paper's files marked with HTML comments.
 
@@ -43,7 +43,7 @@ The body of the issue should have the url of the repository with the paper's fil
   check_references:
 ...
 ```
-Buffy will clone the git repository specified between `<!--target-repository-->` and `<!--end-target-repository-->` marks and check the DOIs for all entries in the paper.bib file.
+Buffy will clone the git repository specified between `<!--target-repository-->` and `<!--end-target-repository-->` marks and check the DOIs for all entries in the `paper.bib` file.
 
 
 **Example customizing fields:**
@@ -54,7 +54,7 @@ Buffy will clone the git repository specified between `<!--target-repository-->`
       branch_field: branch-to-review
 ...
 ```
-Buffy will clone the git repository specified between `<!--software-location-->` and `<!--end-software-location-->` marks, then checkout into the branch specified between `<!--branch-to-review-->` and `<!--end-branch-to-review-->` and then check the DOIs for all entries in the paper.bib file.
+Buffy will clone the git repository specified between `<!--software-location-->` and `<!--end-software-location-->` marks, then checkout into the branch specified between `<!--branch-to-review-->` and `<!--end-branch-to-review-->` and then check the DOIs for all entries in the `paper.bib` file.
 
 
 ## In action
