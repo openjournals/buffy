@@ -37,7 +37,7 @@ end
 
 ### Keyname
 
-Using `keyname` you can define the handle for the responder to be used in the configuration file. Using a symbol is ok.
+Using `keyname` you can define the handle for the responder to be used in the configuration file. Using a symbol is OK.
 
 For our example we'll just use _clock_:
 
@@ -119,7 +119,7 @@ now the command must be added to the config file or the responder will error and
     clock:
       command: tell me the time
 ...
-````
+```
 
 But we don't want to be too strict so, we'll allow the command to be changed but by default we'll have one. For that we'll use an auxiliary instance method:
 
