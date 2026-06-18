@@ -72,7 +72,14 @@ describe GoodbyeResponder do
     end
 
     it "should populate locals" do
-      expected_locals = { issue_id: 5, issue_author: "opener", issue_title: "Test paper", bot_name: "botsci", repo: "openjournals/buffy", sender: "user33", "reviewer" => "@xuanxu" }
+      expected_locals = { issue_id: 5,
+                          issue_author: "opener",
+                          issue_title: "Test paper",
+                          bot_name: "botsci",
+                          repo: "openjournals/buffy",
+                          sender: "user33", "reviewer" => "@xuanxu",
+                          doi_issue_id: "00005"
+                        }
 
       expect(@responder).to receive(:respond_external_template).with("thanks.md", expected_locals)
       @responder.process_message("")
