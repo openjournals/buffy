@@ -15,7 +15,10 @@ class GoodbyeResponder < Responder
       params[:messages].each {|msg| respond(msg)}
     end
 
-    respond_external_template(params[:template_file], locals) if params[:template_file]
+    if params[:template_file]
+      utils = Sinatra::IndifferentHash[ doi_issue_id: locals[:issue_id].to_s.rjust(5, "0") ]
+      respond_external_template(params[:template_file], locals.merge(utils))
+    end
 
     external_service(params[:external_service]) if params[:external_service]
 
