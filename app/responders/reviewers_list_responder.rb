@@ -14,6 +14,11 @@ class ReviewersListResponder < Responder
     new_reviewer = @match_data[2].strip.downcase
     to_or_from = @match_data[3].downcase
 
+    if issue_closed?
+      respond("This issue is closed, so its reviewers list can't be changed. If the review has already started, please run this command in the review issue instead.")
+      return
+    end
+
     if !issue_body_has?("reviewers-list")
       respond("I can't find the reviewers list")
       return
@@ -62,6 +67,10 @@ class ReviewersListResponder < Responder
     else
       respond("#{reviewer} is not in the reviewers list")
     end
+  end
+
+  def issue_closed?
+    context.respond_to?(:raw_payload) && context.raw_payload&.dig("issue", "state") == "closed"
   end
 
   def list_of_reviewers

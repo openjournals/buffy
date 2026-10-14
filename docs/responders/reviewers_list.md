@@ -25,6 +25,8 @@ The body of the issue should have the target field placeholder marked with HTML 
 <!--reviewers-list-->  <!--end-reviewers-list-->
 ```
 
+Reviewers can't be added to or removed from a closed issue: if the issue is closed (for example a pre-review issue once the review has started) the responder will reply with an error message asking to run the command in the review issue instead.
+
 ## Settings key
 
 `reviewers_list`

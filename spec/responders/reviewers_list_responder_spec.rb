@@ -103,6 +103,23 @@ describe ReviewersListResponder do
         @responder.process_message(msg)
       end
 
+      it "should not add user if the issue is closed" do
+        @responder.context = OpenStruct.new(sender: "editor", raw_payload: { "issue" => { "state" => "closed" } })
+        expect(@responder).to_not receive(:update_issue)
+        expect(@responder).to_not receive(:add_collaborator)
+        expect(@responder).to_not receive(:add_assignee)
+        expect(@responder).to receive(:respond).with("This issue is closed, so its reviewers list can't be changed. If the review has already started, please run this command in the review issue instead.")
+        @responder.process_message(@msg)
+      end
+
+      it "should add user if the issue is open" do
+        @responder.context = OpenStruct.new(sender: "editor", raw_payload: { "issue" => { "state" => "open" } })
+        expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon, @xuanxu<!--end-reviewers-list--> ..."
+        expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        expect(@responder).to receive(:respond).with("@xuanxu added to the reviewers list!")
+        @responder.process_message(@msg)
+      end
+
       it "should not add as assignee/collaborator if not configured" do
         expect(@responder).to_not receive(:add_collaborator)
         expect(@responder).to_not receive(:add_assignee)
@@ -136,6 +153,14 @@ describe ReviewersListResponder do
       it "should remove user from the reviewers list in the body of the issue" do
         expected_new_body = "...Reviewers: <!--reviewers-list-->@arfon<!--end-reviewers-list--> ..."
         expect(@responder).to receive(:update_issue).with({ body: expected_new_body })
+        @responder.process_message(@msg)
+      end
+
+      it "should not remove user if the issue is closed" do
+        @responder.context = OpenStruct.new(sender: "editor", raw_payload: { "issue" => { "state" => "closed" } })
+        expect(@responder).to_not receive(:update_issue)
+        expect(@responder).to_not receive(:remove_assignee)
+        expect(@responder).to receive(:respond).with("This issue is closed, so its reviewers list can't be changed. If the review has already started, please run this command in the review issue instead.")
         @responder.process_message(@msg)
       end
 
