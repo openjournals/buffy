@@ -160,7 +160,7 @@ describe ReviewersListResponder do
         @responder.context = OpenStruct.new(sender: "editor", raw_payload: { "issue" => { "state" => "closed" } })
         expect(@responder).to_not receive(:update_issue)
         expect(@responder).to_not receive(:remove_assignee)
-        expect(@responder).to receive(:respond).with("This issue is closed, so its reviewers list can't be changed. If the review has already started, please run this command in the review issue instead.")
+        expect(@responder).to receive(:respond).with("This issue is closed, so its reviewers list shouldn't be changed here. If the review has already started, please run this command in the review issue instead.")
         @responder.process_message(@msg)
       end
 
