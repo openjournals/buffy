@@ -13,7 +13,7 @@ jobs:
     - name: Install development tools
       shell: bash
       run: |
-        sudo apt install libicu-dev
+        sudo apt-get install -y libjitterentropy3-dev libicu-dev
     - uses: actions/checkout@v6
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
