@@ -15,7 +15,7 @@ class ReviewersListResponder < Responder
     to_or_from = @match_data[3].downcase
 
     if issue_closed?
-      respond("This issue is closed, so its reviewers list shouldn't be changed. If the review has already started, please run this command in the review issue instead.")
+      respond("This issue is closed, so its reviewers list shouldn't be changed here. If the review has already started, please run this command in the review issue instead.")
       return
     end
 
