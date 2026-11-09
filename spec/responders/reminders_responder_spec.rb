@@ -82,6 +82,18 @@ describe RemindersResponder do
       @responder.process_message(msg)
     end
 
+    ["a week", "a month", "A week"].each do |period|
+      it "should schedule a reminder for 'in #{period}'" do
+        msg = "@botsci remind me in #{period}"
+        @responder.match_data = @responder.event_regex.match(msg)
+        expected_msg = ":wave: @editor21, please take a look at the state of the submission (this is an automated reminder)."
+        expect(AsyncMessageWorker).to receive(:perform_at).with(instance_of(Time), @responder.locals, expected_msg)
+        expect(@responder).to receive(:respond).with("Reminder set for @editor21 in #{period}")
+
+        @responder.process_message(msg)
+      end
+    end
+
     it "should respond success message and schedule worker run" do
       msg = "@botsci remind @reviewer42 in 3 weeks"
       @responder.match_data = @responder.event_regex.match(msg)
@@ -192,6 +204,20 @@ describe RemindersResponder do
       expect(@responder).to receive(:respond).with("Reviewers can only set reminders to themselves.")
 
       @responder.process_message(msg)
+    end
+  end
+
+  describe "#target_time" do
+    it "should treat 'a week' as one week" do
+      expect(@responder.target_time("a", "week")).to be_within(5).of(Chronic.parse("in 1 week"))
+    end
+
+    it "should treat 'a month' as one month" do
+      expect(@responder.target_time("a", "month")).to be_within(5).of(Chronic.parse("in 1 month"))
+    end
+
+    it "should not recognize other words as a size" do
+      expect(@responder.target_time("some", "time")).to be_nil
     end
   end
 
