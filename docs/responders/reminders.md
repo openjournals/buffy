@@ -1,7 +1,7 @@
 Reminders
 =========
 
-This responder allows to schedule a reminder for the author or a reviewer to return to a review after a certain period of time (supported units: days and weeks). The command will only work if the mentioned user is an author, a reviewer for the submission or the sender of the message (so editors can set reminders for themselves). Multiple users can be reminded at once using a comma-separated list.
+This responder allows to schedule a reminder for the author or a reviewer to return to a review after a certain period of time (supported units: days, weeks and months). The command will only work if the mentioned user is an author, a reviewer for the submission or the sender of the message (so editors can set reminders for themselves). Multiple users can be reminded at once using a comma-separated list.
 
 
 ## Listens to
@@ -14,6 +14,12 @@ This responder allows to schedule a reminder for the author or a reviewer to ret
 ```
 ```
 @botname remind @reviewer1, @reviewer2 in 2 weeks
+```
+```
+@botname remind me in a week
+```
+```
+@botname remind me in a month
 ```
 
 ## Settings key

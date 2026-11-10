@@ -79,12 +79,14 @@ class RemindersResponder < Responder
   end
 
   def target_time(size, unit)
+    # Chronic parses "in 1 week" and "in one week", but not "in a week"
+    size = "1" if size.match?(/\Aan?\z/i)
     Chronic.parse("in #{size} #{unit}")
   end
 
   def default_description
     "Remind an author, a reviewer or the editor to return to a review after a " + "\n" +
-    "# certain period of time (supported units days and weeks)"
+    "# certain period of time (supported units days, weeks and months)"
   end
 
   def default_example_invocation
