@@ -26,6 +26,9 @@ describe AuthorsCheckResponder do
       expect(@responder.event_regex).to match("@botsci check authors with archive 10.5281/zenodo.123 from branch paper")
       expect(@responder.event_regex).to_not match("@botsci check authors list")
       expect(@responder.event_regex).to_not match("@botsci check authors with archive")
+      expect(@responder.event_regex).to match("@botsci check authors with paper docs/paper.md")
+      expect(@responder.event_regex).to match("@botsci check authors with paper docs/paper.md from branch joss with archive 10.5281/zenodo.1")
+      expect(@responder.event_regex).to_not match("@botsci check authors with paper")
     end
   end
 
@@ -51,6 +54,15 @@ describe AuthorsCheckResponder do
     end
   end
 
+  describe "#paper_value" do
+    it "should be the paper path from the command, or empty" do
+      @responder.match_data = @responder.event_regex.match("@botsci check authors")
+      expect(@responder.paper_value).to eq("")
+      @responder.match_data = @responder.event_regex.match("@botsci check authors with archive 10.5281/zenodo.1 with paper docs/paper.md.")
+      expect(@responder.paper_value).to eq("docs/paper.md")
+    end
+  end
+
   describe "#process_message" do
     let(:expected_locals) { {"bot_name" => "botsci", "issue_author" => nil, "issue_title" => nil, "issue_id" => nil, "repo" => nil, "sender" => nil} }
 
@@ -70,7 +82,7 @@ describe AuthorsCheckResponder do
       expect(@responder).to receive(:react_to_comment).with("eyes")
       expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals, "https://github.com/a/b", "",
                                                                  { "command" => "", "issue" => "10.5281/zenodo.123", "field" => "archive" },
-                                                                 ["rev1", "rev2", "editor"])
+                                                                 ["rev1", "rev2", "editor"], "")
       @responder.process_message("@botsci check authors")
     end
 
@@ -85,7 +97,7 @@ describe AuthorsCheckResponder do
 
       expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals.merge("match_data_1" => " from branch paper"), "https://github.com/a/b", "paper",
                                                                  { "command" => "", "issue" => "10.5281/zenodo.9", "field" => "zenodo" },
-                                                                 ["boss"])
+                                                                 ["boss"], "")
       @responder.process_message(msg)
     end
   end

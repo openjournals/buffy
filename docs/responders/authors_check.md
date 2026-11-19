@@ -36,11 +36,16 @@ The Zenodo archive can be given in the command, as a DOI or a Zenodo record URL:
 @botname check authors with archive https://zenodo.org/records/123456
 ```
 
-Both options can be used together, in either order.
+The paper's file can be given in the command, as its path in the repository. For a LaTeX paper, the authors are read from the `paper.yml` file next to it:
+```
+@botname check authors with paper docs/paper.md
+```
+
+These options can be used together, in any order.
 
 ## Requirements
 
-The target repository should include a `paper.md` file (or a `paper.tex` file with a `paper.yml` metadata file next to it) with an `authors` list in its metadata. If there are several, the one closest to the root of the repository is used. Each author can have a `name`, or `given-names` and `surname` fields, and optionally an `orcid`. Authors can also be listed as plain names (`- Jane Doe`), and footnotes in names (`Jane Doe^[Corresponding author]`) are ignored.
+The target repository should include a `paper.md` file (or a `paper.tex` file with a `paper.yml` metadata file next to it) with an `authors` list in its metadata. If there are several, the one closest to the root of the repository is used, unless a file is given with `with paper <path>`. Each author can have a `name`, or `given-names` and `surname` fields, and optionally an `orcid`. Authors can also be listed as plain names (`- Jane Doe`), and footnotes in names (`Jane Doe^[Corresponding author]`) are ignored.
 
 The body of the issue should have the URL of the repository marked with HTML comments:
 
@@ -61,6 +66,8 @@ If the archive isn't given in the command, and the most recent `@botname set ...
 Zenodo sandbox records are not checked.
 
 If no archive is found, or it isn't in Zenodo, or the repository isn't on GitHub, that part of the check is skipped and the reply says so.
+
+When the paper's file or the Zenodo archive can't be found or read, the reply says what went wrong and how to name it explicitly, e.g. `@botname check authors with paper <path to paper.md>` or `@botname check authors with archive <Zenodo DOI or URL>`.
 
 ## Settings key
 

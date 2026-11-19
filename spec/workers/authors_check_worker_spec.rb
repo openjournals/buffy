@@ -4,8 +4,13 @@ describe AuthorsCheckWorker do
 
   before do
     @worker = described_class.new
+    @worker.context = OpenStruct.new(bot_name: "botsci")
     disable_github_calls_for(@worker)
+    allow(@worker).to receive(:load_context_and_env)
   end
+
+  let(:paper_hint) { "Sorry, I couldn't figure out the right paper file. Please name it explicitly: `@botsci check authors with paper <path to paper.md>`" }
+  let(:archive_hint) { "Sorry, I couldn't figure out the Zenodo archive. Please name it explicitly: `@botsci check authors with archive <Zenodo DOI or URL>`" }
 
   describe "perform" do
     before do
@@ -15,16 +20,22 @@ describe AuthorsCheckWorker do
     end
 
     it "should respond with the error and cleanup if the paper can't be read" do
-      expect(@worker).to receive(:paper_file_from_repo).with("url", "main").and_return([nil, "Downloading the repository failed."])
+      expect(@worker).to receive(:paper_file_from_repo).with("url", "main", "").and_return([nil, "Downloading the repository failed."])
       expect(@worker).to receive(:respond).with("Downloading the repository failed.")
       expect(@worker).to receive(:cleanup)
       @worker.perform({}, "url", "main", {}, [])
     end
 
     it "should respond if the paper has no authors" do
-      expect(@worker).to receive(:paper_file_from_repo).and_return([PaperFile.new("paper.md").tap { |p| p.metadata_content = "title: x" }, nil])
-      expect(@worker).to receive(:respond).with("I couldn't find a list of authors in the paper's metadata.")
+      expect(@worker).to receive(:paper_file_from_repo).and_return([PaperFile.new("docs/paper.md").tap { |p| p.metadata_content = "title: x" }, nil])
+      expect(@worker).to receive(:respond).with("I couldn't find a list of authors in `docs/paper.md`. #{paper_hint}")
       @worker.perform({}, "url", "main", {}, [])
+    end
+
+    it "should pass the paper path from the command" do
+      expect(@worker).to receive(:paper_file_from_repo).with("url", "main", "docs/paper.md").and_return([nil, "error"])
+      expect(@worker).to receive(:respond).with("error")
+      @worker.perform({}, "url", "main", {}, [], "docs/paper.md")
     end
 
     it "should respond with the error and stop if the archive is unclear" do
@@ -39,7 +50,7 @@ describe AuthorsCheckWorker do
       paper = PaperFile.new("paper.md")
       authors = [{ name: "Jane Doe", orcid: "" }]
       allow(paper).to receive(:authors).and_return(authors)
-      expect(@worker).to receive(:paper_file_from_repo).with("https://github.com/a/b", "main").and_return([paper, nil])
+      expect(@worker).to receive(:paper_file_from_repo).with("https://github.com/a/b", "main", "").and_return([paper, nil])
       zenodo = [{ name: "Doe, Jane", orcid: "" }]
       github = [{ login: "jd", name: "Jane Doe", contributions: 3 }, { login: "rev", name: "Re View", contributions: 1 }]
       sources = { "command" => "10.5281/zenodo.1", "issue" => "", "field" => "archive" }
@@ -61,13 +72,14 @@ describe AuthorsCheckWorker do
 
     it "should return an error if the repo can't be cloned" do
       expect(@worker).to receive(:clone_repo_metadata).with("url", @dir, "main").and_return(false)
-      expect(@worker.paper_file_from_repo("url", "main")).to eq([nil, "Downloading the repository failed. Please make sure the URL and the branch name are correct."])
+      expect(@worker.paper_file_from_repo("url", "main")).to eq([nil, "Downloading the repository failed. Please make sure the URL and the branch name are correct. " +
+                                                                      "To use a different branch, run `@botsci check authors from branch <branch name>`."])
     end
 
     it "should return an error if there's no paper" do
       allow(@worker).to receive(:clone_repo_metadata).and_return(true)
       allow(@worker).to receive(:repo_files).with(@dir).and_return(["README.md", "src/paper_utils.py"])
-      expect(@worker.paper_file_from_repo("url", nil)).to eq([nil, "I couldn't find a `paper.md` or `paper.tex` file in the repository, so I can't check the authors."])
+      expect(@worker.paper_file_from_repo("url", nil)).to eq([nil, "I couldn't find a `paper.md` or `paper.tex` file in the repository. #{paper_hint}"])
     end
 
     it "should fetch only the paper's metadata, without writing anything to disk" do
@@ -109,7 +121,31 @@ describe AuthorsCheckWorker do
       allow(@worker).to receive(:clone_repo_metadata).and_return(true)
       allow(@worker).to receive(:repo_files).and_return(["paper/paper.tex"])
       allow(@worker).to receive(:read_repo_file).and_return(nil)
-      expect(@worker.paper_file_from_repo("url", nil)).to eq([nil, "I couldn't read `paper/paper.yml` from the repository, so I can't check the authors."])
+      expect(@worker.paper_file_from_repo("url", nil)).to eq([nil, "I couldn't read `paper/paper.yml` from the repository. #{paper_hint}"])
+    end
+
+    it "should use the paper given in the command" do
+      allow(@worker).to receive(:clone_repo_metadata).and_return(true)
+      allow(@worker).to receive(:repo_files).and_return(["paper.md", "joss/manuscript.md"])
+      expect(@worker).to receive(:read_repo_file).with(@dir, "joss/manuscript.md").and_return("authors:\n  - name: Jane Doe\n")
+
+      paper, error = @worker.paper_file_from_repo("url", nil, "./joss/manuscript.md")
+      expect(error).to be_nil
+      expect(paper.paper_path).to eq("joss/manuscript.md")
+    end
+
+    it "should use paper.yml next to a LaTeX paper given in the command" do
+      allow(@worker).to receive(:clone_repo_metadata).and_return(true)
+      allow(@worker).to receive(:repo_files).and_return(["tex/main.tex", "tex/paper.yml"])
+      expect(@worker).to receive(:read_repo_file).with(@dir, "tex/paper.yml").and_return("authors:\n  - Jane Doe\n")
+      expect(@worker.paper_file_from_repo("url", nil, "tex/main.tex").first.authors).to eq([{ name: "Jane Doe", orcid: "" }])
+    end
+
+    it "should return an error if the paper given in the command isn't in the repository" do
+      allow(@worker).to receive(:clone_repo_metadata).and_return(true)
+      allow(@worker).to receive(:repo_files).and_return(["paper.md"])
+      expect(@worker).to_not receive(:read_repo_file)
+      expect(@worker.paper_file_from_repo("url", nil, "../../etc/passwd")).to eq([nil, "I couldn't find `../../etc/passwd` in the repository. #{paper_hint}"])
     end
 
     it "should work with a real repository, including symlinks and file names that aren't UTF-8" do
@@ -328,19 +364,21 @@ describe AuthorsCheckWorker do
     it "should skip if there's no archive" do
       expect(@worker.zenodo_creators_for("", notes)).to be_nil
       expect(notes.last).to match(/couldn't find a Zenodo archive in the command, the issue or its comments/)
-      expect(notes.last).to include("`@botsci check authors with archive <Zenodo DOI or URL>`")
+      expect(notes.last).to end_with(archive_hint)
     end
 
     it "should skip if the archive is not in Zenodo" do
       ["10.6084/m9.figshare.1", "10.1234/foozenodo.5", "https://notzenodo.org/records/5"].each do |archive|
         expect(@worker.zenodo_creators_for(archive, notes)).to be_nil
         expect(notes.last).to match(/is not a Zenodo DOI or URL/)
+        expect(notes.last).to end_with(archive_hint)
       end
     end
 
     it "should skip Zenodo sandbox records" do
       expect(@worker.zenodo_creators_for("https://sandbox.zenodo.org/records/5", notes)).to be_nil
       expect(notes.last).to match(/is a Zenodo sandbox record/)
+      expect(notes.last).to end_with(archive_hint)
     end
 
     it "should keep archive values on one line in notes" do
@@ -372,6 +410,7 @@ describe AuthorsCheckWorker do
       stub_request(:get, "https://zenodo.org/api/records/404").to_return(status: 404)
       expect(@worker.zenodo_creators_for("10.5281/zenodo.404", notes)).to be_nil
       expect(notes.last).to match(/couldn't retrieve the Zenodo record/)
+      expect(notes.last).to end_with(archive_hint)
     end
 
     it "should give up after too many redirects or a network error" do

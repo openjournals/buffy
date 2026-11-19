@@ -6,11 +6,12 @@ class AuthorsCheckResponder < Responder
 
   BRANCH_OPTION = /from branch ([\/\.\w-]+)/i
   ARCHIVE_OPTION = /with archive (\S+)/i
+  PAPER_OPTION = /with paper (\S+)/i
 
   def define_listening
     @event_action = "issue_comment.created"
-    # Optional "from branch <name>" and "with archive <DOI or URL>", in any order
-    @event_regex = /\A@#{bot_name} check authors((?: +(?:from branch [\/\.\w-]+|with archive \S+))*)\.?\s*$/i
+    # Optional "from branch <name>", "with archive <DOI or URL>" and "with paper <path>", in any order
+    @event_regex = /\A@#{bot_name} check authors((?: +(?:from branch [\/\.\w-]+|with archive \S+|with paper \S+))*)\.?\s*$/i
   end
 
   def process_message(message)
@@ -18,13 +19,18 @@ class AuthorsCheckResponder < Responder
       respond("I couldn't find the URL for the target repository")
     else
       react_to_comment("eyes")
-      AuthorsCheckWorker.perform_async(serializable(locals), target_repo_value, branch_value, archive_sources, ignored_logins)
+      AuthorsCheckWorker.perform_async(serializable(locals), target_repo_value, branch_value, archive_sources, ignored_logins, paper_value)
     end
   end
 
   # The branch from the command, or else from the issue
   def branch_value
     command_option(BRANCH_OPTION) || value_of_or_default(params[:branch_field], "branch")
+  end
+
+  # The path of the paper's file in the repository, if given in the command
+  def paper_value
+    command_option(PAPER_OPTION)&.sub(/\.\z/, "").to_s
   end
 
   # Where the worker can find the archive: the command, the issue's body,
@@ -49,13 +55,14 @@ class AuthorsCheckResponder < Responder
 
   def default_description
     "Compare the paper's authors with the Zenodo archive's authors and the repository's contributors" + "\n" +
-    "# Optionally, it can be run on a non-default branch, or with a given Zenodo archive "
+    "# Optionally, it can be run on a non-default branch, with a given Zenodo archive, or with a given paper file "
   end
 
   def default_example_invocation
     "@#{bot_name} check authors" + "\n" +
     "@#{bot_name} check authors from branch custom-branch-name" + "\n" +
-    "@#{bot_name} check authors with archive https://zenodo.org/records/123456"
+    "@#{bot_name} check authors with archive https://zenodo.org/records/123456" + "\n" +
+    "@#{bot_name} check authors with paper docs/paper.md"
   end
 
   private

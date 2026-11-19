@@ -14,16 +14,19 @@ class AuthorsCheckWorker < BuffyWorker
 
   # archive_sources: { "command" => archive given in the command, "issue" => archive value in the
   # issue's body, "field" => name of the archive field (as in "@bot set <value> as <field>") }
-  def perform(locals, url, branch, archive_sources, ignored_logins)
+  # paper: path of the paper's file in the repository given in the command, if any
+  def perform(locals, url, branch, archive_sources, ignored_logins, paper = "")
     load_context_and_env(locals)
     notes = []
     archive = find_archive(archive_sources.to_h, notes)
 
-    paper, error = paper_file_from_repo(url, branch)
+    paper_file, error = paper_file_from_repo(url, branch, paper)
     return respond(error) if error
 
-    paper_authors = paper.authors
-    return respond("I couldn't find a list of authors in the paper's metadata.") if paper_authors.empty?
+    paper_authors = paper_file.authors
+    if paper_authors.empty?
+      return respond("I couldn't find a list of authors in #{inline_code(paper_file.metadata_path)}. #{paper_hint}")
+    end
 
     zenodo_creators = zenodo_creators_for(archive, notes)
     github_contributors = github_contributors_for(url, notes)
@@ -43,22 +46,28 @@ class AuthorsCheckWorker < BuffyWorker
   # Only the paper's metadata is needed, so instead of downloading the whole repository
   # this clones it without file contents and fetches just the metadata file (paper.md,
   # or paper.yml for LaTeX papers). Nothing from the repository is written to disk.
-  # Returns [PaperFile, nil], or [nil, error message].
-  def paper_file_from_repo(url, branch)
+  # If a paper path is given it's used, otherwise the paper.md or paper.tex closest to the
+  # root of the repository. Returns [PaperFile, nil], or [nil, error message].
+  def paper_file_from_repo(url, branch, requested_paper = "")
     unless clone_repo_metadata(url, path, branch)
-      return [nil, "Downloading the repository failed. Please make sure the URL and the branch name are correct."]
+      return [nil, "Downloading the repository failed. Please make sure the URL and the branch name are correct. " +
+                   "To use a different branch, run `@#{context.bot_name} check authors from branch <branch name>`."]
     end
 
-    # If there are several papers, use the one closest to the root of the repository
-    paper_path = repo_files(path).select { |f| f.match?(/(\A|\/)paper\.(md|tex)\z/) }.min_by { |f| [f.count("/"), f] }
-    if paper_path.nil?
-      return [nil, "I couldn't find a `paper.md` or `paper.tex` file in the repository, so I can't check the authors."]
+    files = repo_files(path)
+    requested_paper = requested_paper.to_s.strip.sub(%r{\A(\./|/)+}, "")
+    if requested_paper.empty?
+      paper_path = files.select { |f| f.match?(/(\A|\/)paper\.(md|tex)\z/) }.min_by { |f| [f.count("/"), f] }
+      return [nil, "I couldn't find a `paper.md` or `paper.tex` file in the repository. #{paper_hint}"] if paper_path.nil?
+    else
+      paper_path = files.find { |f| f == requested_paper.b }
+      return [nil, "I couldn't find #{inline_code(requested_paper)} in the repository. #{paper_hint}"] if paper_path.nil?
     end
 
     metadata_path = paper_path.end_with?(".tex") ? File.join(File.dirname(paper_path), "paper.yml") : paper_path
     content = read_repo_file(path, metadata_path)
     if content.nil?
-      return [nil, "I couldn't read #{inline_code(metadata_path)} from the repository, so I can't check the authors."]
+      return [nil, "I couldn't read #{inline_code(metadata_path)} from the repository. #{paper_hint}"]
     end
 
     paper = PaperFile.new(utf8(paper_path))
@@ -126,21 +135,20 @@ class AuthorsCheckWorker < BuffyWorker
     archive = archive.to_s.strip
 
     if archive.empty?
-      notes << "I couldn't find a Zenodo archive in the command, the issue or its comments, so Zenodo authors were not checked. " +
-               "To check them, run `@#{context.bot_name} check authors with archive <Zenodo DOI or URL>`."
+      notes << "I couldn't find a Zenodo archive in the command, the issue or its comments, so Zenodo authors were not checked. #{archive_hint}"
       return nil
     end
 
     match = archive.match(ZENODO_REFERENCE)
     if match.nil?
       kind = archive.match?(/sandbox\.zenodo\.org/i) ? "is a Zenodo sandbox record" : "is not a Zenodo DOI or URL"
-      notes << "The archive (#{inline_code(archive)}) #{kind}, so its authors were not checked."
+      notes << "The archive (#{inline_code(archive)}) #{kind}, so its authors were not checked. #{archive_hint}"
       return nil
     end
 
     record = zenodo_record(match[1] || match[2])
     if record.nil?
-      notes << "I couldn't retrieve the Zenodo record for #{inline_code(archive)}, so Zenodo authors were not checked."
+      notes << "I couldn't retrieve the Zenodo record for #{inline_code(archive)}, so Zenodo authors were not checked. #{archive_hint}"
       return nil
     end
 
@@ -203,6 +211,16 @@ class AuthorsCheckWorker < BuffyWorker
   end
 
   private
+
+  def paper_hint
+    "Sorry, I couldn't figure out the right paper file. Please name it explicitly: " +
+      "`@#{context.bot_name} check authors with paper <path to paper.md>`"
+  end
+
+  def archive_hint
+    "Sorry, I couldn't figure out the Zenodo archive. Please name it explicitly: " +
+      "`@#{context.bot_name} check authors with archive <Zenodo DOI or URL>`"
+  end
 
   # Text inside a code span on one line, so it can't break out of it and mention anyone
   def inline_code(text)
