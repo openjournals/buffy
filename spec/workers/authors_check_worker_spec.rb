@@ -7,6 +7,7 @@ describe AuthorsCheckWorker do
     @worker.context = OpenStruct.new(bot_name: "botsci")
     disable_github_calls_for(@worker)
     allow(@worker).to receive(:load_context_and_env)
+    allow(@worker).to receive(:logger).and_return(Logger.new(nil))
   end
 
   let(:paper_hint) { "Sorry, I couldn't figure out the right paper file. Please name it explicitly: `@botsci check authors with paper <path to paper.md>`" }
@@ -471,6 +472,605 @@ describe AuthorsCheckWorker do
       result = @worker.github_contributors_for("https://github.com/a/b", notes)
       expect(result.map { |c| c[:login] }).to eq((1..50).map { |i| "user#{i}" })
       expect(notes).to eq(["This repository has 55 contributors; only the 50 with the most commits were checked."])
+    end
+  end
+
+  describe "perform (more cases)" do
+    before { allow(@worker).to receive(:cleanup) }
+
+    def paper_with(content, path = "paper.md")
+      PaperFile.new(path).tap { |p| p.metadata_content = content }
+    end
+
+    it "loads the context from the locals" do
+      allow(@worker).to receive(:find_archive).and_return("")
+      allow(@worker).to receive(:paper_file_from_repo).and_return([nil, "error"])
+      allow(@worker).to receive(:respond)
+      expect(@worker).to receive(:load_context_and_env).with({ "bot_name" => "botsci" })
+      @worker.perform({ "bot_name" => "botsci" }, "url", "main", {}, [])
+    end
+
+    it "works with jobs queued without a paper path" do
+      allow(@worker).to receive(:find_archive).and_return("")
+      expect(@worker).to receive(:paper_file_from_repo).with("url", "main", "").and_return([nil, "error"])
+      allow(@worker).to receive(:respond)
+      @worker.perform({}, "url", "main", {}, [])
+    end
+
+    it "accepts nil archive sources and ignored users" do
+      expect(@worker).to receive(:find_archive).with({}, []).and_return("")
+      allow(@worker).to receive(:paper_file_from_repo).and_return([paper_with("authors:\n  - Jane Doe\n"), nil])
+      allow(@worker).to receive(:zenodo_creators_for).and_return(nil)
+      allow(@worker).to receive(:github_contributors_for).and_return([{ login: "jd", name: "Jane Doe", contributions: 1 }])
+      expect(@worker).to receive(:respond_template).with(:authors_check, hash_including(:report))
+      @worker.perform({}, "url", "main", nil, nil)
+    end
+
+    it "names paper.yml when a LaTeX paper has no authors" do
+      allow(@worker).to receive(:find_archive).and_return("")
+      allow(@worker).to receive(:paper_file_from_repo).and_return([paper_with("title: x", "tex/paper.tex"), nil])
+      expect(@worker).to receive(:respond).with("I couldn't find a list of authors in `tex/paper.yml`. #{paper_hint}")
+      @worker.perform({}, "url", "main", {}, [])
+    end
+
+    it "names paper.yml without ./ for a LaTeX paper at the root" do
+      allow(@worker).to receive(:find_archive).and_return("")
+      allow(@worker).to receive(:paper_file_from_repo).and_return([paper_with("title: x", "paper.tex"), nil])
+      expect(@worker).to receive(:respond).with("I couldn't find a list of authors in `paper.yml`. #{paper_hint}")
+      @worker.perform({}, "url", "main", {}, [])
+    end
+
+    it "reports no authors when the metadata isn't valid YAML" do
+      allow(@worker).to receive(:find_archive).and_return("")
+      allow(@worker).to receive(:paper_file_from_repo).and_return([paper_with("authors: [unclosed"), nil])
+      expect(@worker).to receive(:respond).with("I couldn't find a list of authors in `paper.md`. #{paper_hint}")
+      @worker.perform({}, "url", "main", {}, [])
+    end
+
+    it "doesn't look up Zenodo or GitHub when the paper has a problem" do
+      allow(@worker).to receive(:find_archive).and_return("")
+      allow(@worker).to receive(:paper_file_from_repo).and_return([nil, "error"])
+      allow(@worker).to receive(:respond)
+      expect(@worker).to_not receive(:zenodo_creators_for)
+      expect(@worker).to_not receive(:github_contributors_for)
+      @worker.perform({}, "url", "main", {}, [])
+    end
+
+    it "passes the notes from every step to the template, in order" do
+      allow(@worker).to receive(:find_archive) { |_, notes| notes << "archive note"; "10.5281/zenodo.1" }
+      allow(@worker).to receive(:paper_file_from_repo).and_return([paper_with("authors:\n  - Jane Doe\n"), nil])
+      allow(@worker).to receive(:zenodo_creators_for) { |_, notes| notes << "zenodo note"; nil }
+      allow(@worker).to receive(:github_contributors_for) { |_, notes| notes << "github note"; nil }
+      expect(@worker).to receive(:respond_template).with(:authors_check, hash_including(notes: ["archive note", "zenodo note", "github note"]))
+      @worker.perform({}, "url", "main", {}, [])
+    end
+
+    it "cleans up even if something unexpected fails" do
+      allow(@worker).to receive(:find_archive).and_return("")
+      allow(@worker).to receive(:paper_file_from_repo).and_return([paper_with("authors:\n  - Jane Doe\n"), nil])
+      allow(@worker).to receive(:zenodo_creators_for).and_return(nil)
+      allow(@worker).to receive(:github_contributors_for).and_raise(RuntimeError, "boom")
+      expect(@worker).to receive(:cleanup)
+      expect { @worker.perform({}, "url", "main", {}, []) }.to raise_error(RuntimeError, "boom")
+    end
+  end
+
+  describe "#paper_file_from_repo (more cases)" do
+    before do
+      allow(@worker).to receive(:path).and_return(@dir = Dir.mktmpdir)
+      allow(@worker).to receive(:clone_repo_metadata).and_return(true)
+    end
+    after { FileUtils.rm_rf(@dir) }
+
+    def found_path(files, requested = "")
+      allow(@worker).to receive(:repo_files).and_return(files)
+      read = nil
+      allow(@worker).to receive(:read_repo_file) { |_, file| read = file; "authors:\n  - Jane Doe\n" }
+      paper, error = @worker.paper_file_from_repo("url", nil, requested)
+      error ? error : read
+    end
+
+    it "clones the repository into the worker's folder, at the branch" do
+      expect(@worker).to receive(:clone_repo_metadata).with("https://github.com/a/b", @dir, "joss").and_return(false)
+      @worker.paper_file_from_repo("https://github.com/a/b", "joss")
+    end
+
+    it "looks for the paper when no path is given" do
+      expect(found_path(["paper.md"], nil)).to eq("paper.md")
+      expect(found_path(["paper.md"], "  ")).to eq("paper.md")
+    end
+
+    it "picks the first one alphabetically among papers at the same depth" do
+      expect(found_path(["b/paper.md", "a/paper.md"])).to eq("a/paper.md")
+    end
+
+    it "prefers paper.md over paper.tex in the same folder" do
+      expect(found_path(["paper/paper.tex", "paper/paper.yml", "paper/paper.md"])).to eq("paper/paper.md")
+    end
+
+    it "prefers a LaTeX paper closer to the root, reading its paper.yml" do
+      expect(found_path(["paper.tex", "paper.yml", "docs/paper.md"])).to eq("paper.yml")
+    end
+
+    it "only matches files named exactly paper.md or paper.tex" do
+      files = ["mypaper.md", "paper.md.bak", "Paper.md", "paper.mdx", "paper.txt", "docs/paper/notes.md"]
+      expect(found_path(files)).to eq("I couldn't find a `paper.md` or `paper.tex` file in the repository. #{paper_hint}")
+    end
+
+    it "removes a leading ./ or / from the given path" do
+      files = ["joss/paper.md"]
+      expect(found_path(files, "./joss/paper.md")).to eq("joss/paper.md")
+      expect(found_path(files, "/joss/paper.md")).to eq("joss/paper.md")
+      expect(found_path(files, ".//joss/paper.md")).to eq("joss/paper.md")
+      expect(found_path(files, "  joss/paper.md  ")).to eq("joss/paper.md")
+    end
+
+    it "uses the given path even if a paper.md is closer to the root" do
+      expect(found_path(["paper.md", "joss/paper.md"], "joss/paper.md")).to eq("joss/paper.md")
+    end
+
+    it "doesn't accept a folder as the paper" do
+      expect(found_path(["joss/paper.md"], "joss")).to eq("I couldn't find `joss` in the repository. #{paper_hint}")
+    end
+
+    it "keeps the given path on one line in the error" do
+      expect(found_path(["paper.md"], "x\n@octocat")).to eq("I couldn't find `x @octocat` in the repository. #{paper_hint}")
+    end
+
+    it "names paper.md when it can't be read" do
+      allow(@worker).to receive(:repo_files).and_return(["docs/paper.md"])
+      allow(@worker).to receive(:read_repo_file).and_return(nil)
+      expect(@worker.paper_file_from_repo("url", nil)).to eq([nil, "I couldn't read `docs/paper.md` from the repository. #{paper_hint}"])
+    end
+
+    it "returns UTF-8 paths, even for folders whose names aren't UTF-8" do
+      allow(@worker).to receive(:repo_files).and_return(["r\xE9sum\xE9/paper.md".b])
+      allow(@worker).to receive(:read_repo_file).and_return("authors:\n  - Jane Doe\n")
+      paper, _error = @worker.paper_file_from_repo("url", nil)
+      expect(paper.paper_path.encoding).to eq(Encoding::UTF_8)
+      expect(paper.paper_path).to be_valid_encoding
+      expect(paper.authors).to eq([{ name: "Jane Doe", orcid: "" }])
+    end
+  end
+
+  describe "#find_archive (more cases)" do
+    let(:notes) { [] }
+    let(:client) { double("Octokit::Client", issue_comments: []) }
+
+    before do
+      @worker.context = OpenStruct.new(bot_name: "botsci", repo: "org/reviews", issue_id: 5)
+      allow(@worker).to receive(:github_client).and_return(client)
+    end
+
+    def comment(id, login, body)
+      OpenStruct.new(id: id, user: OpenStruct.new(login: login), body: body)
+    end
+
+    def sources(command: "", issue: "", field: "archive")
+      { "command" => command, "issue" => issue, "field" => field }
+    end
+
+    def with_comments(*comments)
+      allow(client).to receive(:issue_comments).and_return(comments)
+    end
+
+    context "archive in the command" do
+      it "strips spaces" do
+        expect(@worker.find_archive(sources(command: "  10.5281/zenodo.1 "), notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "treats Pending as no archive" do
+        expect(@worker.find_archive(sources(command: "PENDING", issue: "10.5281/zenodo.2"), notes)).to eq("10.5281/zenodo.2")
+      end
+
+      it "works with missing sources" do
+        expect(@worker.find_archive({}, notes)).to eq("")
+      end
+    end
+
+    context "set commands" do
+      it "uses 'archive' as the field when none is given" do
+        with_comments(comment(1, "author", "@botsci set 10.5281/zenodo.9 as archive"))
+        expect { @worker.find_archive(sources(field: ""), notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict)
+        expect { @worker.find_archive({ "issue" => "" }, notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict)
+      end
+
+      it "escapes the field name" do
+        with_comments(comment(1, "author", "@botsci set 10.5281/zenodo.9 as zenodoXdoi"))
+        expect(@worker.find_archive(sources(field: "zenodo.doi", issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "recognizes commands in any case and with a final period" do
+        with_comments(comment(1, "editor", "@BOTSCI SET 10.5281/zenodo.9 AS ARCHIVE."))
+        expect { @worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict, /sets `10.5281\/zenodo.9`/)
+      end
+
+      it "recognizes commands followed by more lines" do
+        with_comments(comment(1, "editor", "@botsci set 10.5281/zenodo.9 as archive\nThanks!"))
+        expect { @worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict)
+      end
+
+      it "ignores commands that aren't at the start of the comment" do
+        with_comments(comment(1, "editor", "Please run @botsci set 10.5281/zenodo.9 as archive"),
+                      comment(2, "editor", "Thanks!\n@botsci set 10.5281/zenodo.9 as archive"))
+        expect(@worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "ignores commands for other bots" do
+        with_comments(comment(1, "editor", "@otherbot set 10.5281/zenodo.9 as archive"))
+        expect(@worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "ignores set commands in the bot's own comments" do
+        with_comments(comment(1, "botsci", "@botsci set 10.5281/zenodo.9 as archive"))
+        expect(@worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "compares the set value with the issue ignoring case and spaces" do
+        with_comments(comment(1, "editor", "@botsci set  10.5281/ZENODO.1  as archive"))
+        expect(@worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "only looks at the most recent set command" do
+        with_comments(comment(1, "author", "@botsci set 10.5281/zenodo.999 as archive"),
+                      comment(2, "editor", "@botsci set 10.5281/zenodo.1 as archive"))
+        expect(@worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "raises an error for a conflicting set command even when there are Zenodo mentions" do
+        with_comments(comment(1, "author", "@botsci set 10.5281/zenodo.9 as archive"), comment(2, "author", "See 10.5281/zenodo.7"))
+        expect { @worker.find_archive(sources, notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict)
+      end
+
+      it "keeps the values on one line and in code spans in the error" do
+        with_comments(comment(1, "author", "@botsci set `x`@octocat as archive"))
+        expect { @worker.find_archive(sources(issue: "a\n\nb"), notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict) do |error|
+          expect(error.message).to include("sets `'x'@octocat`, but the issue has `a b`")
+          expect(error.message.gsub(/`[^`\n]*`/, "")).to_not include("@")
+        end
+      end
+
+      it "names the field in the error" do
+        with_comments(comment(1, "author", "@botsci set 10.5281/zenodo.9 as zenodo"))
+        expect { @worker.find_archive(sources(field: "zenodo"), notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict) do |error|
+          expect(error.message).to include("`@botsci set ... as zenodo`")
+          expect(error.message).to include("the issue has no zenodo set")
+          expect(error.message).to include("`@botsci set <DOI> as zenodo`")
+        end
+      end
+    end
+
+    context "archive in the issue" do
+      it "treats Pending in the issue as no archive" do
+        with_comments(comment(1, "author", "Archive: 10.5281/zenodo.33"))
+        expect(@worker.find_archive(sources(issue: " pending "), notes)).to eq("10.5281/zenodo.33")
+      end
+
+      it "doesn't add a note" do
+        expect(@worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
+        expect(notes).to be_empty
+      end
+    end
+
+    context "Zenodo mentions in comments" do
+      it "finds DOIs, doi.org links and zenodo.org record, upload and deposit links" do
+        ["10.5281/zenodo.1", "https://doi.org/10.5281/zenodo.1", "https://zenodo.org/record/1",
+         "https://zenodo.org/records/1", "https://zenodo.org/uploads/1", "https://zenodo.org/deposit/1",
+         "HTTPS://ZENODO.ORG/RECORDS/1"].each do |reference|
+          @worker.instance_variable_set(:@human_comments, nil)
+          with_comments(comment(1, "author", "Here it is: #{reference}."))
+          expect(@worker.find_archive(sources, [])).to match(/zenodo\.(org\/\w+\/)?1\z/i)
+        end
+      end
+
+      it "doesn't take other sites or Zenodo sandbox links for Zenodo" do
+        with_comments(comment(1, "author", "https://sandbox.zenodo.org/records/1 https://foozenodo.org/records/2 https://my-zenodo.org/records/3"))
+        expect(@worker.find_archive(sources, notes)).to eq("")
+      end
+
+      it "skips comments without a reference" do
+        with_comments(comment(1, "author", "Archive: 10.5281/zenodo.1"), comment(2, "author", "Thanks!"))
+        expect(@worker.find_archive(sources, notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "skips comments without a body" do
+        with_comments(comment(1, "author", "Archive: 10.5281/zenodo.1"), comment(2, "author", nil))
+        expect(@worker.find_archive(sources, notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "reads comments from users it can't identify" do
+        with_comments(OpenStruct.new(id: 3, user: nil, body: "10.5281/zenodo.4"))
+        expect(@worker.find_archive(sources, notes)).to eq("10.5281/zenodo.4")
+      end
+
+      it "recognizes the bot's comments regardless of case" do
+        with_comments(comment(1, "author", "10.5281/zenodo.1"), comment(2, "BotSci", "10.5281/zenodo.2"))
+        expect(@worker.find_archive(sources, notes)).to eq("10.5281/zenodo.1")
+      end
+
+      it "links to the comment in a note" do
+        with_comments(comment(42, "author", "10.5281/zenodo.1"))
+        @worker.find_archive(sources, notes)
+        expect(notes).to eq(["Using the Zenodo archive `10.5281/zenodo.1` mentioned in [this comment](https://github.com/org/reviews/issues/5#issuecomment-42)."])
+      end
+    end
+
+    it "reads the comments only once" do
+      expect(client).to receive(:issue_comments).once.and_return([comment(1, "author", "nothing here")])
+      expect(@worker.find_archive(sources, notes)).to eq("")
+    end
+
+    it "doesn't read the comments when there's nothing to check" do
+      expect(client).to_not receive(:issue_comments)
+      @worker.find_archive(sources(command: "10.5281/zenodo.1"), notes)
+    end
+  end
+
+  describe "#zenodo_creators_for (more cases)" do
+    let(:notes) { [] }
+
+    def zenodo_returns(id, metadata)
+      stub_request(:get, "https://zenodo.org/api/records/#{id}").to_return(status: 200, body: { metadata: metadata }.to_json)
+    end
+
+    it "treats a blank archive as no archive" do
+      expect(@worker.zenodo_creators_for("   ", notes)).to be_nil
+      expect(notes.last).to end_with(archive_hint)
+    end
+
+    it "is empty for a record without creators" do
+      zenodo_returns(1, {})
+      expect(@worker.zenodo_creators_for("10.5281/zenodo.1", notes)).to eq([])
+      expect(notes).to be_empty
+    end
+
+    it "uses empty values for missing names and ORCIDs" do
+      zenodo_returns(2, { creators: [{}, { name: "Doe, Jane" }] })
+      expect(@worker.zenodo_creators_for("10.5281/zenodo.2", notes)).to eq([{ name: "", orcid: "" }, { name: "Doe, Jane", orcid: "" }])
+    end
+
+    it "finds the record id in a DOI written in uppercase" do
+      zenodo_returns(3, { creators: [] })
+      expect(@worker.zenodo_creators_for("10.5281/ZENODO.3", notes)).to eq([])
+    end
+
+    it "accepts deposit links" do
+      zenodo_returns(4, { creators: [] })
+      expect(@worker.zenodo_creators_for("https://zenodo.org/deposit/4", notes)).to eq([])
+    end
+  end
+
+  describe "#zenodo_record" do
+    it "returns the parsed record" do
+      stub_request(:get, "https://zenodo.org/api/records/1").with(headers: { "Accept" => "application/json" }).to_return(status: 200, body: '{"id": 1}')
+      expect(@worker.zenodo_record("1")).to eq({ "id" => 1 })
+    end
+
+    it "is nil for errors" do
+      stub_request(:get, "https://zenodo.org/api/records/1").to_return(status: 500)
+      expect(@worker.zenodo_record("1")).to be_nil
+    end
+
+    [301, 302, 303, 307, 308].each do |status|
+      it "follows #{status} redirects" do
+        stub_request(:get, "https://zenodo.org/api/records/1").to_return(status: status, headers: { "Location" => "https://zenodo.org/api/records/2" })
+        stub_request(:get, "https://zenodo.org/api/records/2").to_return(status: 200, body: '{"id": 2}')
+        expect(@worker.zenodo_record("1")).to eq({ "id" => 2 })
+      end
+    end
+
+    it "is nil for a redirect without a location" do
+      stub_request(:get, "https://zenodo.org/api/records/1").to_return(status: 302)
+      expect(@worker.zenodo_record("1")).to be_nil
+    end
+
+    it "follows up to two redirects" do
+      stub_request(:get, "https://zenodo.org/api/records/1").to_return(status: 302, headers: { "Location" => "/api/records/2" })
+      stub_request(:get, "https://zenodo.org/api/records/2").to_return(status: 302, headers: { "Location" => "/api/records/3" })
+      stub_request(:get, "https://zenodo.org/api/records/3").to_return(status: 200, body: '{"id": 3}')
+      expect(@worker.zenodo_record("1")).to eq({ "id" => 3 })
+    end
+
+    it "is nil for a response that isn't JSON" do
+      stub_request(:get, "https://zenodo.org/api/records/1").to_return(status: 200, body: "<html>")
+      expect(@worker.zenodo_record("1")).to be_nil
+    end
+
+    it "is nil for an invalid redirect location" do
+      stub_request(:get, "https://zenodo.org/api/records/1").to_return(status: 302, headers: { "Location" => "http://[invalid" })
+      expect(@worker.zenodo_record("1")).to be_nil
+    end
+
+    it "is nil for timeouts" do
+      stub_request(:get, "https://zenodo.org/api/records/1").to_timeout
+      expect(@worker.zenodo_record("1")).to be_nil
+    end
+  end
+
+  describe "#github_contributors_for (more cases)" do
+    let(:notes) { [] }
+    let(:client) { double("Octokit::Client") }
+    before do
+      allow(@worker).to receive(:github_client).and_return(client)
+      allow(@worker).to receive(:get_user).and_return(nil)
+    end
+
+    {
+      "https://github.com/a/b" => "a/b",
+      "http://github.com/a/b" => "a/b",
+      "https://www.github.com/a/b" => "a/b",
+      "https://github.com/a/b/" => "a/b",
+      "https://github.com/a/b.git" => "a/b",
+      "https://GitHub.com/a.b/c-d.e" => "a.b/c-d.e",
+      "  https://github.com/a/b  " => "a/b"
+    }.each do |url, repo|
+      it "reads the repository name from #{url.strip}" do
+        expect(client).to receive(:contributors).with(repo).and_return([])
+        expect(@worker.github_contributors_for(url, notes)).to eq([])
+      end
+    end
+
+    ["https://gitlab.com/a/b", "https://github.com/a", "https://github.com/a/b/tree/main",
+     "https://a.github.io/b", "", nil].each do |url|
+      it "doesn't treat #{url.inspect} as a GitHub repository" do
+        expect(client).to_not receive(:contributors)
+        expect(@worker.github_contributors_for(url, notes)).to be_nil
+        expect(notes).to eq(["The repository is not hosted on GitHub, so GitHub contributors were not checked."])
+      end
+    end
+
+    it "leaves out bots by type and by name" do
+      allow(client).to receive(:contributors).and_return([{ login: "app", type: "Bot", contributions: 9 },
+                                                          { login: "renovate[bot]", type: "User", contributions: 8 },
+                                                          { login: "botanist", type: "User", contributions: 1 }])
+      expect(@worker.github_contributors_for("https://github.com/a/b", notes).map { |c| c[:login] }).to eq(["botanist"])
+    end
+
+    it "doesn't add a note for exactly 50 contributors" do
+      allow(client).to receive(:contributors).and_return((1..50).map { |i| { login: "u#{i}", contributions: 1 } })
+      expect(@worker.github_contributors_for("https://github.com/a/b", notes).size).to eq(50)
+      expect(notes).to be_empty
+    end
+
+    it "counts the limit after leaving out bots" do
+      contributors = (1..50).map { |i| { login: "u#{i}", contributions: 1 } } + [{ login: "x[bot]", contributions: 1 }]
+      allow(client).to receive(:contributors).and_return(contributors)
+      expect(@worker.github_contributors_for("https://github.com/a/b", notes).size).to eq(50)
+      expect(notes).to be_empty
+    end
+
+    it "uses an empty name for profiles without one" do
+      allow(client).to receive(:contributors).and_return([{ login: "x", contributions: 1 }])
+      allow(@worker).to receive(:get_user).with("x").and_return(double(name: nil))
+      expect(@worker.github_contributors_for("https://github.com/a/b", notes)).to eq([{ login: "x", name: "", contributions: 1 }])
+    end
+
+    it "counts failed lookups of any kind" do
+      allow(client).to receive(:contributors).and_return([{ login: "x", contributions: 2 }, { login: "y", contributions: 1 }])
+      allow(@worker).to receive(:get_user).with("x").and_raise(Octokit::Forbidden)
+      allow(@worker).to receive(:get_user).with("y").and_raise(Faraday::ConnectionFailed.new("down"))
+      result = @worker.github_contributors_for("https://github.com/a/b", notes)
+      expect(result.map { |c| c[:name] }).to eq(["", ""])
+      expect(notes).to eq(["I couldn't look up the GitHub profile of 2 contributors, so they were matched by username only."])
+    end
+  end
+
+  describe "hints and inline code" do
+    it "names the bot in the hints" do
+      expect(@worker.send(:paper_hint)).to eq(paper_hint)
+      expect(@worker.send(:archive_hint)).to eq(archive_hint)
+    end
+
+    it "puts text in a code span on one line" do
+      expect(@worker.send(:inline_code, "a\n\n b\t c")).to eq("`a b c`")
+    end
+
+    it "replaces backticks so they can't end the code span" do
+      expect(@worker.send(:inline_code, "a`b")).to eq("`a'b`")
+    end
+
+    it "handles text that isn't UTF-8" do
+      result = @worker.send(:inline_code, "r\xE9sum\xE9".b)
+      expect(result).to be_valid_encoding
+      expect(result).to start_with("`r").and end_with("sum�`")
+    end
+
+    it "handles nil" do
+      expect(@worker.send(:inline_code, nil)).to eq("``")
+    end
+  end
+
+  describe "authors_check template (more cases)" do
+    def render(report, notes = [])
+      message = nil
+      allow(@worker).to receive(:respond) { |m| message = m }
+      @worker.respond_template(:authors_check, { report: report, notes: notes })
+      message
+    end
+
+    def report_for(authors, zenodo: nil, github: nil)
+      AuthorsChecker.new(paper_authors: authors, zenodo_creators: zenodo, github_contributors: github).check
+    end
+
+    it "shows exact Zenodo matches with ✅" do
+      expect(render(report_for([{ name: "Jane Doe" }], zenodo: [{ name: "Doe, Jane" }]))).to include("| Jane Doe | ✅ Doe, Jane | — |")
+    end
+
+    it "shows Zenodo names written differently with ⚠️" do
+      message = render(report_for([{ name: "Jane Doe" }, { name: "John Smith" }], zenodo: [{ name: "DOE, JANE" }, { name: "Smith, J." }]))
+      expect(message).to include("| Jane Doe | ⚠️ Written differently: DOE, JANE | — |")
+      expect(message).to include("| John Smith | ⚠️ Written differently: Smith, J. | — |")
+    end
+
+    it "shows missing Zenodo authors with ❌" do
+      expect(render(report_for([{ name: "Jane Doe" }], zenodo: []))).to include("| Jane Doe | ❌ Not found | — |")
+    end
+
+    it "shows GitHub matches with the same name with ✅, even if written differently" do
+      message = render(report_for([{ name: "Jane Doe" }, { name: "John Smith" }],
+                                  github: [{ login: "jd", name: "Jane Doe", contributions: 1 }, { login: "js", name: "JOHN SMITH", contributions: 1 }]))
+      expect(message).to include("| Jane Doe | — | ✅ `@jd` (Jane Doe) |")
+      expect(message).to include("| John Smith | — | ✅ `@js` (JOHN SMITH) |")
+    end
+
+    it "shows probable GitHub matches with ⚠️" do
+      message = render(report_for([{ name: "John Smith" }], github: [{ login: "jsmith", name: "", contributions: 1 }]))
+      expect(message).to include("| John Smith | — | ⚠️ Possibly `@jsmith` |")
+    end
+
+    it "shows missing GitHub contributors with ❌" do
+      expect(render(report_for([{ name: "Jane Doe" }], github: []))).to include("| Jane Doe | — | ❌ Not found |")
+    end
+
+    it "can show only the GitHub column as unchecked" do
+      expect(render(report_for([{ name: "Jane Doe" }], zenodo: [{ name: "Doe, Jane" }]))).to include("| Jane Doe | ✅ Doe, Jane | — |")
+    end
+
+    it "can show only the Zenodo column as unchecked" do
+      expect(render(report_for([{ name: "Jane Doe" }], github: [{ login: "jd", name: "Jane Doe", contributions: 1 }]))).to include("| Jane Doe | — | ✅ `@jd` (Jane Doe) |")
+    end
+
+    it "doesn't list unmatched people when everyone matched" do
+      message = render(report_for([{ name: "Jane Doe" }], zenodo: [{ name: "Doe, Jane" }], github: [{ login: "jd", name: "Jane Doe", contributions: 1 }]))
+      expect(message).to_not include("not listed in the paper")
+      expect(message).to_not include("not matched to a paper author")
+    end
+
+    it "lists unmatched GitHub contributors with their commits" do
+      message = render(report_for([{ name: "Jane Doe" }], github: [{ login: "a", name: "Ann", contributions: 1 },
+                                                                   { login: "b", name: "", contributions: 2 },
+                                                                   { login: "c", name: "", contributions: 0 }]))
+      expect(message).to include("- `@a` (Ann): 1 commit\n")
+      expect(message).to include("- `@b`: 2 commits\n")
+      expect(message).to include("- `@c`: 0 commits\n")
+    end
+
+    it "shows each note in italics" do
+      message = render(report_for([{ name: "Jane Doe" }]), ["first note", "second note"])
+      expect(message).to include("\n_first note_\n")
+      expect(message).to include("\n_second note_\n")
+    end
+
+    it "has no notes when there are none" do
+      expect(render(report_for([{ name: "Jane Doe" }]))).to_not match(/^_/)
+    end
+
+    it "always explains how to read the results" do
+      message = render(report_for([{ name: "Jane Doe" }]))
+      expect(message).to include("<summary>How to read this</summary>")
+      expect(message).to include("not a pass/fail check")
+    end
+
+    it "escapes pipes, replaces backticks and puts # in code spans" do
+      message = render(report_for([{ name: "A | B" }, { name: "C`D" }, { name: "E #1" }]))
+      expect(message).to include("| A \\| B |")
+      expect(message).to include("| C'D |")
+      expect(message).to include("| `E #1` |")
+    end
+
+    it "removes backticks and spaces from usernames" do
+      message = render(report_for([{ name: "Jane Doe" }], github: [{ login: "a`b c", name: "", contributions: 1 }]))
+      expect(message).to include("- `@abc`: 1 commit")
     end
   end
 end

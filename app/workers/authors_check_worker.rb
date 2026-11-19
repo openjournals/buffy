@@ -25,7 +25,7 @@ class AuthorsCheckWorker < BuffyWorker
 
     paper_authors = paper_file.authors
     if paper_authors.empty?
-      return respond("I couldn't find a list of authors in #{inline_code(paper_file.metadata_path)}. #{paper_hint}")
+      return respond("I couldn't find a list of authors in #{inline_code(paper_file.metadata_path.delete_prefix("./"))}. #{paper_hint}")
     end
 
     zenodo_creators = zenodo_creators_for(archive, notes)
@@ -64,7 +64,11 @@ class AuthorsCheckWorker < BuffyWorker
       return [nil, "I couldn't find #{inline_code(requested_paper)} in the repository. #{paper_hint}"] if paper_path.nil?
     end
 
-    metadata_path = paper_path.end_with?(".tex") ? File.join(File.dirname(paper_path), "paper.yml") : paper_path
+    metadata_path = paper_path
+    if paper_path.end_with?(".tex")
+      folder = File.dirname(paper_path)
+      metadata_path = folder == "." ? "paper.yml" : File.join(folder, "paper.yml")
+    end
     content = read_repo_file(path, metadata_path)
     if content.nil?
       return [nil, "I couldn't read #{inline_code(metadata_path)} from the repository. #{paper_hint}"]
