@@ -20,7 +20,34 @@ describe AuthorsCheckResponder do
       expect(@responder.event_regex).to match("@botsci check authors    \r\n ignored part")
       expect(@responder.event_regex).to match("@botsci check authors from branch custom/branch")
       expect(@responder.event_regex).to_not match("@botsci check authors from branch ")
+      expect(@responder.event_regex).to match("@botsci check authors with archive https://zenodo.org/records/123")
+      expect(@responder.event_regex).to match("@botsci check authors with archive 10.5281/zenodo.123.")
+      expect(@responder.event_regex).to match("@botsci check authors from branch paper with archive 10.5281/zenodo.123")
+      expect(@responder.event_regex).to match("@botsci check authors with archive 10.5281/zenodo.123 from branch paper")
       expect(@responder.event_regex).to_not match("@botsci check authors list")
+      expect(@responder.event_regex).to_not match("@botsci check authors with archive")
+    end
+  end
+
+  describe "command options" do
+    def options_for(msg)
+      @responder.match_data = @responder.event_regex.match(msg)
+      [@responder.branch_value, @responder.archive_value]
+    end
+
+    before do
+      @responder.context.issue_body += "<!--branch-->issue-branch<!--end-branch-->" +
+                                       "<!--archive-->10.5281/zenodo.1<!--end-archive-->"
+    end
+
+    it "should use the values from the issue by default" do
+      expect(options_for("@botsci check authors")).to eq(["issue-branch", "10.5281/zenodo.1"])
+    end
+
+    it "should use the branch and archive from the command, in any order" do
+      expect(options_for("@botsci check authors with archive https://zenodo.org/records/9.")).to eq(["issue-branch", "https://zenodo.org/records/9"])
+      expect(options_for("@botsci check authors from branch b1 with archive 10.5281/zenodo.9")).to eq(["b1", "10.5281/zenodo.9"])
+      expect(options_for("@botsci check authors with archive 10.5281/zenodo.9 from branch b1")).to eq(["b1", "10.5281/zenodo.9"])
     end
   end
 
@@ -54,7 +81,7 @@ describe AuthorsCheckResponder do
       msg = "@botsci check authors from branch paper"
       @responder.match_data = @responder.event_regex.match(msg)
 
-      expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals.merge("match_data_1" => "paper"), "https://github.com/a/b", "paper", "10.5281/zenodo.9", ["boss"])
+      expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals.merge("match_data_1" => " from branch paper"), "https://github.com/a/b", "paper", "10.5281/zenodo.9", ["boss"])
       @responder.process_message(msg)
     end
   end

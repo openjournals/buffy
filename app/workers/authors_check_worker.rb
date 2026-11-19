@@ -35,13 +35,15 @@ class AuthorsCheckWorker < BuffyWorker
   # Returns the list of creators of the Zenodo archive, or nil if they can't be retrieved
   def zenodo_creators_for(archive, notes)
     archive = archive.to_s.strip
-    record_id = archive[/zenodo\.(\d+)/i, 1]
+    # Zenodo DOI (10.5281/zenodo.123, also as a doi.org link) or record URL (zenodo.org/records/123)
+    record_id = archive[/zenodo\.(\d+)/i, 1] || archive[%r{zenodo\.org/records?/(\d+)}i, 1]
 
     if archive.empty? || archive.downcase == "pending"
-      notes << "No archive DOI found in this issue, so Zenodo authors were not checked."
+      notes << "No archive found in this issue, so Zenodo authors were not checked. " +
+               "To check them, run `@#{context.bot_name} check authors with archive <Zenodo DOI or URL>`."
       return nil
     elsif record_id.nil?
-      notes << "The archive (`#{archive.tr("`", "")}`) is not a Zenodo DOI, so its authors were not checked."
+      notes << "The archive (`#{archive.tr("`", "")}`) is not a Zenodo DOI or URL, so its authors were not checked."
       return nil
     end
 

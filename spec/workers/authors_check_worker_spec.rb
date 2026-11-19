@@ -96,15 +96,27 @@ describe AuthorsCheckWorker do
 
   describe "#zenodo_creators_for" do
     let(:notes) { [] }
+    before { @worker.context = OpenStruct.new(bot_name: "botsci") }
 
     it "should skip if there's no archive" do
       expect(@worker.zenodo_creators_for("Pending", notes)).to be_nil
-      expect(notes.last).to match(/No archive DOI found/)
+      expect(notes.last).to match(/No archive found/)
+      expect(notes.last).to include("`@botsci check authors with archive <Zenodo DOI or URL>`")
     end
 
     it "should skip if the archive is not in Zenodo" do
       expect(@worker.zenodo_creators_for("10.6084/m9.figshare.1", notes)).to be_nil
-      expect(notes.last).to match(/is not a Zenodo DOI/)
+      expect(notes.last).to match(/is not a Zenodo DOI or URL/)
+    end
+
+    it "should accept Zenodo DOIs and record URLs" do
+      body = { metadata: { creators: [{ name: "Doe, Jane" }] } }.to_json
+      stub_request(:get, "https://zenodo.org/api/records/77").to_return(status: 200, body: body)
+      ["10.5281/zenodo.77", "https://doi.org/10.5281/zenodo.77", "https://zenodo.org/records/77",
+       "https://zenodo.org/record/77", "zenodo.org/records/77?preview=1"].each do |archive|
+        expect(@worker.zenodo_creators_for(archive, notes)).to eq([{ name: "Doe, Jane", orcid: "" }])
+      end
+      expect(notes).to be_empty
     end
 
     it "should return the creators of the record, following redirects" do

@@ -28,6 +28,14 @@ A non-default branch can be specified to look for the paper's files in it:
 @botname check authors from branch <custom-branch-name>
 ```
 
+A Zenodo archive can be given in the command, to check it before it's set in the issue. It can be a DOI or a Zenodo record URL:
+```
+@botname check authors with archive 10.5281/zenodo.123456
+@botname check authors with archive https://zenodo.org/records/123456
+```
+
+Both options can be used together, in either order.
+
 ## Requirements
 
 The target repository should include a `paper.md` file (or a `paper.tex` file with a `paper.yml` metadata file) with an `authors` list in its metadata. Each author can have a `name`, or `given-names` and `surname` fields, and optionally an `orcid`.
@@ -38,7 +46,7 @@ The body of the issue should have the URL of the repository marked with HTML com
 <!--target-repository--> URL HERE <!--end-target-repository-->
 ```
 
-To check the Zenodo authors, the issue should also include the archive's DOI (Zenodo DOIs look like `10.5281/zenodo.123456`):
+To check the Zenodo authors without passing the archive in the command, the issue should include the archive's DOI (Zenodo DOIs look like `10.5281/zenodo.123456`) or Zenodo URL:
 
 ```html
 <!--archive--> DOI HERE <!--end-archive-->
@@ -54,7 +62,7 @@ If there is no archive, or it isn't in Zenodo, or the repository isn't on GitHub
 ```eval_rst
 :url_field: The optional name of the field marked with HTML comments where the URL of the repository with the paper is located. Default value is **target-repository**.
 :branch_field: The optional name of the field marked with HTML comments where the name of the branch is located. Defaults to **branch**. If the setting is not present or the branch field is not found in the body of the issue, the default branch of the git repo will be used.
-:archive_field: The optional name of the field marked with HTML comments where the DOI of the archive is located. Default value is **archive**.
+:archive_field: The optional name of the field marked with HTML comments where the DOI of the archive is located, used when the command doesn't include one. Default value is **archive**.
 :ignored_users_fields: The optional list of fields marked with HTML comments that contain GitHub usernames to leave out of the contributors list. Default value is **[reviewers-list, editor]**.
 
 ```
