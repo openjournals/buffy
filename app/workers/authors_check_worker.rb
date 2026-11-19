@@ -32,17 +32,25 @@ class AuthorsCheckWorker < BuffyWorker
     cleanup
   end
 
-  # Returns the list of creators of the Zenodo archive, or nil if they can't be retrieved
+  # A Zenodo DOI (10.5281/zenodo.123, also inside a doi.org link) or record URL (zenodo.org/records/123)
+  ZENODO_REFERENCE = %r{10\.5281/zenodo\.\d+|zenodo\.org/records?/\d+}i
+
+  # Returns the list of creators of the Zenodo archive, or nil if they can't be retrieved.
+  # The archive comes from the command or the issue; if there's none, the most recent
+  # issue comment mentioning a Zenodo DOI or URL is used.
   def zenodo_creators_for(archive, notes)
     archive = archive.to_s.strip
-    # Zenodo DOI (10.5281/zenodo.123, also as a doi.org link) or record URL (zenodo.org/records/123)
-    record_id = archive[/zenodo\.(\d+)/i, 1] || archive[%r{zenodo\.org/records?/(\d+)}i, 1]
+    archive = "" if archive.downcase == "pending"
+    archive = archive_from_comments(notes) if archive.empty?
 
-    if archive.empty? || archive.downcase == "pending"
-      notes << "No archive found in this issue, so Zenodo authors were not checked. " +
+    if archive.empty?
+      notes << "I couldn't find a Zenodo archive in the command or in the issue comments, so Zenodo authors were not checked. " +
                "To check them, run `@#{context.bot_name} check authors with archive <Zenodo DOI or URL>`."
       return nil
-    elsif record_id.nil?
+    end
+
+    record_id = archive[/zenodo\.(\d+)/i, 1] || archive[%r{zenodo\.org/records?/(\d+)}i, 1]
+    if record_id.nil?
       notes << "The archive (`#{archive.tr("`", "")}`) is not a Zenodo DOI or URL, so its authors were not checked."
       return nil
     end
@@ -55,6 +63,22 @@ class AuthorsCheckWorker < BuffyWorker
 
     creators = record.dig("metadata", "creators").to_a
     creators.map { |c| { name: c["name"].to_s, orcid: c["orcid"].to_s } }
+  end
+
+  # Finds the most recent Zenodo DOI or URL in the issue comments, skipping the bot's own
+  # comments (they can mention Zenodo DOIs of cited software, e.g. in reference checks)
+  def archive_from_comments(notes)
+    bot = context.bot_name.to_s.downcase
+    comments = github_client.issue_comments(context.repo, context.issue_id)
+    comment = comments.reverse.find { |c| c.user&.login.to_s.downcase != bot && c.body.to_s.match?(ZENODO_REFERENCE) }
+    return "" if comment.nil?
+
+    archive = comment.body[ZENODO_REFERENCE]
+    notes << "Using the Zenodo archive `#{archive}` from [this comment](#{comment_url(comment.id)})."
+    archive
+  rescue Octokit::Error => e
+    logger.warn("Error reading comments of issue #{context.issue_id}: #{e.message}")
+    ""
   end
 
   def zenodo_record(record_id)

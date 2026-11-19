@@ -40,7 +40,7 @@ class AuthorsCheckResponder < Responder
 
   def default_description
     "Compare the paper's authors with the Zenodo archive's authors and the repository's contributors" + "\n" +
-    "# Optionally, it can be run on a non-default branch, or with a Zenodo archive that isn't set in the issue yet "
+    "# Optionally, it can be run on a non-default branch, or with a given Zenodo archive "
   end
 
   def default_example_invocation

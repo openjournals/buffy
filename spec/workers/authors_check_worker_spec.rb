@@ -96,12 +96,41 @@ describe AuthorsCheckWorker do
 
   describe "#zenodo_creators_for" do
     let(:notes) { [] }
-    before { @worker.context = OpenStruct.new(bot_name: "botsci") }
+    let(:client) { double("Octokit::Client", issue_comments: []) }
+    let(:zenodo_body) { { metadata: { creators: [{ name: "Doe, Jane" }] } }.to_json }
 
-    it "should skip if there's no archive" do
+    before do
+      @worker.context = OpenStruct.new(bot_name: "botsci", repo: "org/reviews", issue_id: 5)
+      allow(@worker).to receive(:github_client).and_return(client)
+    end
+
+    def comment(id, login, body)
+      OpenStruct.new(id: id, user: OpenStruct.new(login: login), body: body)
+    end
+
+    it "should skip if there's no archive in the command, issue or comments" do
+      expect(client).to receive(:issue_comments).with("org/reviews", 5).and_return([comment(1, "author", "No DOI here")])
       expect(@worker.zenodo_creators_for("Pending", notes)).to be_nil
-      expect(notes.last).to match(/No archive found/)
+      expect(notes.last).to match(/couldn't find a Zenodo archive in the command or in the issue comments/)
       expect(notes.last).to include("`@botsci check authors with archive <Zenodo DOI or URL>`")
+    end
+
+    it "should use the most recent Zenodo archive in the comments, skipping the bot's comments" do
+      comments = [comment(1, "author", "Old archive: https://doi.org/10.5281/zenodo.11"),
+                  comment(2, "author", "New archive is at https://zenodo.org/records/22, thanks!"),
+                  comment(3, "editor", "Looks good"),
+                  comment(4, "botsci", "Reference check: 10.5281/zenodo.33 is OK")]
+      expect(client).to receive(:issue_comments).and_return(comments)
+      stub_request(:get, "https://zenodo.org/api/records/22").to_return(status: 200, body: zenodo_body)
+
+      expect(@worker.zenodo_creators_for("", notes)).to eq([{ name: "Doe, Jane", orcid: "" }])
+      expect(notes).to eq(["Using the Zenodo archive `zenodo.org/records/22` from [this comment](https://github.com/org/reviews/issues/5#issuecomment-2)."])
+    end
+
+    it "should not read the comments if the archive was given" do
+      expect(client).to_not receive(:issue_comments)
+      stub_request(:get, "https://zenodo.org/api/records/77").to_return(status: 200, body: zenodo_body)
+      @worker.zenodo_creators_for("10.5281/zenodo.77", notes)
     end
 
     it "should skip if the archive is not in Zenodo" do
