@@ -54,6 +54,8 @@ class PaperFile
 
   def metadata
     return {} if paper_path.nil?
+    # Date and Time are allowed only so that an unquoted date anywhere in the front matter
+    # (e.g. `date: 2026-07-06`) doesn't make the whole parse fail; the date itself isn't used.
     @metadata ||= (YAML.load_file(metadata_path, permitted_classes: [Date, Time]) rescue {})
     @metadata.is_a?(Hash) ? @metadata : {}
   end
