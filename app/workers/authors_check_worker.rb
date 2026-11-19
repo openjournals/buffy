@@ -5,7 +5,9 @@ class AuthorsCheckWorker < BuffyWorker
 
   MAX_CONTRIBUTORS = 50
 
-  def perform(locals, url, branch, archive, ignored_logins)
+  # archive_sources: { "command" => archive given in the command, "issue" => archive value in the
+  # issue's body, "field" => name of the archive field (as in "@bot set <value> as <field>") }
+  def perform(locals, url, branch, archive_sources, ignored_logins)
     load_context_and_env(locals)
     return unless setup_local_repo(url, branch)
 
@@ -18,7 +20,7 @@ class AuthorsCheckWorker < BuffyWorker
     elsif paper_authors.empty?
       respond("I couldn't find a list of authors in the paper's metadata.")
     else
-      zenodo_creators = zenodo_creators_for(archive, notes)
+      zenodo_creators = zenodo_creators_for(find_archive(archive_sources.to_h, notes), notes)
       github_contributors = github_contributors_for(url, notes)
 
       checker = AuthorsChecker.new(paper_authors: paper_authors,
@@ -35,16 +37,58 @@ class AuthorsCheckWorker < BuffyWorker
   # A Zenodo DOI (10.5281/zenodo.123, also inside a doi.org link) or record URL (zenodo.org/records/123)
   ZENODO_REFERENCE = %r{10\.5281/zenodo\.\d+|zenodo\.org/records?/\d+}i
 
-  # Returns the list of creators of the Zenodo archive, or nil if they can't be retrieved.
-  # The archive comes from the command or the issue; if there's none, the most recent
-  # issue comment mentioning a Zenodo DOI or URL is used.
+  # Finds the archive to check, in this order:
+  #   1. the archive given in the command
+  #   2. the most recent "@bot set <value> as archive" comment
+  #   3. the archive value in the issue's body
+  #   4. the most recent comment mentioning a Zenodo DOI or URL
+  # The bot's own comments are skipped (they can mention Zenodo DOIs of cited software,
+  # e.g. in reference checks). Returns "" if no archive is found.
+  def find_archive(sources, notes)
+    value = ->(v) { v = v.to_s.strip; v.casecmp?("pending") ? "" : v }
+
+    archive = value.call(sources["command"])
+    return archive unless archive.empty?
+
+    field = sources["field"].to_s.empty? ? "archive" : sources["field"].to_s
+    set_command = /\A@#{Regexp.escape(context.bot_name.to_s)} set (.*) as #{Regexp.escape(field)}\.?\s*$/i
+    set_comment = human_comments.find { |c| !value.call(c.body.to_s[set_command, 1]).empty? }
+    if set_comment
+      archive = value.call(set_comment.body[set_command, 1])
+      notes << "Using the archive `#{archive.tr("`", "")}` set in [this comment](#{comment_url(set_comment.id)})."
+      return archive
+    end
+
+    archive = value.call(sources["issue"])
+    return archive unless archive.empty?
+
+    mention = human_comments.find { |c| c.body.to_s.match?(ZENODO_REFERENCE) }
+    if mention
+      archive = mention.body[ZENODO_REFERENCE]
+      notes << "Using the Zenodo archive `#{archive}` mentioned in [this comment](#{comment_url(mention.id)})."
+      return archive
+    end
+
+    ""
+  end
+
+  # Issue comments not written by the bot, most recent first
+  def human_comments
+    @human_comments ||= begin
+      bot = context.bot_name.to_s.downcase
+      github_client.issue_comments(context.repo, context.issue_id).reverse.reject { |c| c.user&.login.to_s.downcase == bot }
+    rescue Octokit::Error => e
+      logger.warn("Error reading comments of issue #{context.issue_id}: #{e.message}")
+      []
+    end
+  end
+
+  # Returns the list of creators of the Zenodo archive, or nil if they can't be retrieved
   def zenodo_creators_for(archive, notes)
     archive = archive.to_s.strip
-    archive = "" if archive.downcase == "pending"
-    archive = archive_from_comments(notes) if archive.empty?
 
     if archive.empty?
-      notes << "I couldn't find a Zenodo archive in the command or in the issue comments, so Zenodo authors were not checked. " +
+      notes << "I couldn't find a Zenodo archive in the command, the issue or its comments, so Zenodo authors were not checked. " +
                "To check them, run `@#{context.bot_name} check authors with archive <Zenodo DOI or URL>`."
       return nil
     end
@@ -63,22 +107,6 @@ class AuthorsCheckWorker < BuffyWorker
 
     creators = record.dig("metadata", "creators").to_a
     creators.map { |c| { name: c["name"].to_s, orcid: c["orcid"].to_s } }
-  end
-
-  # Finds the most recent Zenodo DOI or URL in the issue comments, skipping the bot's own
-  # comments (they can mention Zenodo DOIs of cited software, e.g. in reference checks)
-  def archive_from_comments(notes)
-    bot = context.bot_name.to_s.downcase
-    comments = github_client.issue_comments(context.repo, context.issue_id)
-    comment = comments.reverse.find { |c| c.user&.login.to_s.downcase != bot && c.body.to_s.match?(ZENODO_REFERENCE) }
-    return "" if comment.nil?
-
-    archive = comment.body[ZENODO_REFERENCE]
-    notes << "Using the Zenodo archive `#{archive}` from [this comment](#{comment_url(comment.id)})."
-    archive
-  rescue Octokit::Error => e
-    logger.warn("Error reading comments of issue #{context.issue_id}: #{e.message}")
-    ""
   end
 
   def zenodo_record(record_id)

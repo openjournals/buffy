@@ -49,8 +49,11 @@ The body of the issue should have the URL of the repository marked with HTML com
 The Zenodo archive is looked for in this order:
 
 1. The archive given in the command (`with archive <DOI or URL>`).
-2. The `archive` value in the body of the issue, if it has been set (e.g. with `@botname set <DOI> as archive`).
-3. The most recent issue comment that mentions a Zenodo DOI (like `10.5281/zenodo.123456`) or a Zenodo record URL. The bot's own comments are skipped. The reply links to the comment it used, so the editor can check it's the right archive.
+2. The most recent `@botname set <DOI> as archive` comment in the issue.
+3. The `archive` value in the body of the issue.
+4. The most recent issue comment that mentions a Zenodo DOI (like `10.5281/zenodo.123456`) or a Zenodo record URL.
+
+The bot's own comments are skipped. When the archive comes from a comment, the reply links to that comment, so the editor can check it's the right archive.
 
 If no archive is found, or it isn't in Zenodo, or the repository isn't on GitHub, that part of the check is skipped and the reply says so.
 
@@ -62,7 +65,7 @@ If no archive is found, or it isn't in Zenodo, or the repository isn't on GitHub
 ```eval_rst
 :url_field: The optional name of the field marked with HTML comments where the URL of the repository with the paper is located. Default value is **target-repository**.
 :branch_field: The optional name of the field marked with HTML comments where the name of the branch is located. Defaults to **branch**. If the setting is not present or the branch field is not found in the body of the issue, the default branch of the git repo will be used.
-:archive_field: The optional name of the field marked with HTML comments in the body of the issue where the DOI of the archive may be set, used when the command doesn't include one. Default value is **archive**.
+:archive_field: The optional name of the archive field, used to find `@botname set <DOI> as <archive_field>` comments and the value marked with HTML comments in the body of the issue. Default value is **archive**.
 :ignored_users_fields: The optional list of fields marked with HTML comments that contain GitHub usernames to leave out of the contributors list. Default value is **[reviewers-list, editor]**.
 
 ```

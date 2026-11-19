@@ -12,13 +12,13 @@ describe AuthorsCheckWorker do
     it "should do nothing if error checking out the repo" do
       expect(@worker).to receive(:setup_local_repo).and_return(false)
       expect(PaperFile).to_not receive(:find)
-      @worker.perform({}, "url", "main", "", [])
+      @worker.perform({}, "url", "main", {}, [])
     end
 
     it "should respond if there is no paper file" do
       expect(PaperFile).to receive(:find).and_return(PaperFile.new)
       expect(@worker).to receive(:respond).with(/couldn't find a `paper.md` or `paper.tex` file/)
-      @worker.perform({}, "url", "main", "", [])
+      @worker.perform({}, "url", "main", {}, [])
     end
 
     it "should respond if the paper has no authors" do
@@ -26,7 +26,7 @@ describe AuthorsCheckWorker do
       allow(paper).to receive(:authors).and_return([])
       expect(PaperFile).to receive(:find).and_return(paper)
       expect(@worker).to receive(:respond).with("I couldn't find a list of authors in the paper's metadata.")
-      @worker.perform({}, "url", "main", "", [])
+      @worker.perform({}, "url", "main", {}, [])
     end
 
     it "should respond with the authors_check template and cleanup" do
@@ -36,6 +36,8 @@ describe AuthorsCheckWorker do
       expect(PaperFile).to receive(:find).and_return(paper)
       zenodo = [{ name: "Doe, Jane", orcid: "" }]
       github = [{ login: "jd", name: "Jane Doe", contributions: 3 }, { login: "rev", name: "Re View", contributions: 1 }]
+      sources = { "command" => "10.5281/zenodo.1", "issue" => "", "field" => "archive" }
+      expect(@worker).to receive(:find_archive).with(sources, []).and_return("10.5281/zenodo.1")
       expect(@worker).to receive(:zenodo_creators_for).with("10.5281/zenodo.1", []).and_return(zenodo)
       expect(@worker).to receive(:github_contributors_for).with("https://github.com/a/b", []).and_return(github)
 
@@ -43,7 +45,7 @@ describe AuthorsCheckWorker do
       expect(@worker).to receive(:respond_template).with(:authors_check, { report: expected_report, notes: [] })
       expect(@worker).to receive(:cleanup)
 
-      @worker.perform({}, "https://github.com/a/b", "main", "10.5281/zenodo.1", ["rev"])
+      @worker.perform({}, "https://github.com/a/b", "main", sources, ["rev"])
     end
   end
 
@@ -94,10 +96,9 @@ describe AuthorsCheckWorker do
     end
   end
 
-  describe "#zenodo_creators_for" do
+  describe "#find_archive" do
     let(:notes) { [] }
     let(:client) { double("Octokit::Client", issue_comments: []) }
-    let(:zenodo_body) { { metadata: { creators: [{ name: "Doe, Jane" }] } }.to_json }
 
     before do
       @worker.context = OpenStruct.new(bot_name: "botsci", repo: "org/reviews", issue_id: 5)
@@ -108,29 +109,70 @@ describe AuthorsCheckWorker do
       OpenStruct.new(id: id, user: OpenStruct.new(login: login), body: body)
     end
 
-    it "should skip if there's no archive in the command, issue or comments" do
-      expect(client).to receive(:issue_comments).with("org/reviews", 5).and_return([comment(1, "author", "No DOI here")])
-      expect(@worker.zenodo_creators_for("Pending", notes)).to be_nil
-      expect(notes.last).to match(/couldn't find a Zenodo archive in the command or in the issue comments/)
-      expect(notes.last).to include("`@botsci check authors with archive <Zenodo DOI or URL>`")
+    def sources(command: "", issue: "", field: "archive")
+      { "command" => command, "issue" => issue, "field" => field }
     end
 
-    it "should use the most recent Zenodo archive in the comments, skipping the bot's comments" do
+    it "should use the archive from the command first, without reading comments" do
+      expect(client).to_not receive(:issue_comments)
+      expect(@worker.find_archive(sources(command: "10.5281/zenodo.1", issue: "10.5281/zenodo.2"), notes)).to eq("10.5281/zenodo.1")
+      expect(notes).to be_empty
+    end
+
+    it "should then use the most recent 'set ... as archive' command" do
+      comments = [comment(1, "editor", "@botsci set 10.5281/zenodo.11 as archive"),
+                  comment(2, "editor", "@botsci set 10.5281/zenodo.22 as archive."),
+                  comment(3, "author", "New version at https://zenodo.org/records/33"),
+                  comment(4, "editor", "@botsci set v1.0 as version"),
+                  comment(5, "botsci", "Done! archive is now 10.5281/zenodo.22")]
+      expect(client).to receive(:issue_comments).with("org/reviews", 5).and_return(comments)
+
+      expect(@worker.find_archive(sources(issue: "10.5281/zenodo.99"), notes)).to eq("10.5281/zenodo.22")
+      expect(notes).to eq(["Using the archive `10.5281/zenodo.22` set in [this comment](https://github.com/org/reviews/issues/5#issuecomment-2)."])
+    end
+
+    it "should use the configured archive field name in set commands" do
+      comments = [comment(1, "editor", "@botsci set 10.5281/zenodo.11 as zenodo"), comment(2, "editor", "@botsci set 10.5281/zenodo.22 as archive")]
+      allow(client).to receive(:issue_comments).and_return(comments)
+      expect(@worker.find_archive(sources(field: "zenodo"), notes)).to eq("10.5281/zenodo.11")
+    end
+
+    it "should then use the archive value in the issue" do
+      allow(client).to receive(:issue_comments).and_return([comment(1, "author", "Archive: 10.5281/zenodo.33")])
+      expect(@worker.find_archive(sources(issue: "10.5281/zenodo.99"), notes)).to eq("10.5281/zenodo.99")
+      expect(notes).to be_empty
+    end
+
+    it "should then use the most recent comment mentioning a Zenodo archive, skipping the bot's comments" do
       comments = [comment(1, "author", "Old archive: https://doi.org/10.5281/zenodo.11"),
                   comment(2, "author", "New archive is at https://zenodo.org/records/22, thanks!"),
                   comment(3, "editor", "Looks good"),
                   comment(4, "botsci", "Reference check: 10.5281/zenodo.33 is OK")]
-      expect(client).to receive(:issue_comments).and_return(comments)
-      stub_request(:get, "https://zenodo.org/api/records/22").to_return(status: 200, body: zenodo_body)
+      allow(client).to receive(:issue_comments).and_return(comments)
 
-      expect(@worker.zenodo_creators_for("", notes)).to eq([{ name: "Doe, Jane", orcid: "" }])
-      expect(notes).to eq(["Using the Zenodo archive `zenodo.org/records/22` from [this comment](https://github.com/org/reviews/issues/5#issuecomment-2)."])
+      expect(@worker.find_archive(sources(issue: "Pending"), notes)).to eq("zenodo.org/records/22")
+      expect(notes).to eq(["Using the Zenodo archive `zenodo.org/records/22` mentioned in [this comment](https://github.com/org/reviews/issues/5#issuecomment-2)."])
     end
 
-    it "should not read the comments if the archive was given" do
-      expect(client).to_not receive(:issue_comments)
-      stub_request(:get, "https://zenodo.org/api/records/77").to_return(status: 200, body: zenodo_body)
-      @worker.zenodo_creators_for("10.5281/zenodo.77", notes)
+    it "should return an empty string if no archive is found" do
+      allow(client).to receive(:issue_comments).and_return([comment(1, "author", "@botsci set Pending as archive")])
+      expect(@worker.find_archive(sources, notes)).to eq("")
+    end
+
+    it "should ignore errors reading the comments" do
+      allow(client).to receive(:issue_comments).and_raise(Octokit::NotFound)
+      expect(@worker.find_archive(sources(issue: "10.5281/zenodo.99"), notes)).to eq("10.5281/zenodo.99")
+    end
+  end
+
+  describe "#zenodo_creators_for" do
+    let(:notes) { [] }
+    before { @worker.context = OpenStruct.new(bot_name: "botsci") }
+
+    it "should skip if there's no archive" do
+      expect(@worker.zenodo_creators_for("", notes)).to be_nil
+      expect(notes.last).to match(/couldn't find a Zenodo archive in the command, the issue or its comments/)
+      expect(notes.last).to include("`@botsci check authors with archive <Zenodo DOI or URL>`")
     end
 
     it "should skip if the archive is not in Zenodo" do

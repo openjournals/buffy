@@ -32,7 +32,7 @@ describe AuthorsCheckResponder do
   describe "command options" do
     def options_for(msg)
       @responder.match_data = @responder.event_regex.match(msg)
-      [@responder.branch_value, @responder.archive_value]
+      [@responder.branch_value, @responder.archive_sources["command"], @responder.archive_sources["issue"]]
     end
 
     before do
@@ -41,13 +41,13 @@ describe AuthorsCheckResponder do
     end
 
     it "should use the values from the issue by default" do
-      expect(options_for("@botsci check authors")).to eq(["issue-branch", "10.5281/zenodo.1"])
+      expect(options_for("@botsci check authors")).to eq(["issue-branch", "", "10.5281/zenodo.1"])
     end
 
     it "should use the branch and archive from the command, in any order" do
-      expect(options_for("@botsci check authors with archive https://zenodo.org/records/9.")).to eq(["issue-branch", "https://zenodo.org/records/9"])
-      expect(options_for("@botsci check authors from branch b1 with archive 10.5281/zenodo.9")).to eq(["b1", "10.5281/zenodo.9"])
-      expect(options_for("@botsci check authors with archive 10.5281/zenodo.9 from branch b1")).to eq(["b1", "10.5281/zenodo.9"])
+      expect(options_for("@botsci check authors with archive https://zenodo.org/records/9.")).to eq(["issue-branch", "https://zenodo.org/records/9", "10.5281/zenodo.1"])
+      expect(options_for("@botsci check authors from branch b1 with archive 10.5281/zenodo.9")).to eq(["b1", "10.5281/zenodo.9", "10.5281/zenodo.1"])
+      expect(options_for("@botsci check authors with archive 10.5281/zenodo.9 from branch b1")).to eq(["b1", "10.5281/zenodo.9", "10.5281/zenodo.1"])
     end
   end
 
@@ -68,7 +68,9 @@ describe AuthorsCheckResponder do
                                        "<!--editor-->@Editor<!--end-editor-->"
 
       expect(@responder).to receive(:react_to_comment).with("eyes")
-      expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals, "https://github.com/a/b", "", "10.5281/zenodo.123", ["rev1", "rev2", "editor"])
+      expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals, "https://github.com/a/b", "",
+                                                                 { "command" => "", "issue" => "10.5281/zenodo.123", "field" => "archive" },
+                                                                 ["rev1", "rev2", "editor"])
       @responder.process_message("@botsci check authors")
     end
 
@@ -81,7 +83,9 @@ describe AuthorsCheckResponder do
       msg = "@botsci check authors from branch paper"
       @responder.match_data = @responder.event_regex.match(msg)
 
-      expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals.merge("match_data_1" => " from branch paper"), "https://github.com/a/b", "paper", "10.5281/zenodo.9", ["boss"])
+      expect(AuthorsCheckWorker).to receive(:perform_async).with(expected_locals.merge("match_data_1" => " from branch paper"), "https://github.com/a/b", "paper",
+                                                                 { "command" => "", "issue" => "10.5281/zenodo.9", "field" => "zenodo" },
+                                                                 ["boss"])
       @responder.process_message(msg)
     end
   end

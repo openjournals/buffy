@@ -18,7 +18,7 @@ class AuthorsCheckResponder < Responder
       respond("I couldn't find the URL for the target repository")
     else
       react_to_comment("eyes")
-      AuthorsCheckWorker.perform_async(serializable(locals), target_repo_value, branch_value, archive_value, ignored_logins)
+      AuthorsCheckWorker.perform_async(serializable(locals), target_repo_value, branch_value, archive_sources, ignored_logins)
     end
   end
 
@@ -27,9 +27,18 @@ class AuthorsCheckResponder < Responder
     command_option(BRANCH_OPTION) || value_of_or_default(params[:branch_field], "branch")
   end
 
-  # The archive DOI or URL from the command, or else from the issue
-  def archive_value
-    command_option(ARCHIVE_OPTION)&.sub(/\.\z/, "") || value_of_or_default(params[:archive_field], "archive")
+  # Where the worker can find the archive: the command, the issue's body,
+  # and the field name used in "@bot set <value> as <field>" comments
+  def archive_sources
+    {
+      "command" => command_option(ARCHIVE_OPTION)&.sub(/\.\z/, "").to_s,
+      "issue" => read_value_from_body(archive_field),
+      "field" => archive_field
+    }
+  end
+
+  def archive_field
+    params[:archive_field].to_s.strip.empty? ? "archive" : params[:archive_field].to_s.strip
   end
 
   # GitHub users that should not be listed as missing authors, by default the reviewers and the editor
