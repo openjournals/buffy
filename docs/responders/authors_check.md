@@ -12,7 +12,7 @@ Only the paper's metadata is downloaded from the repository, not the whole repos
 
 Names are matched leniently, so small differences are flagged rather than missed:
 
-- **Zenodo:** ✅ means the name is written exactly the same way (Zenodo's `Last, First` format counts as the same as `First Last`). ⚠️ means it is probably the same person but the name is written differently: different accents or capitalization, a missing initial, a typo, or a different name with the same ORCID.
+- **Zenodo:** ✅ means the name is written exactly the same way (Zenodo's `Last, First` format counts as the same as `First Last`). ⚠️ means it is probably the same person but the name is written differently: different accents or capitalization, a missing initial, a typo, or a different name with the same ORCID. It is also shown, with both ORCIDs, when the paper and Zenodo list different ORCIDs for the same name.
 - **GitHub:** ✅ means the name in the contributor's GitHub profile matches. ⚠️ means it is probably the same person: a similar name, or a username built from the author's name (for example `jsmith` for John Smith) when the profile doesn't have a different name.
 
 GitHub contributors are people who made commits, so authors who contributed in other ways won't be found there, and not every contributor has to be an author. The results are meant to help editors, not to pass or fail a submission.
@@ -40,7 +40,7 @@ Both options can be used together, in either order.
 
 ## Requirements
 
-The target repository should include a `paper.md` file (or a `paper.tex` file with a `paper.yml` metadata file next to it) with an `authors` list in its metadata. If there are several, the one closest to the root of the repository is used. Each author can have a `name`, or `given-names` and `surname` fields, and optionally an `orcid`.
+The target repository should include a `paper.md` file (or a `paper.tex` file with a `paper.yml` metadata file next to it) with an `authors` list in its metadata. If there are several, the one closest to the root of the repository is used. Each author can have a `name`, or `given-names` and `surname` fields, and optionally an `orcid`. Authors can also be listed as plain names (`- Jane Doe`), and footnotes in names (`Jane Doe^[Corresponding author]`) are ignored.
 
 The body of the issue should have the URL of the repository marked with HTML comments:
 

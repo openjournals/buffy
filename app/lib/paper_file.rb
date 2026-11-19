@@ -62,7 +62,7 @@ class PaperFile
       content = @metadata_content || File.read(metadata_path)
       # Date and Time are allowed only so that an unquoted date anywhere in the front matter
       # (e.g. `date: 2026-07-06`) doesn't make the whole parse fail; the date itself isn't used.
-      YAML.load(content, permitted_classes: [Date, Time])
+      YAML.load(content, permitted_classes: [Date, Time], aliases: true)
     rescue StandardError
       {}
     end
@@ -76,6 +76,8 @@ class PaperFile
     return [] unless raw_authors.is_a?(Array)
 
     raw_authors.filter_map do |author|
+      # Authors can also be listed as plain names: `- Jane Doe`
+      author = { 'name' => author } if author.is_a?(String)
       next unless author.is_a?(Hash)
       name_fields = author['name'].is_a?(Hash) ? author['name'] : author
       name = if author['name'].is_a?(String)
@@ -83,7 +85,8 @@ class PaperFile
              else
                ['given-names', 'dropping-particle', 'non-dropping-particle', 'surname', 'suffix'].map { |f| name_fields[f] }.compact.join(" ")
              end
-      name = name.to_s.gsub(/\^\[[^\]]*\]/, "").strip
+      # Remove footnotes, which can contain brackets: `Jane Doe^[Equal [contribution]]`
+      name = name.to_s.gsub(/\^(?<note>\[(?:[^\[\]]|\g<note>)*\])/, "").strip
       next if name.empty?
       { name: name, orcid: author['orcid'].to_s.strip }
     end

@@ -50,6 +50,13 @@ describe AuthorsChecker do
       expect(subject.compare({ name: "Xu Li" }, { login: "alexulin", name: "" })).to be_nil
     end
 
+    it "is :close for the same name with a different ORCID" do
+      author = { name: "Jane Doe", orcid: "0000-0001-2345-6789" }
+      expect(subject.compare(author, { name: "Doe, Jane", orcid: "0000-0009-8765-4321" })).to eq(:close)
+      expect(subject.compare(author, { name: "Doe, Jane", orcid: "https://orcid.org/0000-0001-2345-6789" })).to eq(:exact)
+      expect(subject.compare(author, { name: "Doe, Jane", orcid: "" })).to eq(:exact)
+    end
+
     it "is nil for different people" do
       expect(subject.compare({ name: "Tanya Sah" }, { name: "Tanmay Sah" })).to be_nil
       expect(subject.compare({ name: "Jane Doe" }, { name: "John Smith" })).to be_nil
@@ -103,6 +110,15 @@ describe AuthorsChecker do
       expect(report[:authors].map { |r| r[:github]&.dig(:person, :login) }).to eq(["weili", "aschmidt", nil])
       expect(report[:github_only].map { |c| c[:login] }).to eq(["liwei-chen"])
       expect(report[:zenodo_only]).to eq([{ name: "Doe, J." }])
+    end
+
+    it "includes both ORCIDs in a match when they differ" do
+      authors = [{ name: "Jane Doe", orcid: "0000-0001-2345-6789" }, { name: "John Smith", orcid: "0000-0002-0000-0001" }]
+      zenodo = [{ name: "Doe, Jane", orcid: "0000-0009-8765-4321" }, { name: "Smith, John", orcid: "0000-0002-0000-0001" }]
+      report = described_class.new(paper_authors: authors, zenodo_creators: zenodo).check
+
+      expect(report[:authors].map { |r| [r[:zenodo][:status], r[:zenodo][:orcids]] }).to eq([[:close, ["0000-0001-2345-6789", "0000-0009-8765-4321"]], [:exact, nil]])
+      expect(report[:zenodo_only]).to eq([])
     end
 
     it "uses nil for sources that were not checked" do

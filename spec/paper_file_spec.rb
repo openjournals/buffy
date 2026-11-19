@@ -50,11 +50,13 @@ describe PaperFile do
   end
 
   describe "#authors" do
-    it "should read the authors from the paper's metadata" do
+    it "should read the authors from the paper's metadata, with YAML aliases, footnotes and plain names" do
       paper = PaperFile.new(fixture("paper_with_authors.md"))
       expect(paper.authors).to eq([{ name: "Jane Q. Doe", orcid: "0000-0001-2345-6789" },
                                    { name: "Ludwig van Beethoven", orcid: "" },
-                                   { name: "Ada Lovelace", orcid: "" }])
+                                   { name: "Grace Hopper", orcid: "" },
+                                   { name: "Ada Lovelace", orcid: "" },
+                                   { name: "Alan Turing", orcid: "" }])
     end
 
     it "should be empty if there's no metadata" do

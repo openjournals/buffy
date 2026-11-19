@@ -191,6 +191,16 @@ describe AuthorsCheckWorker do
       @worker.respond_template(:authors_check, { report: report, notes: [] })
     end
 
+    it "should show both ORCIDs when they differ" do
+      authors = [{ name: "Jane Doe", orcid: "0000-0001-2345-6789" }]
+      zenodo = [{ name: "Doe, Jane", orcid: "0000-0009-8765-4321" }]
+      report = AuthorsChecker.new(paper_authors: authors, zenodo_creators: zenodo).check
+      expect(@worker).to receive(:respond) do |message|
+        expect(message).to include("| Jane Doe | ⚠️ Different ORCID: Doe, Jane has 0000-0009-8765-4321 (paper: 0000-0001-2345-6789) | — |")
+      end
+      @worker.respond_template(:authors_check, { report: report, notes: [] })
+    end
+
     it "should show a dash for sources that were not checked" do
       report = AuthorsChecker.new(paper_authors: [{ name: "Jane Doe" }]).check
       expect(@worker).to receive(:respond) do |message|

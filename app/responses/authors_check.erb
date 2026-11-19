@@ -14,6 +14,8 @@
   zenodo_cell = lambda do |match|
     if match.nil?
       "❌ Not found"
+    elsif match[:orcids]
+      "⚠️ Different ORCID: #{safe.call(match[:person][:name])} has #{safe.call(match[:orcids][1])} (paper: #{safe.call(match[:orcids][0])})"
     elsif match[:status] == :exact
       "✅ #{safe.call(match[:person][:name])}"
     else
@@ -62,7 +64,7 @@ _<%= note %>_
 <summary>How to read this</summary>
 
 - ✅ The name matches. For Zenodo, "Last, First" and "First Last" count as the same.
-- ⚠️ Zenodo: the name is written differently (accents, capitalization, initials, typos). GitHub: probably the same person, but the editor should confirm.
+- ⚠️ Zenodo: the name is written differently (accents, capitalization, initials, typos), or the paper and Zenodo have different ORCIDs. GitHub: probably the same person, but the editor should confirm.
 - ❌ No match found.
 
 GitHub only lists people who made commits, so authors who contributed in other ways won't appear there. Contributors don't all need to be authors. These results are for the editor to review, not a pass/fail check.

@@ -12,7 +12,8 @@ require 'did_you_mean'
 #   :exact   same name, written the same way ("Last, First" and "First Last" are equivalent)
 #   :same    same name ignoring case, accents and punctuation
 #   :close   probably the same person: same ORCID, a missing middle name or initial,
-#            a one-letter typo, or a GitHub username built from the author's name
+#            a one-letter typo, or a GitHub username built from the author's name.
+#            Also the same name when both have an ORCID and they differ.
 #   nil      not the same person
 class AuthorsChecker
 
@@ -31,7 +32,8 @@ class AuthorsChecker
   #   authors: one row per paper author with its best :zenodo and :github match (or nil)
   #   zenodo_only: Zenodo creators that aren't any paper author's match
   #   github_only: GitHub contributors that aren't any paper author's match
-  # A match is { status: :exact | :same | :close, person: }
+  # A match is { status: :exact | :same | :close, person:, orcids: } where orcids is
+  # [author's ORCID, person's ORCID] if both have one and they differ, or nil
   # A nil list (instead of an empty one) means that source wasn't checked
   def check
     rows = paper_authors.map do |author|
@@ -56,7 +58,7 @@ class AuthorsChecker
       status = compare(author, candidate)
       next unless status
       next if RANKS.index(status) > best_rank_with_other_authors(author, candidate)
-      { status: status, person: candidate }
+      { status: status, person: candidate, orcids: conflicting_orcids(author, candidate) }
     end
     matches.min_by { |m| RANKS.index(m[:status]) }
   end
@@ -72,6 +74,13 @@ class AuthorsChecker
   end
 
   def compare(author, other)
+    status = compare_names(author, other)
+    # The same name with a different ORCID may be a different person, or a mistake: flag it
+    status = :close if [:exact, :same].include?(status) && conflicting_orcids(author, other)
+    status
+  end
+
+  def compare_names(author, other)
     return :exact if !display_name(author[:name]).empty? && display_name(author[:name]) == display_name(other[:name])
 
     a_tokens = normalize_name(author[:name]).split
@@ -110,6 +119,11 @@ class AuthorsChecker
   def best_rank_with_other_authors(author, candidate)
     ranks = (paper_authors - [author]).filter_map { |other| status = compare(other, candidate); status && RANKS.index(status) }
     ranks.min || RANKS.size
+  end
+
+  def conflicting_orcids(author, other)
+    orcids = [orcid(author), orcid(other)]
+    orcids if orcids.none?(&:empty?) && orcids.uniq.size == 2
   end
 
   def same_orcid?(author, other)
