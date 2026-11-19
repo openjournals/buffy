@@ -1,3 +1,5 @@
+require 'did_you_mean'
+
 # Compares the list of authors in a paper with the creators of its Zenodo archive
 # and with the contributors of its GitHub repository.
 #
@@ -122,7 +124,7 @@ class AuthorsChecker
     shorter, longer = [a, b].sort_by(&:size)
     return true if shorter.size > 1 && (shorter - longer).empty?
     # One-letter typo in names long enough for that to be meaningful
-    a.join(" ").length > 8 && levenshtein_distance(a.join(" "), b.join(" ")) <= 1
+    a.join(" ").length > 8 && DidYouMean::Levenshtein.distance(a.join(" "), b.join(" ")) <= 1
   end
 
   def token_match?(x, y)
@@ -140,21 +142,5 @@ class AuthorsChecker
     return true if name_tokens.count { |t| t.length > 1 && letters.include?(t) } >= 2
     return true if parts.any? { |p| p.length >= 5 && name_tokens.include?(p) }
     [first[0] + last, last + first[0], first + last[0]].include?(letters)
-  end
-
-  def levenshtein_distance(s, t)
-    return t.length if s.empty?
-    return s.length if t.empty?
-
-    previous = (0..t.length).to_a
-    s.each_char.with_index(1) do |s_char, i|
-      current = [i]
-      t.each_char.with_index(1) do |t_char, j|
-        cost = s_char == t_char ? 0 : 1
-        current << [previous[j] + 1, current[j - 1] + 1, previous[j - 1] + cost].min
-      end
-      previous = current
-    end
-    previous.last
   end
 end
