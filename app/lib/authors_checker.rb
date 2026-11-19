@@ -29,8 +29,8 @@ class AuthorsChecker
 
   # Returns a hash with:
   #   authors: one row per paper author with its best :zenodo and :github match (or nil)
-  #   zenodo_only: Zenodo creators that don't match any paper author
-  #   github_only: GitHub contributors that don't match any paper author
+  #   zenodo_only: Zenodo creators that aren't any paper author's match
+  #   github_only: GitHub contributors that aren't any paper author's match
   # A match is { status: :exact | :same | :close, person: }
   # A nil list (instead of an empty one) means that source wasn't checked
   def check
@@ -44,8 +44,8 @@ class AuthorsChecker
 
     {
       authors: rows,
-      zenodo_only: unmatched(zenodo_creators),
-      github_only: unmatched(github_contributors)
+      zenodo_only: unmatched(zenodo_creators, rows.map { |r| r[:zenodo]&.dig(:person) }),
+      github_only: unmatched(github_contributors, rows.map { |r| r[:github]&.dig(:person) })
     }
   end
 
@@ -61,10 +61,14 @@ class AuthorsChecker
     matches.min_by { |m| RANKS.index(m[:status]) }
   end
 
-  # People that don't match any paper author (one author can have several GitHub accounts)
-  def unmatched(candidates)
+  # Candidates that aren't the chosen match of any paper author. The only ones left out
+  # are those with the same name as an author (e.g. a second GitHub account): a merely
+  # probable match that wasn't chosen is still listed, so nobody silently disappears.
+  def unmatched(candidates, chosen)
     return nil if candidates.nil?
-    candidates.reject { |c| paper_authors.any? { |author| compare(author, c) } }
+    candidates.reject do |c|
+      chosen.include?(c) || paper_authors.any? { |author| [:exact, :same].include?(compare(author, c)) }
+    end
   end
 
   def compare(author, other)
@@ -76,7 +80,7 @@ class AuthorsChecker
     return :same if !a_tokens.empty? && a_tokens.sort == o_tokens.sort
     return :close if same_orcid?(author, other)
     return :close if similar_names?(a_tokens, o_tokens)
-    return :close if other[:login] && login_matches_name?(other[:login], a_tokens)
+    return :close if other[:login] && login_usable?(o_tokens, a_tokens) && login_matches_name?(other[:login], a_tokens)
 
     nil
   end
@@ -131,6 +135,12 @@ class AuthorsChecker
     x == y || (x.length == 1 && y.start_with?(x)) || (y.length == 1 && x.start_with?(y))
   end
 
+  # A username only counts as evidence if the profile name doesn't say otherwise: the
+  # profile has no name, or just one name that is also one of the author's names
+  def login_usable?(profile_tokens, name_tokens)
+    profile_tokens.empty? || (profile_tokens.size == 1 && name_tokens.include?(profile_tokens.first))
+  end
+
   # Usernames like "jsmith", "johnsmith", "smith-john", "john-ds" or "smithj" for John Smith
   def login_matches_name?(login, name_tokens)
     return false if name_tokens.size < 2
@@ -139,7 +149,7 @@ class AuthorsChecker
     parts = login.split(/[^a-z]+/)
     first, last = name_tokens.first, name_tokens.last
 
-    return true if name_tokens.count { |t| t.length > 1 && letters.include?(t) } >= 2
+    return true if name_tokens.count { |t| t.length >= 3 && letters.include?(t) } >= 2
     return true if parts.any? { |p| p.length >= 5 && name_tokens.include?(p) }
     [first[0] + last, last + first[0], first + last[0]].include?(letters)
   end

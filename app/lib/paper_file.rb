@@ -52,11 +52,20 @@ class PaperFile
     @bibtex_filename
   end
 
+  # The contents of the metadata file, when it was read from somewhere other than the
+  # local disk (e.g. fetched from a git repository). If not set, metadata_path is read.
+  attr_writer :metadata_content
+
   def metadata
     return {} if paper_path.nil?
-    # Date and Time are allowed only so that an unquoted date anywhere in the front matter
-    # (e.g. `date: 2026-07-06`) doesn't make the whole parse fail; the date itself isn't used.
-    @metadata ||= (YAML.load_file(metadata_path, permitted_classes: [Date, Time]) rescue {})
+    @metadata ||= begin
+      content = @metadata_content || File.read(metadata_path)
+      # Date and Time are allowed only so that an unquoted date anywhere in the front matter
+      # (e.g. `date: 2026-07-06`) doesn't make the whole parse fail; the date itself isn't used.
+      YAML.load(content, permitted_classes: [Date, Time])
+    rescue StandardError
+      {}
+    end
     @metadata.is_a?(Hash) ? @metadata : {}
   end
 

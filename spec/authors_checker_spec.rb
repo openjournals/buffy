@@ -38,6 +38,18 @@ describe AuthorsChecker do
       expect(subject.compare({ name: "John Smith" }, { login: "jsmith", name: "" })).to eq(:close)
     end
 
+    it "doesn't use the username when the profile name belongs to someone else" do
+      expect(subject.compare({ name: "David Smith" }, { login: "david", name: "David Jones" })).to be_nil
+      expect(subject.compare({ name: "Maria Garcia" }, { login: "maria-k", name: "Maria Kowalski" })).to be_nil
+      expect(subject.compare({ name: "John Smith" }, { login: "jsmith", name: "Jane Roe" })).to be_nil
+    end
+
+    it "doesn't match usernames on very short names" do
+      expect(subject.compare({ name: "An Li" }, { login: "danielinglis", name: "" })).to be_nil
+      expect(subject.compare({ name: "Yu Ma" }, { login: "yumamoto", name: "" })).to be_nil
+      expect(subject.compare({ name: "Xu Li" }, { login: "alexulin", name: "" })).to be_nil
+    end
+
     it "is nil for different people" do
       expect(subject.compare({ name: "Tanya Sah" }, { name: "Tanmay Sah" })).to be_nil
       expect(subject.compare({ name: "Jane Doe" }, { name: "John Smith" })).to be_nil
@@ -78,6 +90,19 @@ describe AuthorsChecker do
 
     it "lists GitHub contributors that are not paper authors, excluding ignored users and extra accounts" do
       expect(report[:github_only].map { |c| c[:login] }).to eq(["someone"])
+    end
+
+    it "lists probable matches that weren't chosen, so nobody disappears" do
+      authors = [{ name: "Wei Li" }, { name: "Anna Schmidt" }, { name: "Jane Doe" }]
+      github = [{ login: "weili", name: "Wei Li", contributions: 10 },
+                { login: "liwei-chen", name: "Liwei Chen", contributions: 25 },
+                { login: "aschmidt", name: "", contributions: 3 }]
+      zenodo = [{ name: "Doe, Jane" }, { name: "Doe, J." }]
+      report = described_class.new(paper_authors: authors, zenodo_creators: zenodo, github_contributors: github).check
+
+      expect(report[:authors].map { |r| r[:github]&.dig(:person, :login) }).to eq(["weili", "aschmidt", nil])
+      expect(report[:github_only].map { |c| c[:login] }).to eq(["liwei-chen"])
+      expect(report[:zenodo_only]).to eq([{ name: "Doe, J." }])
     end
 
     it "uses nil for sources that were not checked" do

@@ -1,11 +1,13 @@
 <%
-  # Never output a raw @mention: usernames, and any other text containing "@", go in code spans
-  # so nobody gets pinged. Pipes are escaped so they don't break the table.
+  # Never output a raw @mention or issue reference: usernames, and any other text containing
+  # "@" or "#", go in code spans so nobody gets pinged and no issue gets a back-reference.
+  # Text is kept on one line (a line break would end the code span and the table row),
+  # and pipes are escaped so they don't break the table.
   safe = lambda do |text|
-    text = text.to_s.tr("`", "'").gsub("|", "\\|")
-    text.include?("@") ? "`#{text}`" : text
+    text = text.to_s.tr("`", "'").gsub(/[[:space:]]+/, " ").strip.gsub("|", "\\|")
+    text.match?(/[@#]/) ? "`#{text}`" : text
   end
-  login = lambda { |name| "`@#{name.to_s.tr("`", "")}`" }
+  login = lambda { |name| "`@#{name.to_s.gsub(/[`[:space:]]/, "")}`" }
   github_label = lambda do |person|
     person[:name].to_s.empty? ? login.call(person[:login]) : "#{login.call(person[:login])} (#{safe.call(person[:name])})"
   end

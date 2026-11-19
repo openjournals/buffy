@@ -6,12 +6,14 @@ This responder compares (asynchronously) the list of authors in the paper with:
 - the authors (creators) of the paper's Zenodo archive, and
 - the contributors to the software's GitHub repository.
 
-It replies with a table showing, for every author in the paper, whether they appear in the Zenodo archive and among the GitHub contributors. It also lists Zenodo authors who aren't in the paper, and GitHub contributors who don't match any paper author.
+It replies with a table showing, for every author in the paper, whether they appear in the Zenodo archive and among the GitHub contributors. It also lists Zenodo authors and GitHub contributors who weren't matched to a paper author (a second account with exactly the same name as an author isn't listed).
+
+Only the paper's metadata is downloaded from the repository, not the whole repository, so the check is quick even for big repositories. GitHub usernames are always shown as code (`` `@username` ``), so the reply doesn't notify anyone.
 
 Names are matched leniently, so small differences are flagged rather than missed:
 
 - **Zenodo:** ✅ means the name is written exactly the same way (Zenodo's `Last, First` format counts as the same as `First Last`). ⚠️ means it is probably the same person but the name is written differently: different accents or capitalization, a missing initial, a typo, or a different name with the same ORCID.
-- **GitHub:** ✅ means the name in the contributor's GitHub profile matches. ⚠️ means it is probably the same person: a similar name, or a username built from the author's name (for example `jsmith` for John Smith).
+- **GitHub:** ✅ means the name in the contributor's GitHub profile matches. ⚠️ means it is probably the same person: a similar name, or a username built from the author's name (for example `jsmith` for John Smith) when the profile doesn't have a different name.
 
 GitHub contributors are people who made commits, so authors who contributed in other ways won't be found there, and not every contributor has to be an author. The results are meant to help editors, not to pass or fail a submission.
 
@@ -38,7 +40,7 @@ Both options can be used together, in either order.
 
 ## Requirements
 
-The target repository should include a `paper.md` file (or a `paper.tex` file with a `paper.yml` metadata file) with an `authors` list in its metadata. Each author can have a `name`, or `given-names` and `surname` fields, and optionally an `orcid`.
+The target repository should include a `paper.md` file (or a `paper.tex` file with a `paper.yml` metadata file next to it) with an `authors` list in its metadata. If there are several, the one closest to the root of the repository is used. Each author can have a `name`, or `given-names` and `surname` fields, and optionally an `orcid`.
 
 The body of the issue should have the URL of the repository marked with HTML comments:
 
@@ -49,11 +51,14 @@ The body of the issue should have the URL of the repository marked with HTML com
 The Zenodo archive is looked for in this order:
 
 1. The archive given in the command (`with archive <DOI or URL>`).
-2. The most recent `@botname set <DOI> as archive` comment in the issue.
-3. The `archive` value in the body of the issue.
-4. The most recent issue comment that mentions a Zenodo DOI (like `10.5281/zenodo.123456`) or a Zenodo record URL.
+2. The `archive` value in the body of the issue (set with `@botname set <DOI> as archive`).
+3. The most recent issue comment that mentions a Zenodo DOI (like `10.5281/zenodo.123456`) or a Zenodo record URL. If a comment mentions several, the last one is used.
 
 The bot's own comments are skipped. When the archive comes from a comment, the reply links to that comment, so the editor can check it's the right archive.
+
+If the archive isn't given in the command, and the most recent `@botname set ... as archive` comment doesn't match the archive in the issue (for example because that command was refused), the bot doesn't guess: it replies with an error, linking to that comment, and asks the editor to set the right archive in the issue. A `set Pending as archive` command cancels the earlier ones.
+
+Zenodo sandbox records are not checked.
 
 If no archive is found, or it isn't in Zenodo, or the repository isn't on GitHub, that part of the check is skipped and the reply says so.
 

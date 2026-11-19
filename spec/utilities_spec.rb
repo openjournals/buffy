@@ -15,6 +15,51 @@ describe "Utilities" do
     disable_github_calls_for(subject)
   end
 
+  describe "#clone_repo_metadata" do
+    let(:base) { ["git", "clone", "--quiet", "--depth", "1", "--filter=blob:none", "--no-checkout"] }
+
+    it "should do a shallow clone without file contents" do
+      expect(Open3).to receive(:capture3).with(*base, "--", "https://github.com/a/b", "./local/folder").
+                       and_return(["", "", OpenStruct.new(success?: true)])
+      expect(subject.clone_repo_metadata("https://github.com/a/b", "./local/folder")).to be_truthy
+    end
+
+    it "should clone the given branch" do
+      expect(Open3).to receive(:capture3).with(*base, "--branch", "joss/paper", "--", "https://github.com/a/b", "./local/folder").
+                       and_return(["", "", OpenStruct.new(success?: false)])
+      expect(subject.clone_repo_metadata("https://github.com/a/b", "./local/folder", "joss/paper")).to be_falsy
+    end
+
+    it "should reject invalid urls and branch names" do
+      expect(Open3).to_not receive(:capture3)
+      expect(subject.clone_repo_metadata("file:///etc/passwd", "./local/folder")).to be_falsy
+      expect(subject.clone_repo_metadata("https://github.com/a/b", "./local/folder", "--upload-pack=x")).to be_falsy
+    end
+  end
+
+  describe "#repo_files and #read_repo_file" do
+    it "should list the regular files, skipping symlinks and submodules, and read one" do
+      tree = "100644 blob aaa\ta.md\0" \
+             "100755 blob bbb\tbin/run\0" \
+             "120000 blob ccc\tpaper.md\0" \
+             "160000 commit ddd\tvendor/lib\0" \
+             "100644 blob eee\tpaper/paper.md\0"
+      expect(Open3).to receive(:capture3).with("git", "-C", "./repo", "ls-tree", "-r", "-z", "HEAD").
+                       and_return([tree, "", OpenStruct.new(success?: true)])
+      expect(subject.repo_files("./repo")).to eq(["a.md", "bin/run", "paper/paper.md"])
+
+      expect(Open3).to receive(:capture3).with("git", "-C", "./repo", "show", "HEAD:paper/paper.md").
+                       and_return(["content", "", OpenStruct.new(success?: true)])
+      expect(subject.read_repo_file("./repo", "paper/paper.md")).to eq("content")
+    end
+
+    it "should return empty values on errors" do
+      allow(Open3).to receive(:capture3).and_return(["", "fatal", OpenStruct.new(success?: false)])
+      expect(subject.repo_files("./repo")).to eq([])
+      expect(subject.read_repo_file("./repo", "missing.md")).to be_nil
+    end
+  end
+
   describe "#clone_repo" do
     it "should return true when successfully cloned a repo to a local path" do
       expect(Open3).to receive(:capture3).
