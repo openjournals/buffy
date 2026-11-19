@@ -1,3 +1,4 @@
+require 'date'
 require 'bibtex'
 
 class PaperFile
@@ -49,6 +50,32 @@ class PaperFile
       @bibtex_error = "Couldn't find bibliography entry in the paper's metadata"
     end
     @bibtex_filename
+  end
+
+  def metadata
+    return {} if paper_path.nil?
+    @metadata ||= (YAML.load_file(metadata_path, permitted_classes: [Date, Time]) rescue {})
+    @metadata.is_a?(Hash) ? @metadata : {}
+  end
+
+  # List of authors from the paper's metadata as hashes with :name and :orcid keys
+  # Supports both `name: Full Name` and the split `given-names`/`surname` fields
+  def authors
+    raw_authors = metadata['authors']
+    return [] unless raw_authors.is_a?(Array)
+
+    raw_authors.filter_map do |author|
+      next unless author.is_a?(Hash)
+      name_fields = author['name'].is_a?(Hash) ? author['name'] : author
+      name = if author['name'].is_a?(String)
+               author['name']
+             else
+               ['given-names', 'dropping-particle', 'non-dropping-particle', 'surname', 'suffix'].map { |f| name_fields[f] }.compact.join(" ")
+             end
+      name = name.to_s.gsub(/\^\[[^\]]*\]/, "").strip
+      next if name.empty?
+      { name: name, orcid: author['orcid'].to_s.strip }
+    end
   end
 
   def metadata_path

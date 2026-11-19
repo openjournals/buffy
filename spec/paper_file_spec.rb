@@ -49,6 +49,20 @@ describe PaperFile do
     end
   end
 
+  describe "#authors" do
+    it "should read the authors from the paper's metadata" do
+      paper = PaperFile.new(fixture("paper_with_authors.md"))
+      expect(paper.authors).to eq([{ name: "Jane Q. Doe", orcid: "0000-0001-2345-6789" },
+                                   { name: "Ludwig van Beethoven", orcid: "" },
+                                   { name: "Ada Lovelace", orcid: "" }])
+    end
+
+    it "should be empty if there's no metadata" do
+      expect(PaperFile.new.authors).to eq([])
+      expect(subject.authors).to eq([])
+    end
+  end
+
   describe "#bibtex_path" do
     it "should return the path of the bib file from the paper's metadata" do
       expect(YAML).to receive(:load_file).with("./doc/paper.md").and_return({'bibliography' => 'references.bib'})

@@ -1,0 +1,67 @@
+<%
+  # Never output a raw @mention: usernames, and any other text containing "@", go in code spans
+  # so nobody gets pinged. Pipes are escaped so they don't break the table.
+  safe = lambda do |text|
+    text = text.to_s.tr("`", "'").gsub("|", "\\|")
+    text.include?("@") ? "`#{text}`" : text
+  end
+  login = lambda { |name| "`@#{name.to_s.tr("`", "")}`" }
+  github_label = lambda do |person|
+    person[:name].to_s.empty? ? login.call(person[:login]) : "#{login.call(person[:login])} (#{safe.call(person[:name])})"
+  end
+  zenodo_cell = lambda do |match|
+    if match.nil?
+      "❌ Not found"
+    elsif match[:status] == :exact
+      "✅ #{safe.call(match[:person][:name])}"
+    else
+      "⚠️ Written differently: #{safe.call(match[:person][:name])}"
+    end
+  end
+  github_cell = lambda do |match|
+    if match.nil?
+      "❌ Not found"
+    elsif match[:status] == :close
+      "⚠️ Possibly #{github_label.call(match[:person])}"
+    else
+      "✅ #{github_label.call(match[:person])}"
+    end
+  end
+  zenodo_checked = !report[:zenodo_only].nil?
+  github_checked = !report[:github_only].nil?
+-%>
+**Authors check**
+
+| Paper author | Zenodo archive | GitHub contributor |
+|---|---|---|
+<% report[:authors].each do |row| -%>
+| <%= safe.call(row[:author][:name]) %> | <%= zenodo_checked ? zenodo_cell.call(row[:zenodo]) : "—" %> | <%= github_checked ? github_cell.call(row[:github]) : "—" %> |
+<% end -%>
+<% if zenodo_checked && report[:zenodo_only].any? -%>
+
+**Zenodo authors not listed in the paper:**
+<% report[:zenodo_only].each do |creator| -%>
+- <%= safe.call(creator[:name]) %>
+<% end -%>
+<% end -%>
+<% if github_checked && report[:github_only].any? -%>
+
+**GitHub contributors not matched to a paper author** (reviewers, editor and bots excluded):
+<% report[:github_only].each do |contributor| -%>
+- <%= github_label.call(contributor) %>: <%= contributor[:contributions] %> commit<%= contributor[:contributions] == 1 ? "" : "s" %>
+<% end -%>
+<% end -%>
+<% notes.each do |note| -%>
+
+_<%= note %>_
+<% end -%>
+
+<details>
+<summary>How to read this</summary>
+
+- ✅ The name matches. For Zenodo, "Last, First" and "First Last" count as the same.
+- ⚠️ Zenodo: the name is written differently (accents, capitalization, initials, typos). GitHub: probably the same person, but the editor should confirm.
+- ❌ No match found.
+
+GitHub only lists people who made commits, so authors who contributed in other ways won't appear there. Contributors don't all need to be authors. These results are for the editor to review, not a pass/fail check.
+</details>
