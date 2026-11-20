@@ -207,14 +207,14 @@ describe AuthorsCheckResponder do
   describe "help" do
     it "describes the command and its options" do
       expect(@responder.description).to include("Compare the paper's authors")
-      expect(@responder.description).to include("non-default branch, with a given Zenodo archive, or with a given paper file")
+      expect(@responder.description).to include("non-default branch, with a given Zenodo archive DOI, or with a given paper file")
     end
 
     it "shows an example for each option" do
       examples = @responder.example_invocation.split("\n")
       expect(examples).to eq(["@botsci check authors",
                               "@botsci check authors from branch custom-branch-name",
-                              "@botsci check authors with archive https://zenodo.org/records/123456",
+                              "@botsci check authors with archive 10.5281/zenodo.123456",
                               "@botsci check authors with paper docs/paper.md"])
       examples.each { |example| expect(@responder.event_regex).to match(example) }
     end

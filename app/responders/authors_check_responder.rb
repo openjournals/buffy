@@ -10,7 +10,7 @@ class AuthorsCheckResponder < Responder
 
   def define_listening
     @event_action = "issue_comment.created"
-    # Optional "from branch <name>", "with archive <DOI or URL>" and "with paper <path>", in any order
+    # Optional "from branch <name>", "with archive <Zenodo DOI>" and "with paper <path>", in any order
     @event_regex = /\A@#{bot_name} check authors((?: +(?:from branch [\/\.\w-]+|with archive \S+|with paper \S+))*)\.?\s*$/i
   end
 
@@ -55,13 +55,13 @@ class AuthorsCheckResponder < Responder
 
   def default_description
     "Compare the paper's authors with the Zenodo archive's authors and the repository's contributors" + "\n" +
-    "# Optionally, it can be run on a non-default branch, with a given Zenodo archive, or with a given paper file "
+    "# Optionally, it can be run on a non-default branch, with a given Zenodo archive DOI, or with a given paper file "
   end
 
   def default_example_invocation
     "@#{bot_name} check authors" + "\n" +
     "@#{bot_name} check authors from branch custom-branch-name" + "\n" +
-    "@#{bot_name} check authors with archive https://zenodo.org/records/123456" + "\n" +
+    "@#{bot_name} check authors with archive 10.5281/zenodo.123456" + "\n" +
     "@#{bot_name} check authors with paper docs/paper.md"
   end
 

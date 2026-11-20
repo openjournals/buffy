@@ -18,6 +18,9 @@ class AuthorsCheckWorker < BuffyWorker
   def perform(locals, url, branch, archive_sources, ignored_logins, paper = "")
     load_context_and_env(locals)
     notes = []
+    # Parts of the check that couldn't run because the archive isn't in Zenodo or the
+    # repository isn't on GitHub, the only places that can be checked. Shown above the table.
+    warnings = []
     archive = find_archive(archive_sources.to_h, notes)
 
     paper_file, error = paper_file_from_repo(url, branch, paper)
@@ -28,15 +31,15 @@ class AuthorsCheckWorker < BuffyWorker
       return respond("I couldn't find a list of authors in #{inline_code(paper_file.metadata_path.delete_prefix("./"))}. #{paper_hint}")
     end
 
-    zenodo_creators = zenodo_creators_for(archive, notes)
-    github_contributors = github_contributors_for(url, notes)
+    zenodo_creators = zenodo_creators_for(archive, notes, warnings)
+    github_contributors = github_contributors_for(url, notes, warnings)
 
     checker = AuthorsChecker.new(paper_authors: paper_authors,
                                  zenodo_creators: zenodo_creators,
                                  github_contributors: github_contributors,
                                  ignored_logins: ignored_logins.to_a)
 
-    respond_template :authors_check, { report: checker.check, notes: notes }
+    respond_template :authors_check, { report: checker.check, notes: notes, warnings: warnings }
   rescue ArchiveConflict => e
     respond(e.message)
   ensure
@@ -100,7 +103,7 @@ class AuthorsCheckWorker < BuffyWorker
     set_command = /\A@#{Regexp.escape(context.bot_name.to_s)} set (.*) as #{Regexp.escape(field)}\.?\s*$/i
     set_comment = human_comments.find { |c| c.body.to_s.match?(set_command) }
     set_archive = set_comment ? value.call(set_comment.body[set_command, 1]) : ""
-    if !set_archive.empty? && !set_archive.casecmp?(issue_archive)
+    if !set_archive.empty? && !same_archive?(set_archive, issue_archive)
       in_issue = issue_archive.empty? ? "the issue has no #{field} set" : "the issue has #{inline_code(issue_archive)}"
       raise ArchiveConflict, "I can't tell which archive to check: the most recent " +
                              "`@#{context.bot_name} set ... as #{field}` command ([this comment](#{comment_url(set_comment.id)})) " +
@@ -123,6 +126,16 @@ class AuthorsCheckWorker < BuffyWorker
     ""
   end
 
+  # Whether two archive values point to the same archive: the same Zenodo record, whether written
+  # as a DOI, a doi.org link or a zenodo.org URL, or else the same DOI ignoring case and a doi.org
+  # or "doi:" prefix. (editorialbot stores "set https://doi.org/<DOI> as archive" as the bare DOI.)
+  def same_archive?(a, b)
+    ids = [a, b].map { |value| value.to_s.match(ZENODO_REFERENCE)&.captures&.compact&.first }
+    return ids[0] == ids[1] if ids.none?(&:nil?)
+    bare = ->(value) { value.to_s.strip.sub(%r{\A(?:https?://)?(?:dx\.)?doi\.org/}i, "").sub(/\Adoi:\s*/i, "") }
+    bare.call(a).casecmp?(bare.call(b))
+  end
+
   # Issue comments not written by the bot, most recent first
   def human_comments
     @human_comments ||= begin
@@ -134,8 +147,10 @@ class AuthorsCheckWorker < BuffyWorker
     end
   end
 
-  # Returns the list of creators of the Zenodo archive, or nil if they can't be retrieved
-  def zenodo_creators_for(archive, notes)
+  # Returns the list of creators of the Zenodo archive, or nil if they can't be retrieved.
+  # The archive should be a DOI: if it's a zenodo.org URL, the record's DOI is used, with a note.
+  # If it isn't in Zenodo, a warning is added.
+  def zenodo_creators_for(archive, notes, warnings = [])
     archive = archive.to_s.strip
 
     if archive.empty?
@@ -145,8 +160,9 @@ class AuthorsCheckWorker < BuffyWorker
 
     match = archive.match(ZENODO_REFERENCE)
     if match.nil?
-      kind = archive.match?(/sandbox\.zenodo\.org/i) ? "is a Zenodo sandbox record" : "is not a Zenodo DOI or URL"
-      notes << "The archive (#{inline_code(archive)}) #{kind}, so its authors were not checked. #{archive_hint}"
+      kind = archive.match?(/sandbox\.zenodo\.org/i) ? "is a Zenodo sandbox record, not a Zenodo DOI" : "isn't a Zenodo DOI"
+      warnings << "The archive (#{inline_code(archive)}) #{kind}, so its authors were not checked. " +
+                  "Only Zenodo archives can be checked. #{other_archive_hint}"
       return nil
     end
 
@@ -154,6 +170,12 @@ class AuthorsCheckWorker < BuffyWorker
     if record.nil?
       notes << "I couldn't retrieve the Zenodo record for #{inline_code(archive)}, so Zenodo authors were not checked. #{archive_hint}"
       return nil
+    end
+
+    if match[2]
+      doi = record["doi"].to_s.strip
+      doi = "10.5281/zenodo.#{record["id"] || match[2]}" if doi.empty?
+      notes << "The archive (#{inline_code(archive)}) is a Zenodo URL, not a DOI, so I used its DOI, #{inline_code(doi)}, instead."
     end
 
     creators = record.dig("metadata", "creators").to_a
@@ -175,11 +197,13 @@ class AuthorsCheckWorker < BuffyWorker
     nil
   end
 
-  # Returns the list of GitHub contributors of the repo, or nil if they can't be retrieved
-  def github_contributors_for(url, notes)
+  # Returns the list of GitHub contributors of the repo, or nil if they can't be retrieved.
+  # If the repository isn't on GitHub, a warning is added.
+  def github_contributors_for(url, notes, warnings = [])
     repo_name = url.to_s.strip[%r{\Ahttps?://(?:www\.)?github\.com/([\w.-]+/[\w.-]+?)(?:\.git)?/?\z}i, 1]
     if repo_name.nil?
-      notes << "The repository is not hosted on GitHub, so GitHub contributors were not checked."
+      warnings << "The repository (#{inline_code(url)}) isn't on GitHub, so its contributors were not checked. " +
+                  "Only GitHub repositories can be checked."
       return nil
     end
 
@@ -223,7 +247,12 @@ class AuthorsCheckWorker < BuffyWorker
 
   def archive_hint
     "Sorry, I couldn't figure out the Zenodo archive. Please name it explicitly: " +
-      "`@#{context.bot_name} check authors with archive <Zenodo DOI or URL>`"
+      "`@#{context.bot_name} check authors with archive <Zenodo DOI>`"
+  end
+
+  # For an archive that was found but isn't in Zenodo
+  def other_archive_hint
+    "If there is a Zenodo archive, name it: `@#{context.bot_name} check authors with archive <Zenodo DOI>`"
   end
 
   # Text inside a code span on one line, so it can't break out of it and mention anyone

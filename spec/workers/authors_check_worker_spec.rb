@@ -11,7 +11,8 @@ describe AuthorsCheckWorker do
   end
 
   let(:paper_hint) { "Sorry, I couldn't figure out the right paper file. Please name it explicitly: `@botsci check authors with paper <path to paper.md>`" }
-  let(:archive_hint) { "Sorry, I couldn't figure out the Zenodo archive. Please name it explicitly: `@botsci check authors with archive <Zenodo DOI or URL>`" }
+  let(:archive_hint) { "Sorry, I couldn't figure out the Zenodo archive. Please name it explicitly: `@botsci check authors with archive <Zenodo DOI>`" }
+  let(:other_archive_hint) { "If there is a Zenodo archive, name it: `@botsci check authors with archive <Zenodo DOI>`" }
 
   describe "perform" do
     before do
@@ -56,11 +57,11 @@ describe AuthorsCheckWorker do
       github = [{ login: "jd", name: "Jane Doe", contributions: 3 }, { login: "rev", name: "Re View", contributions: 1 }]
       sources = { "command" => "10.5281/zenodo.1", "issue" => "", "field" => "archive" }
       expect(@worker).to receive(:find_archive).with(sources, []).and_return("10.5281/zenodo.1")
-      expect(@worker).to receive(:zenodo_creators_for).with("10.5281/zenodo.1", []).and_return(zenodo)
-      expect(@worker).to receive(:github_contributors_for).with("https://github.com/a/b", []).and_return(github)
+      expect(@worker).to receive(:zenodo_creators_for).with("10.5281/zenodo.1", [], []).and_return(zenodo)
+      expect(@worker).to receive(:github_contributors_for).with("https://github.com/a/b", [], []).and_return(github)
 
       expected_report = AuthorsChecker.new(paper_authors: authors, zenodo_creators: zenodo, github_contributors: github, ignored_logins: ["rev"]).check
-      expect(@worker).to receive(:respond_template).with(:authors_check, { report: expected_report, notes: [] })
+      expect(@worker).to receive(:respond_template).with(:authors_check, { report: expected_report, notes: [], warnings: [] })
       expect(@worker).to receive(:cleanup)
 
       @worker.perform({}, "https://github.com/a/b", "main", sources, ["rev"])
@@ -368,33 +369,77 @@ describe AuthorsCheckWorker do
       expect(notes.last).to end_with(archive_hint)
     end
 
-    it "should skip if the archive is not in Zenodo" do
-      ["10.6084/m9.figshare.1", "10.1234/foozenodo.5", "https://notzenodo.org/records/5"].each do |archive|
-        expect(@worker.zenodo_creators_for(archive, notes)).to be_nil
-        expect(notes.last).to match(/is not a Zenodo DOI or URL/)
-        expect(notes.last).to end_with(archive_hint)
+    it "should warn and skip if the archive's DOI doesn't point to Zenodo" do
+      ["10.6084/m9.figshare.1", "https://doi.org/10.6084/m9.figshare.1", "10.1234/foozenodo.5",
+       "https://notzenodo.org/records/5"].each do |archive|
+        warnings = []
+        expect(@worker.zenodo_creators_for(archive, notes, warnings)).to be_nil
+        expect(warnings).to eq(["The archive (`#{archive}`) isn't a Zenodo DOI, so its authors were not checked. " +
+                                "Only Zenodo archives can be checked. #{other_archive_hint}"])
       end
+      expect(notes).to be_empty
     end
 
-    it "should skip Zenodo sandbox records" do
-      expect(@worker.zenodo_creators_for("https://sandbox.zenodo.org/records/5", notes)).to be_nil
-      expect(notes.last).to match(/is a Zenodo sandbox record/)
-      expect(notes.last).to end_with(archive_hint)
+    it "should warn and skip Zenodo sandbox records" do
+      warnings = []
+      expect(@worker.zenodo_creators_for("https://sandbox.zenodo.org/records/5", notes, warnings)).to be_nil
+      expect(warnings.last).to start_with("The archive (`https://sandbox.zenodo.org/records/5`) is a Zenodo sandbox record, not a Zenodo DOI, so its authors were not checked.")
+      expect(warnings.last).to end_with(other_archive_hint)
+      expect(notes).to be_empty
     end
 
-    it "should keep archive values on one line in notes" do
-      @worker.zenodo_creators_for("not a doi\n\n@octocat", notes)
-      expect(notes.last).to include("(`not a doi @octocat`)")
+    it "should keep archive values on one line in warnings" do
+      warnings = []
+      @worker.zenodo_creators_for("not a doi\n\n@octocat", notes, warnings)
+      expect(warnings.last).to include("(`not a doi @octocat`)")
     end
 
-    it "should accept Zenodo DOIs and record URLs" do
-      body = { metadata: { creators: [{ name: "Doe, Jane" }] } }.to_json
+    it "should not warn when there's no archive or the record can't be retrieved" do
+      warnings = []
+      stub_request(:get, "https://zenodo.org/api/records/404").to_return(status: 404)
+      @worker.zenodo_creators_for("", notes, warnings)
+      @worker.zenodo_creators_for("10.5281/zenodo.404", notes, warnings)
+      expect(warnings).to be_empty
+      expect(notes.size).to eq(2)
+    end
+
+    it "should accept Zenodo DOIs and doi.org links without a note" do
+      body = { id: 77, doi: "10.5281/zenodo.77", metadata: { creators: [{ name: "Doe, Jane" }] } }.to_json
       stub_request(:get, "https://zenodo.org/api/records/77").to_return(status: 200, body: body)
-      ["10.5281/zenodo.77", "https://doi.org/10.5281/zenodo.77", "https://zenodo.org/records/77",
-       "https://zenodo.org/record/77", "zenodo.org/records/77?preview=1", "https://zenodo.org/uploads/77"].each do |archive|
+      ["10.5281/zenodo.77", "https://doi.org/10.5281/zenodo.77"].each do |archive|
         expect(@worker.zenodo_creators_for(archive, notes)).to eq([{ name: "Doe, Jane", orcid: "" }])
       end
       expect(notes).to be_empty
+    end
+
+    it "should use the DOI of a Zenodo record URL, and say so" do
+      body = { id: 77, doi: "10.5281/zenodo.77", metadata: { creators: [{ name: "Doe, Jane" }] } }.to_json
+      stub_request(:get, "https://zenodo.org/api/records/77").to_return(status: 200, body: body)
+      ["https://zenodo.org/records/77", "https://zenodo.org/record/77", "zenodo.org/records/77?preview=1",
+       "https://zenodo.org/uploads/77"].each do |archive|
+        notes = []
+        expect(@worker.zenodo_creators_for(archive, notes)).to eq([{ name: "Doe, Jane", orcid: "" }])
+        expect(notes).to eq(["The archive (`#{archive}`) is a Zenodo URL, not a DOI, so I used its DOI, `10.5281/zenodo.77`, instead."])
+      end
+    end
+
+    it "should use the DOI of the record a Zenodo URL redirects to" do
+      stub_request(:get, "https://zenodo.org/api/records/122").to_return(status: 302, headers: { "Location" => "/api/records/123" })
+      body = { id: 123, doi: "10.5281/zenodo.123", metadata: { creators: [] } }.to_json
+      stub_request(:get, "https://zenodo.org/api/records/123").to_return(status: 200, body: body)
+
+      @worker.zenodo_creators_for("https://zenodo.org/records/122", notes)
+      expect(notes.last).to include("so I used its DOI, `10.5281/zenodo.123`, instead")
+    end
+
+    it "should build the DOI from the record id if Zenodo doesn't give one" do
+      stub_request(:get, "https://zenodo.org/api/records/88").to_return(status: 200, body: { id: 88, metadata: {} }.to_json)
+      @worker.zenodo_creators_for("https://zenodo.org/records/88", notes)
+      expect(notes.last).to include("`10.5281/zenodo.88`")
+
+      stub_request(:get, "https://zenodo.org/api/records/89").to_return(status: 200, body: { metadata: {} }.to_json)
+      @worker.zenodo_creators_for("https://zenodo.org/records/89", notes)
+      expect(notes.last).to include("`10.5281/zenodo.89`")
     end
 
     it "should return the creators of the record, following redirects" do
@@ -428,9 +473,12 @@ describe AuthorsCheckWorker do
     let(:client) { double("Octokit::Client") }
     before { allow(@worker).to receive(:github_client).and_return(client) }
 
-    it "should skip repositories not in GitHub" do
-      expect(@worker.github_contributors_for("https://gitlab.com/a/b", notes)).to be_nil
-      expect(notes.last).to match(/not hosted on GitHub/)
+    it "should warn and skip repositories not on GitHub" do
+      warnings = []
+      expect(@worker.github_contributors_for("https://gitlab.com/a/b", notes, warnings)).to be_nil
+      expect(warnings).to eq(["The repository (`https://gitlab.com/a/b`) isn't on GitHub, so its contributors were not checked. " +
+                              "Only GitHub repositories can be checked."])
+      expect(notes).to be_empty
     end
 
     it "should return contributors with their names, excluding bots" do
@@ -711,6 +759,30 @@ describe AuthorsCheckWorker do
         expect(@worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes)).to eq("10.5281/zenodo.1")
       end
 
+      it "matches a doi.org link in the set command with the bare DOI in the issue" do
+        ["https://doi.org/10.5281/zenodo.24358692", "http://dx.doi.org/10.5281/zenodo.24358692",
+         "doi:10.5281/zenodo.24358692"].each do |value|
+          @worker.instance_variable_set(:@human_comments, nil)
+          with_comments(comment(1, "editor", "@botsci set #{value} as archive"))
+          expect(@worker.find_archive(sources(issue: "10.5281/zenodo.24358692"), notes)).to eq("10.5281/zenodo.24358692")
+        end
+      end
+
+      it "matches a Zenodo URL in the set command with the DOI of the same record in the issue" do
+        with_comments(comment(1, "editor", "@botsci set https://zenodo.org/records/42 as archive"))
+        expect(@worker.find_archive(sources(issue: "10.5281/zenodo.42"), notes)).to eq("10.5281/zenodo.42")
+      end
+
+      it "matches doi.org links to DOIs that aren't from Zenodo" do
+        with_comments(comment(1, "editor", "@botsci set https://doi.org/10.6084/m9.figshare.1 as archive"))
+        expect(@worker.find_archive(sources(issue: "10.6084/m9.figshare.1"), notes)).to eq("10.6084/m9.figshare.1")
+      end
+
+      it "still raises an error for a doi.org link to a different record" do
+        with_comments(comment(1, "editor", "@botsci set https://doi.org/10.5281/zenodo.2 as archive"))
+        expect { @worker.find_archive(sources(issue: "10.5281/zenodo.1"), notes) }.to raise_error(AuthorsCheckWorker::ArchiveConflict)
+      end
+
       it "only looks at the most recent set command" do
         with_comments(comment(1, "author", "@botsci set 10.5281/zenodo.999 as archive"),
                       comment(2, "editor", "@botsci set 10.5281/zenodo.1 as archive"))
@@ -834,9 +906,10 @@ describe AuthorsCheckWorker do
       expect(@worker.zenodo_creators_for("10.5281/ZENODO.3", notes)).to eq([])
     end
 
-    it "accepts deposit links" do
+    it "accepts deposit links, using the record's DOI" do
       zenodo_returns(4, { creators: [] })
       expect(@worker.zenodo_creators_for("https://zenodo.org/deposit/4", notes)).to eq([])
+      expect(notes.last).to include("`10.5281/zenodo.4`")
     end
   end
 
@@ -914,8 +987,11 @@ describe AuthorsCheckWorker do
      "https://a.github.io/b", "", nil].each do |url|
       it "doesn't treat #{url.inspect} as a GitHub repository" do
         expect(client).to_not receive(:contributors)
-        expect(@worker.github_contributors_for(url, notes)).to be_nil
-        expect(notes).to eq(["The repository is not hosted on GitHub, so GitHub contributors were not checked."])
+        warnings = []
+        expect(@worker.github_contributors_for(url, notes, warnings)).to be_nil
+        expect(warnings).to eq(["The repository (`#{url}`) isn't on GitHub, so its contributors were not checked. " +
+                                "Only GitHub repositories can be checked."])
+        expect(notes).to be_empty
       end
     end
 
@@ -959,6 +1035,7 @@ describe AuthorsCheckWorker do
     it "names the bot in the hints" do
       expect(@worker.send(:paper_hint)).to eq(paper_hint)
       expect(@worker.send(:archive_hint)).to eq(archive_hint)
+      expect(@worker.send(:other_archive_hint)).to eq(other_archive_hint)
     end
 
     it "puts text in a code span on one line" do
@@ -981,10 +1058,10 @@ describe AuthorsCheckWorker do
   end
 
   describe "authors_check template (more cases)" do
-    def render(report, notes = [])
+    def render(report, notes = [], warnings = [])
       message = nil
       allow(@worker).to receive(:respond) { |m| message = m }
-      @worker.respond_template(:authors_check, { report: report, notes: notes })
+      @worker.respond_template(:authors_check, { report: report, notes: notes, warnings: warnings })
       message
     end
 
@@ -1049,6 +1126,20 @@ describe AuthorsCheckWorker do
       message = render(report_for([{ name: "Jane Doe" }]), ["first note", "second note"])
       expect(message).to include("\n_first note_\n")
       expect(message).to include("\n_second note_\n")
+    end
+
+    it "shows each warning between the heading and the table" do
+      message = render(report_for([{ name: "Jane Doe" }]), ["a note"], ["first warning", "second warning"])
+      expect(message).to start_with("**Authors check**\n\n⚠️ **Warning:** first warning\n\n⚠️ **Warning:** second warning\n\n| Paper author |")
+      expect(message).to include("\n_a note_\n")
+    end
+
+    it "has no warnings when there are none, or when they aren't passed" do
+      expect(render(report_for([{ name: "Jane Doe" }]))).to start_with("**Authors check**\n\n| Paper author |")
+      message = nil
+      allow(@worker).to receive(:respond) { |m| message = m }
+      @worker.respond_template(:authors_check, { report: report_for([{ name: "Jane Doe" }]), notes: [] })
+      expect(message).to start_with("**Authors check**\n\n| Paper author |")
     end
 
     it "has no notes when there are none" do

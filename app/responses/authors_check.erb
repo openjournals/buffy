@@ -33,9 +33,15 @@
   end
   zenodo_checked = !report[:zenodo_only].nil?
   github_checked = !report[:github_only].nil?
+  # Older callers may not pass warnings
+  warnings ||= []
 -%>
 **Authors check**
 
+<% warnings.each do |warning| -%>
+⚠️ **Warning:** <%= warning %>
+
+<% end -%>
 | Paper author | Zenodo archive | GitHub contributor |
 |---|---|---|
 <% report[:authors].each do |row| -%>

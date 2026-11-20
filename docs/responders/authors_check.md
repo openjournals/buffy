@@ -30,11 +30,12 @@ A non-default branch can be specified to look for the paper's files in it:
 @botname check authors from branch <custom-branch-name>
 ```
 
-The Zenodo archive can be given in the command, as a DOI or a Zenodo record URL:
+The Zenodo archive can be given in the command, as its DOI:
 ```
 @botname check authors with archive 10.5281/zenodo.123456
-@botname check authors with archive https://zenodo.org/records/123456
 ```
+
+The archive should be a DOI. If a Zenodo record URL (like `https://zenodo.org/records/123456`) is found instead, in the command, the issue or a comment, the bot looks up that record's DOI on Zenodo, checks that, and says in the reply that it used the DOI instead of the URL. A `doi.org` link (`https://doi.org/10.5281/zenodo.123456`) is read as the DOI it contains.
 
 The paper's file can be given in the command, as its path in the repository. For a LaTeX paper, the authors are read from the `paper.yml` file next to it:
 ```
@@ -55,19 +56,17 @@ The body of the issue should have the URL of the repository marked with HTML com
 
 The Zenodo archive is looked for in this order:
 
-1. The archive given in the command (`with archive <DOI or URL>`).
+1. The archive given in the command (`with archive <Zenodo DOI>`).
 2. The `archive` value in the body of the issue (set with `@botname set <DOI> as archive`).
 3. The most recent issue comment that mentions a Zenodo DOI (like `10.5281/zenodo.123456`) or a Zenodo record URL. If a comment mentions several, the last one is used.
 
 The bot's own comments are skipped. When the archive comes from a comment, the reply links to that comment, so the editor can check it's the right archive.
 
-If the archive isn't given in the command, and the most recent `@botname set ... as archive` comment doesn't match the archive in the issue (for example because that command was refused), the bot doesn't guess: it replies with an error, linking to that comment, and asks the editor to set the right archive in the issue. A `set Pending as archive` command cancels the earlier ones.
+If the archive isn't given in the command, and the most recent `@botname set ... as archive` comment doesn't match the archive in the issue (for example because that command was refused), the bot doesn't guess: it replies with an error, linking to that comment, and asks the editor to set the right archive in the issue. A `set Pending as archive` command cancels the earlier ones. A DOI, its `doi.org` link and the Zenodo URL of the same record count as the same archive, so `@botname set https://doi.org/10.5281/zenodo.123456 as archive` matches `10.5281/zenodo.123456` in the issue.
 
-Zenodo sandbox records are not checked.
+Only Zenodo archives and GitHub repositories can be checked. If the archive's DOI doesn't point to Zenodo (Zenodo sandbox records included), or the repository isn't on GitHub, that part of the check is skipped and the reply starts with a warning saying so. If no archive is found at all, the Zenodo part is skipped and a note at the end of the reply says so.
 
-If no archive is found, or it isn't in Zenodo, or the repository isn't on GitHub, that part of the check is skipped and the reply says so.
-
-When the paper's file or the Zenodo archive can't be found or read, the reply says what went wrong and how to name it explicitly, e.g. `@botname check authors with paper <path to paper.md>` or `@botname check authors with archive <Zenodo DOI or URL>`.
+When the paper's file or the Zenodo archive can't be found or read, the reply says what went wrong and how to name it explicitly, e.g. `@botname check authors with paper <path to paper.md>` or `@botname check authors with archive <Zenodo DOI>`.
 
 ## Settings key
 
