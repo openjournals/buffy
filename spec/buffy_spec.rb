@@ -110,6 +110,25 @@ describe Buffy do
 
           expect(last_response.status).to eq(200)
         end
+
+        it "should space-trim the message but not in the context" do
+          raw_body = "@botsci assign @arfon  as\treviewer "
+          comment_issue_data = @issue_data.merge({ comment: { id: 123456,
+                                                              body: raw_body,
+                                                              created_at: "3/3/2033",
+                                                              html_url: "https://buf.fy" } })
+          comment_payload = comment_issue_data.to_json
+          expect_any_instance_of(ResponderRegistry).to receive(:respond).once do |_registry, message, context|
+            expect(message).to eq("@botsci assign @arfon as reviewer")
+            expect(context.comment_body).to eq(raw_body)
+          end
+
+          with_secret_token "test_secret_token" do
+            post "/dispatch", comment_payload, headers.merge({"HTTP_X_HUB_SIGNATURE" => signature_for(comment_payload), "HTTP_X_GITHUB_EVENT" => "issue_comment"})
+          end
+
+          expect(last_response.status).to eq(200)
+        end
       end
 
       it "should halt if there are errors parsing payload" do
