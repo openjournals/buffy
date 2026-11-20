@@ -35,6 +35,8 @@ buffy:
       team_id: 3824115
       heading: Current journal editors
     check_references:
+    authors_check:
+      only: editors
     repo_checks:
     set_value:
       - version:
