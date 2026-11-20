@@ -97,6 +97,16 @@ describe AuthorsChecker do
         expect(compare("Jane  Doe ", "Jane Doe")).to eq(:exact)
       end
 
+      it "is :exact when only periods after initials differ" do
+        expect(compare("Simon J. Greenhill", "Simon J Greenhill")).to eq(:exact)
+        expect(compare("Greenhill, Simon J", "Simon J. Greenhill")).to eq(:exact)
+        expect(compare("J.R.R. Tolkien", "J R R Tolkien")).to eq(:exact)
+      end
+
+      it "keeps periods that don't follow an initial" do
+        expect(compare("Martin Luther King Jr.", "Martin Luther King Jr")).to eq(:same)
+      end
+
       it "is :same when only case differs" do
         expect(compare("jane doe", "Jane Doe")).to eq(:same)
       end
@@ -111,7 +121,6 @@ describe AuthorsChecker do
 
       it "is :same when only punctuation differs" do
         expect(compare("Jean-Luc Picard", "Jean Luc Picard")).to eq(:same)
-        expect(compare("J.R.R. Tolkien", "J R R Tolkien")).to eq(:same)
       end
 
       it "is :same when the names are in a different order without a comma" do
@@ -184,6 +193,26 @@ describe AuthorsChecker do
         expect(compare("Juan Pablo Aguilar Calle", "Juan Pablo Aguilar")).to eq(:close)
         expect(compare("Juan Pablo Aguilar", "Juan Pablo Aguilar Calle")).to eq(:close)
         expect(compare("Aguilar Juan Pablo", "Juan Pablo Aguilar Calle")).to eq(:close)
+      end
+
+      it "is :close for a short form of a name, ignoring case" do
+        expect(compare("Elijah Knaap", "eli knaap")).to eq(:close)
+        expect(compare("Daniel Arribas-Bel", "Dani Arribas-Bel")).to eq(:close)
+        expect(compare("Dani Arribas-Bel", "Daniel Arribas-Bel")).to eq(:close)
+      end
+
+      it "matches each name with any other name, in any order" do
+        expect(compare("Elijah Knaap", "Knaap, Eli")).to eq(:close)
+        expect(compare("Knaap Elijah", "Eli Knaap")).to eq(:close)
+        expect(compare("Elijah J. Knaap", "Eli Knaap")).to eq(:close)
+      end
+
+      it "doesn't count short forms of fewer than 3 letters" do
+        expect(compare("Johnny Smith", "Jo Smith")).to be_nil
+      end
+
+      it "doesn't match a short form that isn't the start of the name" do
+        expect(compare("Elijah Knaap", "Lija Knaap")).to be_nil
       end
 
       it "is :close for a one-letter typo in a long name" do
@@ -267,12 +296,32 @@ describe AuthorsChecker do
         expect(subject.send(:token_match?, "j", "k")).to be false
       end
 
-      it "doesn't treat two letters as an initial" do
+      it "doesn't treat two letters as an initial or a short form" do
         expect(subject.send(:token_match?, "jo", "john")).to be false
       end
 
-      it "doesn't match a name with a longer one" do
-        expect(subject.send(:token_match?, "john", "johnny")).to be false
+      it "matches a short form of 3 or more letters with the longer name, either way" do
+        expect(subject.send(:token_match?, "eli", "elijah")).to be true
+        expect(subject.send(:token_match?, "elijah", "eli")).to be true
+        expect(subject.send(:token_match?, "john", "johnny")).to be true
+      end
+
+      it "doesn't match names that only share their first letters" do
+        expect(subject.send(:token_match?, "tanya", "tanmay")).to be false
+      end
+    end
+
+    describe "#all_tokens_matched?" do
+      it "matches every name with a different name, in any order" do
+        expect(subject.send(:all_tokens_matched?, %w[knaap eli], %w[elijah knaap])).to be true
+      end
+
+      it "doesn't use one name twice" do
+        expect(subject.send(:all_tokens_matched?, %w[eli elijah], %w[elijah knaap])).to be false
+      end
+
+      it "pairs equal names before short forms" do
+        expect(subject.send(:all_tokens_matched?, %w[dan daniel], %w[daniel danielle])).to be true
       end
     end
 

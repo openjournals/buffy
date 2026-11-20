@@ -12,7 +12,7 @@ Only the paper's metadata is downloaded from the repository, not the whole repos
 
 Names are matched leniently, so small differences are flagged rather than missed:
 
-- **Zenodo:** ✅ means the name is written exactly the same way (Zenodo's `Last, First` format counts as the same as `First Last`). ⚠️ means it is probably the same person but the name is written differently: different accents or capitalization, a missing initial, a typo, or a different name with the same ORCID. It is also shown, with both ORCIDs, when the paper and Zenodo list different ORCIDs for the same name.
+- **Zenodo:** ✅ means the name is written exactly the same way (Zenodo's `Last, First` format counts as the same as `First Last`, and periods after initials are ignored, so `Simon J. Greenhill` matches `Simon J Greenhill`). ⚠️ means it is probably the same person but the name is written differently: different accents or capitalization, a missing initial, a short form of a name (`Eli` for `Elijah`, in any order and any case), a typo, or a different name with the same ORCID. It is also shown, with both ORCIDs, when the paper and Zenodo list different ORCIDs for the same name.
 - **GitHub:** ✅ means the name in the contributor's GitHub profile matches. ⚠️ means it is probably the same person: a similar name, or a username built from the author's name (for example `jsmith` for John Smith) when the profile doesn't have a different name.
 
 GitHub contributors are people who made commits, so authors who contributed in other ways won't be found there, and not every contributor has to be an author. The results are meant to help editors, not to pass or fail a submission.

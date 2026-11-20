@@ -9,15 +9,23 @@ require 'did_you_mean'
 #   github contribs:  { login:, name:, contributions: }
 #
 # Comparing two people gives one of these results, from best to worst:
-#   :exact   same name, written the same way ("Last, First" and "First Last" are equivalent)
+#   :exact   same name, written the same way ("Last, First" and "First Last" are equivalent,
+#            and so are "Simon J. Greenhill" and "Simon J Greenhill")
 #   :same    same name ignoring case, accents and punctuation
 #   :close   probably the same person: same ORCID, a missing middle name or initial,
-#            a one-letter typo, or a GitHub username built from the author's name.
+#            a short form of a name ("Eli" for "Elijah"), a one-letter typo,
+#            or a GitHub username built from the author's name.
 #            Also the same name when both have an ORCID and they differ.
 #   nil      not the same person
 class AuthorsChecker
 
   RANKS = [:exact, :same, :close].freeze
+
+  # A one-letter word followed by a period, like the "J." in "Simon J. Greenhill"
+  INITIAL_WITH_PERIOD = /(?<![\p{L}\p{M}])(\p{L})\./
+
+  # Shortest name that counts as a short form of a longer one ("Eli" for "Elijah")
+  MIN_SHORT_FORM = 3
 
   attr_reader :paper_authors, :zenodo_creators, :github_contributors
 
@@ -81,7 +89,7 @@ class AuthorsChecker
   end
 
   def compare_names(author, other)
-    return :exact if !display_name(author[:name]).empty? && display_name(author[:name]) == display_name(other[:name])
+    return :exact if !exact_form(author[:name]).empty? && exact_form(author[:name]) == exact_form(other[:name])
 
     a_tokens = normalize_name(author[:name]).split
     o_tokens = normalize_name(other[:name]).split
@@ -102,6 +110,11 @@ class AuthorsChecker
       name = "#{first} #{last}"
     end
     name.split.join(" ")
+  end
+
+  # Display name without periods after initials: "Simon J. Greenhill" is the same as "Simon J Greenhill"
+  def exact_form(name)
+    display_name(name).gsub(INITIAL_WITH_PERIOD, '\1 ').split.join(" ")
   end
 
   # Lowercase display name without accents or punctuation
@@ -138,15 +151,29 @@ class AuthorsChecker
   def similar_names?(a, b)
     return false if a.empty? || b.empty?
     return true if a.size > 1 && b.size > 1 && token_match?(a.first, b.first) && token_match?(a.last, b.last)
-    # All names in one are part of the other: "Juan Pablo Aguilar" ~ "Juan Pablo Aguilar Calle"
+    # Each name in one matches a different name in the other, in any order:
+    # "Juan Pablo Aguilar" ~ "Juan Pablo Aguilar Calle", "Eli Knaap" ~ "Knaap Elijah"
     shorter, longer = [a, b].sort_by(&:size)
-    return true if shorter.size > 1 && (shorter - longer).empty?
+    return true if shorter.size > 1 && all_tokens_matched?(shorter, longer)
     # One-letter typo in names long enough for that to be meaningful
     a.join(" ").length > 8 && DidYouMean::Levenshtein.distance(a.join(" "), b.join(" ")) <= 1
   end
 
+  # Every token in shorter matches a different token in longer. Equal tokens are paired first,
+  # so a short form or an initial doesn't take a name that matches another token exactly.
+  def all_tokens_matched?(shorter, longer)
+    remaining = longer.dup
+    shorter.sort_by { |t| longer.include?(t) ? 0 : 1 }.all? do |token|
+      index = remaining.index(token) || remaining.index { |other| token_match?(token, other) }
+      index && remaining.delete_at(index)
+    end
+  end
+
+  # Equal names, an initial and a name ("j" ~ "john"), or a short form of a name ("eli" ~ "elijah")
   def token_match?(x, y)
-    x == y || (x.length == 1 && y.start_with?(x)) || (y.length == 1 && x.start_with?(y))
+    short, long = [x, y].sort_by(&:length)
+    return true if short == long
+    (short.length == 1 || short.length >= MIN_SHORT_FORM) && long.start_with?(short)
   end
 
   # A username only counts as evidence if the profile name doesn't say otherwise: the
