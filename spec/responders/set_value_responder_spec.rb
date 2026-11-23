@@ -190,6 +190,118 @@ describe SetValueResponder do
     end
   end
 
+  describe "with config option: run_responder" do
+    before do
+      @responder = subject.new({env: {bot_github_user: "botsci"}}, { name: "archive" })
+      disable_github_calls_for(@responder)
+      @responder.context = OpenStruct.new(issue_id: 15, repo: "tests", sender: "rev33")
+      @msg = "@botsci set 10.5281/zenodo.123 as archive"
+      @responder.match_data = @responder.event_regex.match(@msg)
+      allow(@responder).to receive(:issue_body).and_return("Archive: <!--archive-->Pending<!--end-archive-->")
+    end
+
+    it "should run the other responder with the new value in its message" do
+      @responder.params = { name: "archive",
+                            run_responder: { responder_key: "check_zenodo_doi", message: "@{{bot_name}} check zenodo doi {{value}}" } }
+
+      expect(@responder).to receive(:process_other_responder).with({ responder_key: "check_zenodo_doi",
+                                                                     message: "@botsci check zenodo doi 10.5281/zenodo.123" })
+      @responder.process_message(@msg)
+    end
+
+    it "should not change the configured message" do
+      run_responder = { responder_key: "check_zenodo_doi", message: "check {{value}}" }
+      @responder.params = { name: "archive", run_responder: run_responder }
+      allow(@responder).to receive(:process_other_responder)
+
+      @responder.process_message(@msg)
+      expect(run_responder[:message]).to eq("check {{value}}")
+    end
+
+    it "should run other responders without a message" do
+      @responder.params = { name: "archive", run_responder: { responder_key: "hello" } }
+      expect(@responder).to receive(:process_other_responder).with({ responder_key: "hello" })
+      @responder.process_message(@msg)
+    end
+
+    it "should run a list of other responders" do
+      @responder.params = { name: "archive",
+                            run_responder: [{ zenodo: { responder_key: "check_zenodo_doi", message: "check {{value}}" } },
+                                            { greeting: { responder_key: "hello" } }] }
+
+      expect(@responder).to receive(:process_other_responder).with({ responder_key: "check_zenodo_doi", message: "check 10.5281/zenodo.123" }).ordered
+      expect(@responder).to receive(:process_other_responder).with({ responder_key: "hello" }).ordered
+      @responder.process_message(@msg)
+    end
+
+    it "should reply before running the other responders" do
+      @responder.params = { name: "archive", run_responder: { responder_key: "hello" } }
+      expect(@responder).to receive(:respond).with("Done! archive is now 10.5281/zenodo.123").ordered
+      expect(@responder).to receive(:process_other_responder).ordered
+      @responder.process_message(@msg)
+    end
+
+    it "should not run other responders if the value couldn't be set" do
+      @responder.params = { name: "archive", if_missing: "error", run_responder: { responder_key: "hello" } }
+      allow(@responder).to receive(:issue_body).and_return("No archive here")
+      expect(@responder).to_not receive(:process_other_responder)
+      @responder.process_message(@msg)
+    end
+
+    it "should not run other responders if not configured" do
+      expect(@responder).to_not receive(:process_other_responder)
+      @responder.process_message(@msg)
+    end
+  end
+
+  describe "checking the Zenodo DOI after setting the archive" do
+    let(:settings) do
+      Sinatra::IndifferentHash[
+        env: { bot_github_user: "botsci" },
+        responders: {
+          set_value: [{ archive: { run_responder: { responder_key: "check_zenodo_doi",
+                                                    message: "@{{bot_name}} check zenodo doi {{value}}" } } }],
+          check_zenodo_doi: nil
+        }
+      ]
+    end
+
+    before do
+      @responder = ResponderRegistry.get_responder(settings, "set_value", "archive")
+      @responder.context = OpenStruct.new(issue_id: 15, repo: "tests", sender: "editor", comment_id: 111)
+      allow(@responder).to receive(:issue_body).and_return("Archive: <!--archive-->Pending<!--end-archive-->")
+      allow_any_instance_of(CheckZenodoDoiResponder).to receive(:github_client).and_return(double(create_issue_comment_reaction: true))
+      disable_github_calls_for(@responder)
+    end
+
+    def set_archive(value)
+      msg = "@botsci set #{value} as archive"
+      @responder.match_data = @responder.event_regex.match(msg)
+      @responder.process_message(msg)
+    end
+
+    it "checks a Zenodo DOI" do
+      expect(@responder).to receive(:respond).with("Done! archive is now 10.5281/zenodo.11164917")
+      expect(ZenodoDoiWorker).to receive(:perform_async).with(hash_including("bot_name" => "botsci"), "10.5281/zenodo.11164917")
+      set_archive("10.5281/zenodo.11164917")
+    end
+
+    it "checks a Zenodo DOI written as a doi.org link" do
+      expect(ZenodoDoiWorker).to receive(:perform_async).with(anything, "https://doi.org/10.5281/zenodo.11164917")
+      set_archive("https://doi.org/10.5281/zenodo.11164917")
+    end
+
+    ["10.21105/joss.01234", "10.6084/m9.figshare.123", "https://osf.io/abcde", "some text"].each do |value|
+      it "says nothing more about #{value.inspect}, which isn't a Zenodo DOI" do
+        expect(@responder).to receive(:respond).with("Done! archive is now #{value}").once
+        expect_any_instance_of(CheckZenodoDoiResponder).to_not receive(:respond)
+        expect_any_instance_of(CheckZenodoDoiResponder).to_not receive(:react_to_comment)
+        expect(ZenodoDoiWorker).to_not receive(:perform_async)
+        set_archive(value)
+      end
+    end
+  end
+
   describe "misconfiguration" do
     it "should raise error if name is missing from config" do
       expect {

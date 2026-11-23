@@ -688,6 +688,18 @@ describe Responder do
       result = @responder.process_other_responder({responder_key: :github_action, responder_name: :draft_paper, message: "test"})
       expect(result).to eq("OK")
     end
+
+    it "should tell the found responder that another responder ran it" do
+      run_by_other = nil
+      allow_any_instance_of(GithubActionResponder).to receive(:process_message) { |responder, _| run_by_other = responder.run_by_other_responder }
+
+      @responder.process_other_responder({responder_key: :github_action, responder_name: :draft_paper, message: "test"})
+      expect(run_by_other).to eq(true)
+    end
+
+    it "should not mark responders run by a command as run by another responder" do
+      expect(@responder.run_by_other_responder).to be_falsey
+    end
   end
 
   describe "#target_repo_value" do

@@ -44,6 +44,9 @@ buffy:
       - archive:
           only: editors
           sample_value: "10.21105/joss.12345"
+          run_responder:
+            responder_key: check_zenodo_doi
+            message: "@{{bot_name}} check zenodo doi {{value}}"
     label_command:
       - review_ok:
           only: editors

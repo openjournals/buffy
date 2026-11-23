@@ -53,9 +53,9 @@ describe ZenodoDoiWorker do
       end
     end
 
-    it "fails DOIs that aren't Zenodo DOIs" do
+    it "neither passes nor fails DOIs that aren't Zenodo DOIs" do
       expect(@worker.message_for(type: :not_zenodo, doi: "10.21105/joss.01234")).to eq(
-        "❌ `10.21105/joss.01234` isn't a Zenodo DOI. Zenodo DOIs look like `10.5281/zenodo.123456`."
+        "`10.21105/joss.01234` isn't a Zenodo DOI, so there's nothing to check. Zenodo DOIs look like `10.5281/zenodo.123456`."
       )
     end
 
@@ -72,7 +72,7 @@ describe ZenodoDoiWorker do
     end
 
     it "keeps backticks in the DOI from breaking the formatting" do
-      expect(@worker.message_for(type: :not_zenodo, doi: "a`b")).to start_with("❌ `ab` isn't a Zenodo DOI.")
+      expect(@worker.message_for(type: :not_zenodo, doi: "a`b")).to start_with("`ab` isn't a Zenodo DOI")
     end
   end
 end

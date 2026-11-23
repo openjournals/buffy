@@ -43,6 +43,21 @@ class SetValueResponder < Responder
     unless errored
       process_labeling
       process_external_service(params[:external_call], locals.merge({new_value: new_value})) if params[:external_call]
+      run_other_responders(new_value) if params[:run_responder]
+    end
+  end
+
+  # Runs the responders configured in run_responder, one or a list of them like in the welcome
+  # responder. {{value}} in a responder's message is replaced with the value just set.
+  def run_other_responders(new_value)
+    configs = params[:run_responder].is_a?(Array) ? params[:run_responder].flat_map(&:values) : [params[:run_responder]]
+
+    configs.each do |other_responder|
+      other_responder = other_responder.dup
+      if other_responder[:message]
+        other_responder[:message] = apply_hash_to_template(other_responder[:message].dup, locals.merge(value: new_value))
+      end
+      process_other_responder(other_responder)
     end
   end
 

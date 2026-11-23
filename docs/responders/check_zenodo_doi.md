@@ -5,7 +5,7 @@ This responder checks (asynchronously) that a Zenodo DOI is a **version DOI**, t
 
 A **concept DOI** fails the check: it covers all versions of a record and always resolves to the latest one, so it won't keep pointing to the version that was reviewed. When that happens, the reply gives the DOI of the latest version.
 
-The check also fails if the DOI isn't a Zenodo DOI or no Zenodo record has it. A version DOI that has a newer version passes, with a note.
+The check also fails if no Zenodo record has the DOI. A version DOI that has a newer version passes, with a note. A DOI that isn't a Zenodo DOI is fine: there's nothing to check, and the reply says so.
 
 ## Listens to
 
@@ -14,6 +14,24 @@ The check also fails if the DOI isn't a Zenodo DOI or no Zenodo record has it. A
 ```
 
 The DOI can be written as `10.5281/zenodo.123456`, `doi:10.5281/zenodo.123456` or `https://doi.org/10.5281/zenodo.123456`.
+
+## Running it when the archive is set
+
+The check can run automatically whenever editors set the archive, using the `run_responder` option of the [Set value responder](./set_value):
+
+```yaml
+...
+  set_value:
+    - archive:
+        only: editors
+        run_responder:
+          responder_key: check_zenodo_doi
+          message: "@{{bot_name}} check zenodo doi {{value}}"
+  check_zenodo_doi:
+...
+```
+
+Run this way, only Zenodo DOIs are checked. Any other archive (a figshare DOI, an OSF link, ...) gets no extra reply at all.
 
 ## Requirements
 

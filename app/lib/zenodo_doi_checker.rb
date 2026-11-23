@@ -11,7 +11,7 @@ require 'json'
 # #check returns a hash with a :type and, depending on it, more details:
 #   :version    => doi:, concept_doi: (nil if it has none), version:, latest: (true/false/nil)
 #   :concept    => doi:, latest_doi:, version: (of the latest version)
-#   :not_zenodo => doi:  (the value isn't a Zenodo DOI)
+#   :not_zenodo => doi:  (the value isn't a Zenodo DOI, so there's nothing to check)
 #   :not_found  => doi:  (no Zenodo record has that DOI)
 #   :error      => doi:  (Zenodo couldn't be reached or gave an unexpected answer)
 class ZenodoDoiChecker
@@ -20,12 +20,29 @@ class ZenodoDoiChecker
 
   attr_reader :doi
 
+  # Accepts a bare DOI or one written as "doi:..." or as a doi.org link.
+  def self.normalize(value)
+    value.to_s.strip
+         .sub(%r{\Ahttps?://(dx\.)?doi\.org/}i, "")
+         .sub(/\Adoi:\s*/i, "")
+         .sub(/[.,;]+\z/, "")
+  end
+
+  # The Zenodo record id in a Zenodo DOI, or nil if the value isn't a Zenodo DOI.
+  def self.record_id(value)
+    normalize(value).match(ZENODO_DOI)&.captures&.first
+  end
+
+  def self.zenodo_doi?(value)
+    !record_id(value).nil?
+  end
+
   def initialize(doi)
-    @doi = normalize(doi)
+    @doi = self.class.normalize(doi)
   end
 
   def check
-    record_id = doi.match(ZENODO_DOI)&.captures&.first
+    record_id = self.class.record_id(doi)
     return result(:not_zenodo) unless record_id
 
     response = get("#{API_URL}/#{record_id}")
@@ -46,14 +63,6 @@ class ZenodoDoiChecker
   end
 
   private
-
-  # Accepts a bare DOI or one written as "doi:..." or as a doi.org link.
-  def normalize(value)
-    value.to_s.strip
-         .sub(%r{\Ahttps?://(dx\.)?doi\.org/}i, "")
-         .sub(/\Adoi:\s*/i, "")
-         .sub(/[.,;]+\z/, "")
-  end
 
   def get(url)
     connection.get(url, nil, { "Accept" => "application/json" })

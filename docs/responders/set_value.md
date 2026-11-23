@@ -48,7 +48,15 @@ Following the previous example if the name of the field is _version_:
 :external_call: *Optional* Configuration for a external service call. All available subparams are described in the `external_service docs`_.
 
 .. _`external_service docs`: ./external_service.html#params
+
+:run_responder: *Optional* Runs a different responder after the value is set. Subparams are:
+
+  :responder_key: *Required*. The key to find the responder in the config file.
+  :responder_name: *Optional*. The name of the responder in the config file if there are several instances under the same responder key.
+  :message: *Optional*. The message to trigger the responder with. ``{{value}}`` in it is replaced with the value that was just set, and ``{{bot_name}}`` with the bot's name.
+
 ```
+If you want to run multiple responders, use a list of named instances of these subparams. The other responders don't run if the value couldn't be set.
 
 ## Examples
 
@@ -79,6 +87,21 @@ Following the previous example if the name of the field is _version_:
           sample_value: "github.com/openjournals/buffy"
 ...
 ```
+
+**Checking the archive's Zenodo DOI after it's set:**
+```yaml
+...
+  responders:
+    set_value:
+      - archive:
+          only: editors
+          run_responder:
+            responder_key: check_zenodo_doi
+            message: "@{{bot_name}} check zenodo doi {{value}}"
+    check_zenodo_doi:
+...
+```
+After `@botname set 10.5281/zenodo.11164917 as archive`, the value is set and the [Check Zenodo DOI responder](./check_zenodo_doi) checks that it's a version DOI. Values that aren't Zenodo DOIs aren't checked.
 
 ## In action
 

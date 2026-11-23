@@ -95,6 +95,35 @@ describe ZenodoDoiChecker do
     end
   end
 
+  describe ".zenodo_doi?" do
+    ["10.5281/zenodo.123", "10.5281/ZENODO.123", "doi:10.5281/zenodo.123", "https://doi.org/10.5281/zenodo.123", " 10.5281/zenodo.123. "].each do |value|
+      it "is true for #{value.inspect}" do
+        expect(described_class.zenodo_doi?(value)).to eq(true)
+      end
+    end
+
+    ["10.21105/joss.01234", "10.5281/zenodo.12a", "10.5281/zenodo.", "https://zenodo.org/records/123", "some text", "", nil].each do |value|
+      it "is false for #{value.inspect}" do
+        expect(described_class.zenodo_doi?(value)).to eq(false)
+      end
+    end
+
+    it "doesn't call Zenodo" do
+      described_class.zenodo_doi?("10.5281/zenodo.123")
+      expect(a_request(:get, /zenodo/)).to_not have_been_made
+    end
+  end
+
+  describe ".record_id" do
+    it "is the record id in a Zenodo DOI" do
+      expect(described_class.record_id("https://doi.org/10.5281/zenodo.11164917")).to eq("11164917")
+    end
+
+    it "is nil for anything else" do
+      expect(described_class.record_id("10.21105/joss.01234")).to be_nil
+    end
+  end
+
   describe "DOIs that can't be classified" do
     it "rejects DOIs that aren't Zenodo DOIs without calling Zenodo" do
       expect(described_class.new("10.21105/joss.01234").check).to eq(type: :not_zenodo, doi: "10.21105/joss.01234")

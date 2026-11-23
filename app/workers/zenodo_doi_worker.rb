@@ -26,7 +26,7 @@ class ZenodoDoiWorker < BuffyWorker
       "of the record, so it won't keep pointing to the version that was reviewed." +
       "\n\nPlease use the DOI of the reviewed version instead. The latest version's DOI is #{latest}."
     when :not_zenodo
-      "❌ #{doi} isn't a Zenodo DOI. Zenodo DOIs look like `10.5281/zenodo.123456`."
+      "#{doi} isn't a Zenodo DOI, so there's nothing to check. Zenodo DOIs look like `10.5281/zenodo.123456`."
     when :not_found
       "❌ I couldn't find a Zenodo record with the DOI #{doi}."
     else
