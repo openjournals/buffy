@@ -22,6 +22,8 @@ class Responder
   attr_accessor :bot_name
   attr_accessor :match_data
   attr_accessor :context
+  # True when another responder runs this one (see #process_other_responder) instead of a command
+  attr_accessor :run_by_other_responder
 
   def self.keyname(key)
     @key = key.to_s
@@ -223,6 +225,7 @@ class Responder
 
     if matching_responder
       matching_responder.context = context
+      matching_responder.run_by_other_responder = true
       msg = other_responder[:message] || ""
       matching_responder.match_data = matching_responder.event_regex.match(msg) unless msg.empty?
       matching_responder.process_message(msg)
